@@ -11,8 +11,6 @@ body {
 	margin-left:auto;
 	margin-right:auto;
 	margin-top:40px;
-
-	
 }
 
 #adminBoxContent{
@@ -25,12 +23,18 @@ body {
 	padding-right:20px;
 }
 
+.logged_in_as{
+	text-align:right;
+	font-size:.9em;
+	margin-top:-20px;
+	font-style: italic;
+}
+
 #experiment,
-#waiting, 
 #editor, 
-#admin, 
-#running, 
-#experiments, 
+#users, 
+#dashboard, 
+#archive, 
 #monitor {
 	width:970px;
 	height:650px;
