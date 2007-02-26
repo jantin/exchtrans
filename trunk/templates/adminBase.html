@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block bodycontent %}
+<div id="{% block sectionDivID %}gernericSectionDivID{% endblock %}">
+	
+	<div id="adminBox">
+		<div class="logged_in_as">You're logged in as, {{ user.username }}. (<a href='/logout'>Logout</a>)</div>
+		<ul id="tabnav">
+			<li class="tab1"><a href="/dashboard">Dashboard</a></li>
+
+			<li class="tab2"><a href="/monitor">Monitor</a></li>
+
+			<li class="tab3"><a href="/editor">Editor</a></li>
+
+			<li class="tab4"><a href="/archive">Archive</a></li>
+
+			<li class="tab5"><a href="/users">Users</a></li>
+		</ul>
+		<div id="adminBoxContent">
+			<p>{% block adminContent %}genericAdminContent{% endblock %}</p>
+		</div>
+	</div>
+</div>
+{% endblock %}
