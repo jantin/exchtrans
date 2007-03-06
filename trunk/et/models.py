@@ -1,35 +1,75 @@
 from django.db import models
 
-class Status(models.Model):
-    statusText = models.CharField(maxlength=100)
+class experimentStatus(models.Model):
+	statusText = models.CharField(maxlength=100)
+	
+	def __str__(self):
+		return self.statusText
+	
+	class Admin:
+		pass
+	
+
+class participantStatus(models.Model):
+	statusText = models.CharField(maxlength=100)
+	
+	def __str__(self):
+		return self.statusText
+	
+	class Admin:
+		pass
+	
 
 class Experiment(models.Model):
-	eid = models.AutoField(primary_key=True)
 	name = models.CharField(maxlength=100)
 	description = models.TextField()
-	status = models.ForeignKey(Status)
-	dateCreated = models.DateField('auto_now_add')
-	dateModified = models.DateField('auto_now')
-
-class Trial(models.Model):
-	pass
+	status = models.ForeignKey(experimentStatus)
+	dateCreated = models.DateField(auto_now_add=True)
+	dateModified = models.DateField(auto_now=True)
 	
-class Publisher(models.Model):
-    name = models.CharField(maxlength=30)
-    address = models.CharField(maxlength=50)
-    city = models.CharField(maxlength=60)
-    state_province = models.CharField(maxlength=30)
-    country = models.CharField(maxlength=50)
-    website = models.URLField()
+	def __str__(self):
+		return self.name
+	
+	class Admin:
+		pass
+	
 
-class Author(models.Model):
-    salutation = models.CharField(maxlength=10)
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=40)
-    email = models.EmailField()
+class Participant(models.Model):
+	name = models.CharField(maxlength=100)
+	status = models.ForeignKey(participantStatus)
+	experiment = models.ForeignKey(Experiment)
+	dateCreated = models.DateField(auto_now_add=True)
 
-class Book(models.Model):
-    title = models.CharField(maxlength=100)
-    authors = models.ManyToManyField(Author)
-    publisher = models.ForeignKey(Publisher)
-    publication_date = models.DateField()
+	def __str__(self):
+		return self.name
+
+	class Admin:
+		pass
+	
+
+class Component(models.Model):
+	name = models.CharField(maxlength=255)
+	description = models.TextField()
+	parameters = models.TextField()
+	
+	def __str__(self):
+		return self.name
+	
+	class Admin:
+		pass
+	
+
+class ExperimentComponents(models.Model):
+	experiment_id = models.ForeignKey(Experiment)
+	component_id = models.ForeignKey(Component)
+	order = models.IntegerField()
+	
+	def __str__(self):
+		return str(self.experiment_id) + "_" + str(self.component_id) + " " + str(self.order)
+	
+	class Meta:
+		ordering = ('order',)
+	
+	class Admin:
+		pass
+	

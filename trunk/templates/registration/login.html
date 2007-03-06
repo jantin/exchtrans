@@ -14,7 +14,7 @@
 
 	{% if user.is_authenticated %}
 	<div id="alert">
-	    <p>You are already logged in as "{{ user }}".</p>
+	    <p>You are already logged in as "{{ user }}". <br/>Do you want to <a href='/logout'>Logout?</a></p>
 	</div>  
 	{% endif %}
 	

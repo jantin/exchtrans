@@ -37,11 +37,12 @@ body {
 #archive, 
 #monitor {
 	width:970px;
-	height:650px;
 	border: 1px solid #CCC;
 	margin-left:auto;
 	margin-right:auto;
 	background-color:#EEE;
+	padding-bottom:60px;
+	margin-bottom:10px;
 }
 
 #waiting #verticalCenter{
@@ -60,16 +61,36 @@ body {
 	margin-right:auto;
 }
 
-#login label {
-	font-size:.8em;
-	font-weight:bold;
-}
-
 #login .input {
 	font-size: 2em;
 	margin-top: 6px;
 	width: 250px;
 	padding:6px;
+}
+
+label {
+	font-size:.8em;
+}
+
+.inputBig {
+	font-size: 1.5em;
+	margin-top: 6px;
+	padding:6px;
+}
+
+input {
+	font-size: 1em;
+	margin-top: 6px;
+	padding:2px;
+}
+
+
+select {
+	margin-top:6px;
+}
+
+textarea{
+	font-family: Verdana, Helvetica, Arial, sans-serif;
 }
 
 .buttonBig {
@@ -83,12 +104,69 @@ body {
 	height:2.5em;
 }
 
-.buttonBig:active {
+.buttonBig:active, .buttonSmall:active {
 border: 2px solid #CCCCCC;
 border-top-color: #999999;
 border-left-color: #999999;
 }
 
+.buttonSmall {
+	border: 1px solid #999999;
+	border-top-color: #CCCCCC;
+	border-left-color: #CCCCCC;
+	background-color: #FFFFFF;
+	font-weight: bold;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	height:2em;
+	font-size: .8em;
+}
+
+/* Edit Components  */
+
+#components{
+	width:80%;
+}
+
+#component{
+	width:100%;
+	border:2px solid #999;
+	margin-bottom:15px;
+}
+
+#componentTopPane{
+	padding-left:6px;
+	padding-right:6px;
+}
+
+#componentOrderField{
+	float: left;
+	width:10%;	
+}
+
+#componentName{
+	float: left;
+	text-align:center;
+	margin-top:6px;
+	width:70%;
+	margin-bottom:10px;
+	font-weight: bold;
+	font-size: 16px;
+
+}
+
+#componentDelete{
+	float: right;
+	text-align:right;
+	margin-top:6px;
+	width:20%;
+}
+
+#componentBottomPane{
+	padding:6px;
+	border-top: 1px solid #999;
+	clear: both;
+	
+}
 
 
 /* Tabs  */
