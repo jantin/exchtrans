@@ -30,7 +30,6 @@ body {
 	font-style: italic;
 }
 
-#experiment,
 #editor, 
 #users, 
 #dashboard, 
@@ -105,9 +104,9 @@ textarea{
 }
 
 .buttonBig:active, .buttonSmall:active {
-border: 2px solid #CCCCCC;
-border-top-color: #999999;
-border-left-color: #999999;
+	border: 2px solid #CCCCCC;
+	border-top-color: #999999;
+	border-left-color: #999999;
 }
 
 .buttonSmall {
@@ -120,6 +119,36 @@ border-left-color: #999999;
 	height:2em;
 	font-size: .8em;
 }
+
+/* Monitor Experiments */
+
+#changeExperiment{
+	margin-top:-70px;
+	margin-left:600px;
+}
+
+/* Dashboard Experiments */
+
+#experiments{
+	
+}
+
+#experiment{
+	width:25em;
+	padding: 20px;
+}
+
+#experimentName{
+	font-weight:bold;
+	font-size:20px;
+}
+
+#experimentStatus, #experimentParticipants, #experimentActionLinks{
+	margin:5px 0px 5px 30px;
+	font-style: italic;
+	font-size:.9em;
+}
+
 
 /* Edit Components  */
 

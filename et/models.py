@@ -1,5 +1,15 @@
 from django.db import models
 
+class experimentSessionStatus(models.Model):
+	statusText = models.CharField(maxlength=100)
+	
+	def __str__(self):
+		return self.statusText
+	
+	class Admin:
+		pass
+	
+
 class experimentStatus(models.Model):
 	statusText = models.CharField(maxlength=100)
 	
@@ -34,10 +44,23 @@ class Experiment(models.Model):
 		pass
 	
 
+class ExperimentSession(models.Model):
+	experiment_id = models.ForeignKey(Experiment)
+	status = models.ForeignKey(experimentSessionStatus)
+	dateStarted = models.DateField(auto_now_add=True)
+	dateEnded = models.DateField()
+	
+	def __str__(self):
+		return str(self.experiment_id) + "_" + str(self.dateStarted) + "_" + str(self.ExperimentSession_id)
+	
+	class Admin:
+		pass
+	
+
 class Participant(models.Model):
 	name = models.CharField(maxlength=100)
 	status = models.ForeignKey(participantStatus)
-	experiment = models.ForeignKey(Experiment)
+	experimentSession = models.ForeignKey(ExperimentSession)
 	dateCreated = models.DateField(auto_now_add=True)
 
 	def __str__(self):
