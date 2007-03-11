@@ -6,7 +6,7 @@ urlpatterns = patterns('',
 	# ET Admin Pages
 	(r'^$', 'exchtran.et.views.dashboard'),
 	(r'^dashboard/$', 'exchtran.et.views.dashboard'),
-	(r'^monitor/$', 'exchtran.et.views.monitor'),
+	(r'^dashboard/monitor/$', 'exchtran.et.views.monitor'),
 	(r'^editor/$', 'exchtran.et.views.editor'),
 	(r'^editor/edit/$', 'exchtran.et.views.edit'),
 	(r'^editor/edit/addComponent/$', 'exchtran.et.views.addComponent'),	

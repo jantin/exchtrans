@@ -6,6 +6,25 @@
 
 {% block adminContent %}
 
-Dashboard
+<h1>Dashboard</h1>
+
+<div id="experiments">
+	{% for e in experiments %}
+	<div id="experiment">
+		<div id="experimentName">
+			{{ e.name }}
+		</div>
+		<div id="experimentStatus">
+			<strong>Status:</strong> {{ e.status.statusText }}
+		</div>
+		<div id="experimentParticipants">
+			{{ e.participants }}<strong>Current participants:</strong> 0
+		</div>
+		<div id="experimentActionLinks">
+			<a href='/experiment/join/?id={{ e.id }}'>Join</a> | <a href='/dashboard/monitor/?id={{ e.id }}'>Monitor</a>
+		</div>
+	</div>
+	{% endfor %}
+</div>
 
 {% endblock %}

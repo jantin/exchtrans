@@ -10,16 +10,20 @@ def profile_redirect(request):
 
 @login_required
 def dashboard(request):
-	"""This page shows the active experiments."""
+	"""This page shows the 'Waiting for participants' and 'In progress' experiments."""
+	experiments = Experiment.objects.filter(status__exact=1) | Experiment.objects.filter(status__exact=3)
 	return render_to_response('adminInterface/dashboard.html', 
-							  {'varName': 'sometext'}, 
+							  {'experiments': experiments}, 
 							  context_instance=RequestContext(request))
 
 @login_required
 def monitor(request):
 	"""This page allows the experimenter to monitor the progress of a running experiment."""
+	experiments = Experiment.objects.filter(status__exact=1) | Experiment.objects.filter(status__exact=3)
+	expID = request.GET.get('id')
+	monitorExperiment = Experiment.objects.get(id=expID)
 	return render_to_response('adminInterface/monitor.html', 
-							  {'varName': 'sometext'}, 
+							  {'experiments': experiments, 'monitorExperiment':monitorExperiment},
 							  context_instance=RequestContext(request))
 
 @login_required
