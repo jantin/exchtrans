@@ -7,17 +7,24 @@ urlpatterns = patterns('',
 	(r'^$', 'exchtran.et.views.dashboard'),
 	(r'^dashboard/$', 'exchtran.et.views.dashboard'),
 	(r'^dashboard/monitor/$', 'exchtran.et.views.monitor'),
-	(r'^editor/$', 'exchtran.et.views.editor'),
-	(r'^editor/edit/$', 'exchtran.et.views.edit'),
-	(r'^editor/edit/addComponent/$', 'exchtran.et.views.addComponent'),	
-	(r'^editor/newExperiment/$', 'exchtran.et.views.newExperiment'),	
-	(r'^archive/$', 'exchtran.et.views.archive'),
+
+	(r'^experiments/$', 'exchtran.et.views.experiments'),
+	(r'^experiments/view/$', 'exchtran.et.views.viewExperiment'),				
+	(r'^experiments/edit/$', 'exchtran.et.views.edit'),
+	(r'^experiments/edit/addComponent/$', 'exchtran.et.views.addComponent'),	
+	(r'^experiments/edit/newExperiment/$', 'exchtran.et.views.newExperiment'),	
+	(r'^experiments/newSession/$', 'exchtran.et.views.newSession'),	
+
 	(r'^users/$', 'exchtran.et.views.users'),
+
+	#Deprecated
+	(r'^editor/$', 'exchtran.et.views.editor'),	
 	
-	# ET Experiment Pages
-	(r'^experiment/$', 'exchtran.et.views.experiment'),
-	(r'^experiment/(\d+)/$', 'exchtran.et.views.experiment'),
-		
+	# ET Experiment Session Pages
+	(r'^session/join/$', 'exchtran.et.views.joinSession'),
+	(r'^session/wait/$', 'exchtran.et.views.wait'),
+	(r'^session/start/$', 'exchtran.et.views.startSession'),
+			
 	# Registration Pages
 	(r'^login/$', 'django.contrib.auth.views.login'),
 	(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/login'}),

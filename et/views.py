@@ -11,19 +11,22 @@ def profile_redirect(request):
 @login_required
 def dashboard(request):
 	"""This page shows the 'Waiting for participants' and 'In progress' experiments."""
-	experiments = Experiment.objects.filter(status__exact=1) | Experiment.objects.filter(status__exact=3)
+	expSessions = ExperimentSession.objects.all()
 	return render_to_response('adminInterface/dashboard.html', 
-							  {'experiments': experiments}, 
+							  {'expSessions': expSessions}, 
 							  context_instance=RequestContext(request))
 
 @login_required
 def monitor(request):
 	"""This page allows the experimenter to monitor the progress of a running experiment."""
-	experiments = Experiment.objects.filter(status__exact=1) | Experiment.objects.filter(status__exact=3)
-	expID = request.GET.get('id')
-	monitorExperiment = Experiment.objects.get(id=expID)
+	expSessions = ExperimentSession.objects.all()
+	sesID = request.GET.get('id')
+	monitorSession = ExperimentSession.objects.get(id=sesID)
+	participants = Participant.objects.filter(experimentSession__exact=sesID)
 	return render_to_response('adminInterface/monitor.html', 
-							  {'experiments': experiments, 'monitorExperiment':monitorExperiment},
+							  {'expSessions': expSessions, 
+							   'monitorSession':monitorSession,
+							   'participants':participants},
 							  context_instance=RequestContext(request))
 
 @login_required
@@ -50,7 +53,7 @@ def edit(request):
 							  context_instance=RequestContext(request))
 
 def addComponent(request):
-	"""This added a component to an experiment"""
+	"""This adds a component to an experiment"""
 	if (request.POST.get('addComponentID') != ""):
 		# put the new component in last place
 		orderCount = ExperimentComponents.objects.filter(experiment_id__exact=request.POST.get('expID')).count() + 1
@@ -63,7 +66,7 @@ def addComponent(request):
 	
 		# redirect back to the experiment editing page
 	
-	return HttpResponseRedirect('/editor/edit/?id=' + request.POST.get('expID'))
+	return HttpResponseRedirect('/experiments/edit/?id=' + request.POST.get('expID'))
 
 def newExperiment(request):
 	"""This creates a new experiment"""
@@ -77,27 +80,80 @@ def newExperiment(request):
 		
 		# redirect back to the experiment editing page
 
-	return HttpResponseRedirect('/editor/edit/?id=' + str(e.id))
+	return HttpResponseRedirect('/experiments/edit/?id=' + str(e.id))
+
+def newSession(request):
+	"""This creates a new experiment session"""
+	expID = request.GET.get('id')
+	expObject = Experiment.objects.get(id=expID)
+	expSesStat = experimentSessionStatus.objects.get(statusText="Not Ready")
+	e = ExperimentSession(experiment_id=expObject, status=expSesStat)
+	e.save()
+	
+	return HttpResponseRedirect('/experiments/view/?id=' + str(expID))
+
+def deleteSession(request):
+	"""This creates a new experiment session"""
+	expID = request.GET.get('id')
+	expObject = Experiment.objects.get(id=expID)
+	expSesStat = experimentSessionStatus.objects.get(statusText="Not Ready")
+	e = ExperimentSession(experiment_id=expObject, status=expSesStat)
+	e.save()
+	
+	return HttpResponseRedirect('/experiments/view/?id=' + str(expID))
 
 
 
 @login_required
-def archive(request):
+def experiments(request):
 	"""This page lists all experiments in the system."""
+	experiments = Experiment.objects.all()
 	return render_to_response('adminInterface/archive.html', 
-							  {'varName': 'sometext'}, 
+							  {'experiments': experiments}, 
 							  context_instance=RequestContext(request))
+@login_required
+def viewExperiment(request):
+	"""This page lists all experiments in the system."""
+	expID = request.GET.get('id')
+	experimentComponentsList = ExperimentComponents.objects.filter(experiment_id__exact=expID)
+	experimentSessions = ExperimentSession.objects.filter(experiment_id__exact=expID)
+	experiment = Experiment.objects.get(id=expID)
+	return render_to_response('adminInterface/experimentView.html', 
+							  {'experiment': experiment,
+							   'experimentComponentsList': experimentComponentsList,
+							   'experimentSessions': experimentSessions
+							   }, 
+							  context_instance=RequestContext(request))
+	
 
 @login_required
-def users(request):
-	"""This page allows you manage users"""
-	return render_to_response('adminInterface/users.html', 
-							  {'varName': 'sometext'}, 
-							  context_instance=RequestContext(request))
+def joinSession(request):
+	"""Creates a participant object and add it to the session."""
+	sesID = request.GET.get('id')
+	partiStatus = experimentSessionStatus.objects.get(statusText="ready")
+	expSes = ExperimentSession.objects.get(id=sesID)
+	p = Participant(status=partiStatus, experimentSession=expSes)
+	p.save()
+	p.name = p.dateCreated.strftime("%Y-%m-%d") + "_" + str(p.id).rjust(4,"0")
+	p.save()
+	return HttpResponseRedirect('/session/wait/?pname=' + p.name)
+	
 
-@login_required
-def experiment(request):
-	"""This page allows you manage users"""
-	return render_to_response('adminInterface/users.html', 
-							  {'varName': 'sometext'}, 
-							  context_instance=RequestContext(request))
+def wait(request):
+	"""Put the participant at a waiting screen."""
+	return render_to_response('session/waiting.html', 
+						  {'waitReason': "Waiting for experimenter to start",
+						   'partName': request.GET.get('pname')}, 
+						  context_instance=RequestContext(request))
+
+def startSession(request):
+	"""Initiates the experiment session"""
+	return HttpResponseRedirect('/dashboard')
+	
+class rex:
+	"""This class drives reciprocal exchange"""
+	def __init__(self, participants, params):
+		self.participants = participants
+		self.params = params
+	
+	
