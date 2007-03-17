@@ -5,33 +5,33 @@
 {% block sectionDivID %}dashboard{% endblock %}
 
 {% block adminContent %}
-
-<h1>Dashboard > Monitor</h1>
-<div id="changeExperiment">
-	<form name="changeExperiments" action="/dashboard/monitor/?id={{ e.id }}" method="get" id="changeExperiments">
-		<p><label for="id">Change Experiment:<br>
+<div id="breadCrumbs">
+	<a href="/dashboard">Dashboard</a> » Monitoring {{ monitorSession.experiment_id.name }} (session {{ monitorSession.id }})
+</div>
+<h1>Monitor</h1>
+<div id="changeSession">
+	<form name="changeSession" action="/dashboard/monitor/?id={{ e.id }}" method="get" id="changeSession">
+		<p><label for="id">Change Session:<br>
 		<select name="id">
-			{% for e in experiments %}
-			<option value="{{ e.id }}">
-				{{ e.name }}
+			{% for s in expSessions %}
+			<option value="{{ s.id }}">
+				{{ s.experiment_id.name }} (Session {{ s.id }})
 			</option>
 			{% endfor %}
 		</select>
 		</label><input class="buttonSmall" type="submit" value="Change »"></p>
 	</form>
 </div>
-<div id="experiments">
-	<div id="experiment">
-		<div id="experimentName">
-			{{ monitorExperiment.name }}
-		</div>
-		<div id="experimentStatus">
-			<strong>Status:</strong> {{ monitorExperiment.status.statusText }}
-		</div>
-		<div id="experimentParticipants">
-			{{ monitorExperiment.participants }}<strong>Current participants:</strong> 0
-		</div>
+	<div id="sessionName">
+		{{ monitorSession.experiment_id.name }}
 	</div>
-</div>
-
+	<div id="sessionInfo">
+		<strong>Session ID:</strong> {{ monitorSession.id }}<br/>
+		<strong>Status:</strong> {{ monitorSession.status.statusText }}<br/>
+		<strong>Current participants:</strong><br/>
+			{% for p in participants %}
+				{{ p.name }}<br/>
+			{% endfor %}
+	</div>
+	<a href="/session/start">Start Experiment</a>
 {% endblock %}

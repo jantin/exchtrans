@@ -31,6 +31,8 @@ body {
 }
 
 #editor, 
+#waiting, 
+#experimentView, 
 #users, 
 #dashboard, 
 #archive, 
@@ -47,6 +49,7 @@ body {
 #waiting #verticalCenter{
 	text-align:center;
 	margin-top:200px;
+	margin-bottom:200px;
 }
 
 #waiting h1 {
@@ -120,32 +123,44 @@ textarea{
 	font-size: .8em;
 }
 
+#breadCrumbs{
+	font-size:.9em;
+	margin-top:-1em;
+	margin-left:-1em;
+	padding-bottom:.5em;
+	border-bottom:1px dashed #CCC;
+	width:100%;
+}
+
 /* Monitor Experiments */
 
-#changeExperiment{
+#changeSession{
 	margin-top:-70px;
-	margin-left:600px;
+	margin-left:275px;
 }
+
+/* Experiment List */
+
+.experimentTable{
+	width:80%;
+}
+
+
 
 /* Dashboard Experiments */
 
-#experiments{
-	
-}
-
-#experiment{
+#expSessions{
 	width:25em;
 	padding: 20px;
 }
 
-#experimentName{
+#sessionName{
 	font-weight:bold;
 	font-size:20px;
 }
 
-#experimentStatus, #experimentParticipants, #experimentActionLinks{
+#sessionInfo{
 	margin:5px 0px 5px 30px;
-	font-style: italic;
 	font-size:.9em;
 }
 
@@ -241,3 +256,26 @@ background: #fff; /* set desired hover color */
 }
 
 /* end css tabs */
+
+/* Tables (From django admin) */
+table { border-collapse:collapse; border-color:#ccc; }
+td, th { border-bottom:1px solid #eee; vertical-align:top; padding:5px; }
+th { text-align:left; font-weight:bold; }
+thead th, 
+tfoot td { padding:2px 5px; background:#e1e1e1 url(../images/nav-bg.gif) top left repeat-x; border-left:1px solid #ddd; border-bottom:1px solid #ddd; }
+tfoot td { border-bottom:none; border-top:1px solid #ddd; }
+thead th:first-child, 
+tfoot td:first-child { border-left:none !important; }
+thead th.optional { font-weight:normal !important; }
+fieldset table { border-right:1px solid #eee; }
+tr.row-label td { font-size:9px; padding-top:2px; padding-bottom:0; border-bottom:none; color:#666; margin-top:-1px; }
+tr.alt { background:#f6f6f6; }
+.row1 { background:#EDF3FE; }
+.row2 { background:white; }
+
+/* SORTABLE TABLES */
+thead th a:link, thead th a:visited { color:#666; display:block; }
+table thead th.sorted { background-position:bottom left !important; }
+table thead th.sorted a { padding-right:13px; }
+table thead th.ascending a { background:url(/site_media/images/arrow-down.gif) right .4em no-repeat; }
+table thead th.descending a { background:url(/site_media/images/arrow-up.gif) right .4em no-repeat; }

@@ -48,17 +48,17 @@ class ExperimentSession(models.Model):
 	experiment_id = models.ForeignKey(Experiment)
 	status = models.ForeignKey(experimentSessionStatus)
 	dateStarted = models.DateField(auto_now_add=True)
-	dateEnded = models.DateField()
+	dateEnded = models.DateField(null=True, blank=True)
 	
 	def __str__(self):
-		return str(self.experiment_id) + "_" + str(self.dateStarted) + "_" + str(self.ExperimentSession_id)
+		return "Session id: " + str(self.id) + " (" + str(self.experiment_id) + ")" 
 	
 	class Admin:
 		pass
 	
 
 class Participant(models.Model):
-	name = models.CharField(maxlength=100)
+	name = models.CharField(maxlength=100, null=True)
 	status = models.ForeignKey(participantStatus)
 	experimentSession = models.ForeignKey(ExperimentSession)
 	dateCreated = models.DateField(auto_now_add=True)
