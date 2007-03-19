@@ -10,9 +10,9 @@
 </div>
 <h1>Monitor</h1>
 <div id="changeSession">
-	<form name="changeSession" action="/dashboard/monitor/?id={{ e.id }}" method="get" id="changeSession">
+	<form name="changeSession" action="/dashboard/monitor/" method="get" id="changeSession">
 		<p><label for="id">Change Session:<br>
-		<select name="id">
+		<select name="sid">
 			{% for s in expSessions %}
 			<option value="{{ s.id }}">
 				{{ s.experiment_id.name }} (Session {{ s.id }})
@@ -33,5 +33,9 @@
 				{{ p.name }}<br/>
 			{% endfor %}
 	</div>
-	<a href="/session/start">Start Experiment</a>
+	{% if running %}
+	<a href="/session/stop/?sid={{ monitorSession.id }}">Stop Session</a>
+	{% else %}
+	<a href="/session/start/?sid={{ monitorSession.id }}">Start Session</a>
+	{% endif %}
 {% endblock %}
