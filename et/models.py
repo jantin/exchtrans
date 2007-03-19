@@ -62,7 +62,9 @@ class Participant(models.Model):
 	status = models.ForeignKey(participantStatus)
 	experimentSession = models.ForeignKey(ExperimentSession)
 	dateCreated = models.DateField(auto_now_add=True)
-
+	currentComponent = models.IntegerField(null=True)
+	currentIteration = models.IntegerField(null=True)
+	
 	def __str__(self):
 		return self.name
 
@@ -74,24 +76,52 @@ class Component(models.Model):
 	name = models.CharField(maxlength=255)
 	description = models.TextField()
 	parameters = models.TextField()
+	functionName = models.CharField(maxlength=255)
 	
 	def __str__(self):
 		return self.name
 	
 	class Admin:
 		pass
-	
+
 
 class ExperimentComponents(models.Model):
 	experiment_id = models.ForeignKey(Experiment)
 	component_id = models.ForeignKey(Component)
 	order = models.IntegerField()
+	iterations = models.IntegerField()
 	
+	# add parameters here, remove from Component
 	def __str__(self):
 		return str(self.experiment_id) + "_" + str(self.component_id) + " " + str(self.order)
 	
 	class Meta:
 		ordering = ('order',)
+	
+	class Admin:
+		pass
+	
+
+class SessionLog(models.Model):
+	participant = models.ForeignKey(Participant)
+	experimentComponent = models.ForeignKey(ExperimentComponents)
+	timestamp = models.DateField(auto_now_add=True)
+	message = models.TextField()
+	
+	def __str__(self):
+		return self.message
+	
+	class Admin:
+		pass
+	
+
+class SessionVar(models.Model):
+	experimentSession = models.ForeignKey(ExperimentSession)
+	key = models.TextField()
+	value = models.TextField()
+	
+	def __str__(self):
+		return self.key + " (" + str(self.experimentSession) + ")"
 	
 	class Admin:
 		pass

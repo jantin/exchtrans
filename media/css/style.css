@@ -21,6 +21,11 @@ body {
 	padding-top:10px;
 	padding-left:20px;
 	padding-right:20px;
+
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:500px;
+	height:auto !important;
+	height:500px;
 }
 
 .logged_in_as{
@@ -36,7 +41,8 @@ body {
 #users, 
 #dashboard, 
 #archive, 
-#monitor {
+#monitor,
+#mainContent {
 	width:970px;
 	border: 1px solid #CCC;
 	margin-left:auto;
@@ -44,6 +50,11 @@ body {
 	background-color:#EEE;
 	padding-bottom:60px;
 	margin-bottom:10px;
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:560px;
+	height:auto !important;
+	height:560px;
 }
 
 #waiting #verticalCenter{
@@ -209,7 +220,49 @@ textarea{
 	padding:6px;
 	border-top: 1px solid #999;
 	clear: both;
+}
+
+/* Reciprocal Exchange (rex)  */
+
+#actionArea, #bottomBar{
+	float:left;
+	width:650px;
+}
+
+#actionArea{
+	background:#FFF;
+	border-bottom:1px dotted #CCC;
+	padding:10px;
 	
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:370px;
+	height:auto !important;
+	height:370px;
+}
+
+#bottomBar{
+	background:#FFF;
+	padding:10px;
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:209px;
+	height:auto !important;
+	height:209px;
+}
+
+#rightCol{
+	float:right;
+	width:279px;
+	background:#FFF;
+	border-left:1px dotted #CCC;
+	padding:10px;
+	
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:600px;
+	height:auto !important;
+	height:600px;
 }
 
 

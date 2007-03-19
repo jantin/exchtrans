@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
 from et.models import *
+import pickle
 
 def profile_redirect(request):
 	"""The generic login view directs to a profile page. This redirects accounts/profile to somewhere else"""
@@ -19,14 +20,24 @@ def dashboard(request):
 @login_required
 def monitor(request):
 	"""This page allows the experimenter to monitor the progress of a running experiment."""
+	# fetch all sessions for sessions drop down
 	expSessions = ExperimentSession.objects.all()
-	sesID = request.GET.get('id')
-	monitorSession = ExperimentSession.objects.get(id=sesID)
-	participants = Participant.objects.filter(experimentSession__exact=sesID)
+	
+	
+	sid = request.GET.get('sid')
+	monitorSession = ExperimentSession.objects.get(id=sid)
+	participants = Participant.objects.filter(experimentSession__exact=sid)
+	
+	if(monitorSession.status.statusText == "Running"):
+		running = True
+	else:
+		running = False
+	
 	return render_to_response('adminInterface/monitor.html', 
 							  {'expSessions': expSessions, 
 							   'monitorSession':monitorSession,
-							   'participants':participants},
+							   'participants':participants,
+							   'running':running},
 							  context_instance=RequestContext(request))
 
 @login_required
@@ -61,6 +72,7 @@ def addComponent(request):
 		# insert the new component into the database
 		ec = ExperimentComponents(experiment_id=Experiment.objects.get(id=request.POST.get('expID')),
 								   component_id=Component.objects.get(id=request.POST.get('addComponentID')),
+								iterations=1,
 									order=orderCount)
 		ec.save()
 	
@@ -90,11 +102,11 @@ def newSession(request):
 	e = ExperimentSession(experiment_id=expObject, status=expSesStat)
 	e.save()
 	
-	return HttpResponseRedirect('/experiments/view/?id=' + str(expID))
+	return HttpResponseRedirect('/experiments/view/?id=' + expID)
 
 def deleteSession(request):
 	"""This creates a new experiment session"""
-	expID = request.GET.get('id')
+	sid = request.GET.get('sid')
 	expObject = Experiment.objects.get(id=expID)
 	expSesStat = experimentSessionStatus.objects.get(statusText="Not Ready")
 	e = ExperimentSession(experiment_id=expObject, status=expSesStat)
@@ -111,6 +123,8 @@ def experiments(request):
 	return render_to_response('adminInterface/archive.html', 
 							  {'experiments': experiments}, 
 							  context_instance=RequestContext(request))
+
+
 @login_required
 def viewExperiment(request):
 	"""This page lists all experiments in the system."""
@@ -129,31 +143,147 @@ def viewExperiment(request):
 @login_required
 def joinSession(request):
 	"""Creates a participant object and add it to the session."""
-	sesID = request.GET.get('id')
-	partiStatus = experimentSessionStatus.objects.get(statusText="ready")
-	expSes = ExperimentSession.objects.get(id=sesID)
-	p = Participant(status=partiStatus, experimentSession=expSes)
+	sid = request.GET.get('sid')
+	
+	# Set participant's status
+	partiStatus = participantStatus.objects.get(statusText="Ready")
+	expSes = ExperimentSession.objects.get(id=sid)
+	p = Participant(status=partiStatus, experimentSession=expSes, currentIteration=0, currentComponent=0)
 	p.save()
+	
+	# Set participant's name
 	p.name = p.dateCreated.strftime("%Y-%m-%d") + "_" + str(p.id).rjust(4,"0")
 	p.save()
-	return HttpResponseRedirect('/session/wait/?pname=' + p.name)
+	
+	if(expSes.status.statusText == "Not Ready"):
+		expSes.status = experimentSessionStatus.objects.get(statusText="Ready")
+		expSes.save()
+	
+	return HttpResponseRedirect('/session/wait/?pname=' + p.name + '&sid=' + sid)
 	
 
 def wait(request):
 	"""Put the participant at a waiting screen."""
 	return render_to_response('session/waiting.html', 
-						  {'waitReason': "Waiting for experimenter to start",
-						   'partName': request.GET.get('pname')}, 
+						  {'waitReason': "Waiting for experimenter to start...",
+						   'partName': request.GET.get('pname'),
+						   'sid': request.GET.get('sid')}, 
 						  context_instance=RequestContext(request))
 
-def startSession(request):
-	"""Initiates the experiment session"""
-	return HttpResponseRedirect('/dashboard')
+
+def rexInit(request):
+	"""Asks the participant to make an offer to other participants"""
 	
+	return render_to_response('rex/rex_offer.html', 
+						  {'waitReason': "Waiting for experimenter to start"}, 
+						  context_instance=RequestContext(request))
+
+
+def rexOffer(request):
+	"""Asks the participant to make an offer to other participants"""
+
+	return render_to_response('rex/rex_offer.html', 
+						  {'waitReason': "Waiting for experimenter to start"}, 
+						  context_instance=RequestContext(request))
+	
+
+def rexOfferSubmit(request):
+	"""Validates the particpant's offer and passes them on to the waiting screen"""
+	return HttpResponseRedirect('/rex/wait')
+
+	
+def rexWait(request):
+	"""Asks participants to wait"""
+	return render_to_response('rex/rex_wait.html', 
+						  {'waitReason': "Waiting for other players."}, 
+						  context_instance=RequestContext(request))
+
+
+def startSession(request):
+	"""Initiates the experiment session"""	
+
+	sid = request.GET.get('sid')
+	
+	# Get the session object
+	sessionObj = ExperimentSession.objects.get(id=sid)
+	
+	# Get a list of the components
+	componentsList = ExperimentComponents.objects.filter(experiment_id__exact=sessionObj.experiment_id.id)
+
+	# Get a list of the participants
+	participantsList = Participant.objects.filter(experimentSession__exact=sid)
+	
+	# Clean out the SessionVar table rows
+	SessionVar.objects.filter(experimentSession=sessionObj).delete()
+	
+	# Make a sessionVariables object, pickle it, store it in SessionVar table
+	sesVars = sessionVariables(componentsList, 0, 0, participantsList)
+	sv = SessionVar(experimentSession=sessionObj, key="sesVars", value=pickle.dumps(sesVars))
+	sv.save()
+	
+	if(sessionObj.status.statusText == "Ready"):
+		# Change status to Running
+		sesStatus = experimentSessionStatus.objects.get(statusText="Running")
+		sessionObj.status = sesStatus
+		sessionObj.save()
+	
+	return HttpResponseRedirect('/dashboard/monitor/?sid=' + sid)
+
+def stopSession(request):
+	"""Initiates the experiment session"""
+	sid = request.GET.get('sid')
+	expSes = ExperimentSession.objects.get(id=sid)
+	
+	if(expSes.status.statusText == "Running"):
+		# Change status to Running
+		sesStatus = experimentSessionStatus.objects.get(statusText="Ready")
+		expSes.status = sesStatus
+		expSes.save()
+	
+	return HttpResponseRedirect('/dashboard/monitor/?sid=' + sid)
+
+
+def driveSession(request):
+	"""Moves participants along the session"""
+	pname = request.GET.get('pname')
+	sid = request.GET.get('sid')
+	expSes = ExperimentSession.objects.get(id=sid)
+	if(expSes.status.statusText != "Running"):
+		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
+	
+	p = Participant.objects.get(name=pname)
+	sv = SessionVar.objects.get(experimentSession=expSes,key="sesVars")
+	sesVars = pickle.loads(sv.value)
+	
+	if(sesVars.componentsList[sesVars.currentComponent].iterations == sesVars.currentIteration):
+		sesVars.currentComponent = sesVars.currentComponent + 1
+		sesVars.currentIteration = 0
+		if(len(sesVars.componentsList) == sesVars.currentComponent):
+			return HttpResponseRedirect('/session/end')
+	
+	sesVars.currentIteration = sesVars.currentIteration + 1
+	sv.value = pickle.dumps(sesVars)
+	sv.save()
+	
+	p.currentIteration = sesVars.currentIteration
+	p.currentComponent = sesVars.currentComponent
+	p.save()
+	
+	componentFunctionName = sesVars.componentsList[sesVars.currentComponent].component_id.functionName
+	return HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
+
+
+
 class rex:
 	"""This class drives reciprocal exchange"""
 	def __init__(self, participants, params):
 		self.participants = participants
 		self.params = params
 	
-	
+class sessionVariables:
+	"""A data structure for session variables (not http sessions)"""	
+	def __init__(self, componentsList, currentComponent, currentIteration, participantsList):
+		self.componentsList = componentsList
+		self.currentComponent = currentComponent
+		self.currentIteration = currentIteration
+		self.participantsList = participantsList

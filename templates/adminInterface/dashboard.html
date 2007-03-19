@@ -16,7 +16,7 @@
 	<div id="sessionInfo">
 		<strong>Session ID:</strong> {{ e.id }}<br/>
 		<strong>Status:</strong> {{ e.status.statusText }}<br/>
-		<a href='/session/join/?id={{ e.id }}'>Join</a> | <a href='/dashboard/monitor/?id={{ e.id }}'>Monitor</a>
+		<a href='/session/join/?sid={{ e.id }}'>Join</a> | <a href='/dashboard/monitor/?sid={{ e.id }}'>Monitor</a>
 	</div>
 </div>
 {% endfor %}

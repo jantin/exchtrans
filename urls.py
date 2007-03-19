@@ -24,6 +24,8 @@ urlpatterns = patterns('',
 	(r'^session/join/$', 'exchtran.et.views.joinSession'),
 	(r'^session/wait/$', 'exchtran.et.views.wait'),
 	(r'^session/start/$', 'exchtran.et.views.startSession'),
+	(r'^session/stop/$', 'exchtran.et.views.stopSession'),	
+	(r'^session/drive/$', 'exchtran.et.views.driveSession'),
 			
 	# Registration Pages
 	(r'^login/$', 'django.contrib.auth.views.login'),
@@ -32,6 +34,15 @@ urlpatterns = patterns('',
 	(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/login'}),
 	(r'^accounts/profile/$', 'exchtran.et.views.profile_redirect'), # default page after login
 	
+	# Rex: Reciprocal Exchange
+	(r'^rexOffer/$', 'exchtran.et.views.rexOffer'),
+	(r'^rexOffer/submit/$', 'exchtran.et.views.rexOfferSubmit'),
+	(r'^rex/wait/$', 'exchtran.et.views.rexWait'),
+	(r'^rex/accept/$', 'exchtran.et.views.rexAccept'),
+	
+	# API
+	(r'^api/sessionStatus/$', 'exchtran.et.api.sessionStatus'),
+		
 	# Media Files
 	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/jonlesser/Documents/Berkeley/07Spring/ExchTrans/svn/exchtran/media'}),
 	
