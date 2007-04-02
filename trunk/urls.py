@@ -38,7 +38,8 @@ urlpatterns = patterns('',
 	(r'^rexOffer/$', 'exchtran.et.views.rexOffer'),
 	(r'^rexOffer/submit/$', 'exchtran.et.views.rexOfferSubmit'),
 	(r'^rex/wait/$', 'exchtran.et.views.rexWait'),
-	(r'^rex/accept/$', 'exchtran.et.views.rexAccept'),
+	(r'^rex/reconcile/$', 'exchtran.et.views.rexReconcile'),
+	(r'^rex/CheckAllOffered/$', 'exchtran.et.views.rexCheckAllOffered'),
 	
 	# API
 	(r'^api/sessionStatus/$', 'exchtran.et.api.sessionStatus'),
