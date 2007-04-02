@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
 from et.models import *
 import pickle
+from time import time
 
 def profile_redirect(request):
 	"""The generic login view directs to a profile page. This redirects accounts/profile to somewhere else"""
@@ -181,23 +182,66 @@ def rexInit(request):
 
 def rexOffer(request):
 	"""Asks the participant to make an offer to other participants"""
-
+	sid = request.GET.get('sid')
+	pname = request.GET.get('pname')
+	
 	return render_to_response('rex/rex_offer.html', 
-						  {'waitReason': "Waiting for experimenter to start"}, 
+						  {'sid': sid, 'pname': pname}, 
 						  context_instance=RequestContext(request))
 	
 
 def rexOfferSubmit(request):
 	"""Validates the particpant's offer and passes them on to the waiting screen"""
-	return HttpResponseRedirect('/rex/wait')
-
+	sid = request.GET.get('sid')
+	pname = request.GET.get('pname')
+	sessionObj = ExperimentSession.objects.get(id=sid)
+	offerList = []
 	
-def rexWait(request):
-	"""Asks participants to wait"""
+	toParticipant = request.POST.get('toParticipant')
+	fromParticipant = pname
+	offerAmount = request.POST.get('offerAmount')
+	
+	offerObj = offer(toParticipant,fromParticipant,offerAmount)
+	
+	sv = SessionVar(experimentSession=sessionObj, key="offers", value=pickle.dumps(offerObj))
+	sv.save()
+	
 	return render_to_response('rex/rex_wait.html', 
-						  {'waitReason': "Waiting for other players."}, 
+						  {'sid': sid, 'pname': pname, 'waitReason':"Waiting for other players..."}, 
 						  context_instance=RequestContext(request))
 
+
+def rexCheckAllOffered(request):
+	"""Checks to see if all the participants have made an offer"""
+	sid = request.GET.get('sid')
+	pname = request.GET.get('pname')
+	sessionObj = ExperimentSession.objects.get(id=sid)
+	
+	offers = SessionVar.objects.filter(experimentSession=sessionObj, key="offers")
+	participantsList = Participant.objects.filter(experimentSession__exact=sid)
+	
+	if(len(participantsList) == len(offers)):
+		response = "Ready"
+	else:
+		response = "Not Ready"
+	
+	
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+def rexReconcile(request):
+	"""Asks the participant to make an offer to other participants"""
+	sid = request.GET.get('sid')
+	pname = request.GET.get('pname')
+	sessionObj = ExperimentSession.objects.get(id=sid)
+	offers = SessionVar.objects.filter(experimentSession=sessionObj, key="offers")
+	offers.delete()
+	
+	
+	return render_to_response('rex/rex_accept.html', 
+						  {'sid': sid, 'pname': pname}, 
+						  context_instance=RequestContext(request))
 
 def startSession(request):
 	"""Initiates the experiment session"""	
@@ -248,25 +292,24 @@ def driveSession(request):
 	pname = request.GET.get('pname')
 	sid = request.GET.get('sid')
 	expSes = ExperimentSession.objects.get(id=sid)
+	
+	# Quick check to make sure the session is still running.
 	if(expSes.status.statusText != "Running"):
 		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
 	
+	# Get the participant object and load session variables
 	p = Participant.objects.get(name=pname)
 	sv = SessionVar.objects.get(experimentSession=expSes,key="sesVars")
 	sesVars = pickle.loads(sv.value)
 	
-	if(sesVars.componentsList[sesVars.currentComponent].iterations == sesVars.currentIteration):
-		sesVars.currentComponent = sesVars.currentComponent + 1
-		sesVars.currentIteration = 0
-		if(len(sesVars.componentsList) == sesVars.currentComponent):
+	
+	if(sesVars.componentsList[p.currentComponent].iterations == p.currentIteration):
+		p.currentComponent = p.currentComponent + 1
+		p.currentIteration = 0
+		if(len(sesVars.componentsList) == p.currentComponent):
 			return HttpResponseRedirect('/session/end')
 	
-	sesVars.currentIteration = sesVars.currentIteration + 1
-	sv.value = pickle.dumps(sesVars)
-	sv.save()
-	
-	p.currentIteration = sesVars.currentIteration
-	p.currentComponent = sesVars.currentComponent
+	p.currentIteration = p.currentIteration + 1
 	p.save()
 	
 	componentFunctionName = sesVars.componentsList[sesVars.currentComponent].component_id.functionName
@@ -287,3 +330,13 @@ class sessionVariables:
 		self.currentComponent = currentComponent
 		self.currentIteration = currentIteration
 		self.participantsList = participantsList
+
+class offer(object):
+	"""A Data structure for holding participant offers"""
+	def __init__(self, toParticipant, fromParticipant, amount):
+		self.fromParticipant = fromParticipant
+		self.toParticipant = toParticipant
+		self.amount = amount
+		self.timestamp = time()
+
+		

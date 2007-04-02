@@ -12,7 +12,8 @@ I know what iteration I'm currently in
 
 
 Drive Session to Participant:
-Let's start the this session! Here is the name of the first component, go do it.
+Let's start the this session! I'm going to increment your iterationCount. 
+Here is the name of the first component, go do it.
 
 Participant to Drive Session:
 Thanks.
@@ -30,3 +31,7 @@ Drive Session to Participant:
 Welcome back. I'm going to increment your iterationCount and see if you need to move to the next component.
 Looks like you are ready to move onto the next component, Peace out. OR Looks like you're done, Peace out!
 
+
+
+When do I increment the current session component?
+When all the participants have 

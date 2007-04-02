@@ -1,6 +1,28 @@
 {% extends "rex/rex_base.html" %}
 
+{% block extrahead %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/heartbeat.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/getParams.js"></script>
+{% endblock %}
+
 {% block actionArea %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+		$.jheartbeat.set({
+			url: "/rex/CheckAllOffered/?sid={{ sid }}&pname={{ pname }}",
+			delay: 3000
+		}, function () {
+			var statusText = document.getElementById('HeartBeatDIV').innerHTML;
+			if(statusText == "Ready"){
+				location.href = "/rex/reconcile/?sid=" + $.getURLParam("sid") + "&pname=" + $.getURLParam("pname")
+			}
+		});
+	});
+
+</script>
+
 <div id="verticalCenter">
 	<h1>{{ waitReason }}</h1>
 	<p><img src="/site_media/images/indicatorSnakeLarge.gif" width="32" height="32" alt="IndicatorSnakeLarge"></p>

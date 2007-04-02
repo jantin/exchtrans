@@ -1,15 +1,16 @@
 {% extends "rex/rex_base.html" %}
 
+
 {% block actionArea %}
 The experimenter has given you 25 points to offer this round. 
 
-<form action="/rexOffer/submit/" method="post" accept-charset="utf-8">
+<form action="/rexOffer/submit/?sid={{sid}}&pname={{pname}}" method="post" accept-charset="utf-8">
 	<table border="0">
 	  <tr>
 	    <td rowspan="2">Make offer to: </td>
-	    <td><input name="radiobutton" type="radio" value="radiobutton" id="radiobutton"></td>
-	    <td><input name="radiobutton" type="radio" value="radiobutton" id="radiobutton"></td>
-	    <td><input name="radiobutton" type="radio" value="radiobutton" id="radiobutton"></td>
+	    <td><input name="toParticipant" type="radio" value="1" id="toParticipant"></td>
+	    <td><input name="toParticipant" type="radio" value="2" id="toParticipant"></td>
+	    <td><input name="toParticipant" type="radio" value="3" id="toParticipant"></td>
 	  </tr>
 	  <tr>
 	    <td>1</td>
@@ -18,7 +19,7 @@ The experimenter has given you 25 points to offer this round.
 	  </tr>
 	  <tr>
 	    <td>Offer amount: </td>
-	    <td colspan="3"><input type="text" name="textfield" id="textfield"></td>
+	    <td colspan="3"><input type="text" name="offerAmount" id="offerAmount"></td>
 	  </tr>
 	  <tr>
 	    <td>&nbsp;</td>
