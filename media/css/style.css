@@ -4,6 +4,7 @@ body {
 	margin-top:10px;
 	padding:0;
 	background-color:#DDD;
+	font-size:.9em;
 }
 
 #adminBox {
@@ -178,27 +179,37 @@ textarea{
 
 /* Edit Components  */
 
-#components{
-	width:80%;
+.sortHelper{
+	border: 3px dashed #666;
+	width: 700px !important;
 }
 
-#component{
-	width:100%;
+.components{
+}
+
+.component{
+	width:700px;
 	border:2px solid #999;
 	margin-bottom:15px;
 }
 
-#componentTopPane{
+.componentTopPane{
 	padding-left:6px;
 	padding-right:6px;
+	
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:40px;
+	height:auto !important;
+	height:40px;
 }
 
-#componentOrderField{
+.componentOrderField{
 	float: left;
 	width:10%;	
 }
 
-#componentName{
+.componentName{
 	float: left;
 	text-align:center;
 	margin-top:6px;
@@ -209,18 +220,22 @@ textarea{
 
 }
 
-#componentDelete{
+.componentDelete{
 	float: right;
 	text-align:right;
 	margin-top:6px;
 	width:20%;
 }
 
-#componentBottomPane{
+.componentBottomPane{
 	padding:6px;
+	background-color:#FFF;
+	width:688px;
 	border-top: 1px solid #999;
+	display:none;
 	clear: both;
 }
+
 
 /* Reciprocal Exchange (rex)  */
 

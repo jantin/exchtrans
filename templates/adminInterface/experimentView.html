@@ -9,7 +9,8 @@
 <a href="/experiments">Experiments</a> » {{ experiment.name }}	
 </div>
 <h1>{{ experiment.name }}</h1>
-
+<p>{{ experiment.description }}</p>
+<p><a href="/experiments/edit/?id={{ experiment.id }}">Edit Experiment</a></p>
 <h3>Statistics</h3>
 Total Runs: 4<br/>
 Last Run: Feb. 2, 2007
@@ -20,12 +21,12 @@ Created by: Coye Cheshire
 Last modified on: Jan. 3, 2007<br/>
 Last modified by: Jon Lesser
 <h3>Components</h3>
-<p><a href="/experiments/edit/?id={{ experiment.id }}">Edit Experiment</a></p>
+<ol>
 {% for ec in experimentComponentsList %}
-{{ ec.component_id.name }}<br/>
+<li>{{ ec.component_id.name }}</li>
 {% endfor %}
+</ol>
 <h3>Open Sessions</h3>
-<p><a href="/experiments/newSession/?id={{ experiment.id }}">Start new session</a></p>
 <table>
 	<thead>
 	<tr><th>ID</th><th>Date started</th><th>Actions</th></tr>
@@ -38,6 +39,8 @@ Last modified by: Jon Lesser
 	</tr>
 	{% endfor %}
 </table>
+<p><a href="/experiments/newSession/?id={{ experiment.id }}">Start new session</a></p>
+
 <h3>Completed Sessions</h3>
 <table>
 	<thead>

@@ -16,6 +16,8 @@ urlpatterns = patterns('',
 	(r'^experiments/newSession/$', 'exchtran.et.views.newSession'),	
 
 	(r'^users/$', 'exchtran.et.views.users'),
+	
+	(r'^scratch/$', 'exchtran.et.views.scratch'),
 
 	#Deprecated
 	(r'^editor/$', 'exchtran.et.views.editor'),	
@@ -43,7 +45,8 @@ urlpatterns = patterns('',
 	
 	# API
 	(r'^api/sessionStatus/$', 'exchtran.et.api.sessionStatus'),
-		
+	(r'^api/rex_toolTipImages/$', 'exchtran.et.api.rex_toolTipImages'),
+	
 	# Media Files
 	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/jonlesser/Documents/Berkeley/07Spring/ExchTrans/svn/exchtran/media'}),
 	
