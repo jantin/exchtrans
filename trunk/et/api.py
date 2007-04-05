@@ -15,3 +15,14 @@ def sessionStatus(request):
 							  {'response': response}, 
 							  context_instance=RequestContext(request))
 
+def rex_toolTipImages(request):
+	"""Responds with content for the requested tooltip"""
+	
+	image = request.GET.get('image')
+	response = "<img src='/site_media/images/rex_offer.png' />"
+
+	
+	return render_to_response('api.html', 
+							  {'response': response}, 
+							  context_instance=RequestContext(request))
+

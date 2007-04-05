@@ -274,7 +274,7 @@ def startSession(request):
 	return HttpResponseRedirect('/dashboard/monitor/?sid=' + sid)
 
 def stopSession(request):
-	"""Initiates the experiment session"""
+	"""Stops the session"""
 	sid = request.GET.get('sid')
 	expSes = ExperimentSession.objects.get(id=sid)
 	
@@ -339,4 +339,9 @@ class offer(object):
 		self.amount = amount
 		self.timestamp = time()
 
-		
+
+def scratch(request):
+	"""outputs scratch template for UI dev"""
+	return render_to_response('scratch.html', 
+						  {'name': "value"}, 
+						  context_instance=RequestContext(request))
