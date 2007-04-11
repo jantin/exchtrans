@@ -40,6 +40,81 @@ def monitor(request):
 							   'participants':participants,
 							   'running':running},
 							  context_instance=RequestContext(request))
+	
+
+
+def components(request):
+	"""This page lists all components in the system."""
+	components = Component.objects.all()
+	componentTypes = ComponentTypes.objects.all()
+	return render_to_response('adminInterface/components.html', 
+							  {	'components': components, 
+								'componentTypes': componentTypes}, 
+							  context_instance=RequestContext(request))
+
+
+def componentEdit(request):
+	"""This page displays a single component for editing"""
+	comID = request.GET.get('id')
+	component = Component.objects.get(id=comID)
+	parameters = pickle.loads(component.parameters)
+	
+	return render_to_response(	component.componentType.editTemplate, 
+								{'component': component,
+								 'parameters': parameters}, 
+						  		context_instance=RequestContext(request))
+
+
+# TODO delete component
+# TODO duplicate component
+# TODO export component
+# TODO load component
+
+
+def componentCreate(request):
+	"""This function creates a new component instance"""
+	# Get information from POST vars
+	componentName = request.POST.get('componentName')
+	componentType = request.POST.get('componentType')
+	
+	# Get component type object
+	componentType = ComponentTypes.objects.get(id=componentType)
+	
+	# Set default parameters
+	# TODO Add better defaults
+	if (componentType.componentType == "Reciprocal Exchange"):
+		componentParams = rexParameters(	"Available Points",
+											"25",
+											"Prompt Text", 
+											"Prompt Text Value",
+											"Participants Label", 
+											"Participants Label Value",
+											"Amount Label", 
+											"Amount Label Value",
+											"Submit Label", 
+											"Submit Label Value",
+											"Waiting Text", 
+											"Waiting Text Value",
+											"Accept Text", 
+											"Accept Text Value",
+											"Accept Button Label", 
+											"Accept Button Label Value")
+	
+	
+	if (componentType.componentType == "Questionnaire"):
+		componentParams = {}
+	
+	
+	# Add component to the database
+	c = Component(	name = componentName,
+					parameters = pickle.dumps(componentParams),
+					componentType = componentType
+					)
+	c.save()
+	
+	return HttpResponseRedirect('/components/edit/?id=' + str(c.id))
+
+
 
 @login_required
 def editor(request):
@@ -63,6 +138,30 @@ def edit(request):
 								'experimentComponentsList': experimentComponentsList,
 								'expDetails': expDetails }, 
 							  context_instance=RequestContext(request))
+
+@login_required
+def experiments(request):
+	"""This page lists all experiments in the system."""
+	experiments = Experiment.objects.all()
+	return render_to_response('adminInterface/archive.html', 
+							  {'experiments': experiments}, 
+							  context_instance=RequestContext(request))
+
+
+@login_required
+def viewExperiment(request):
+	"""This page lists all experiments in the system."""
+	expID = request.GET.get('id')
+	experimentComponentsList = ExperimentComponents.objects.filter(experiment_id__exact=expID)
+	experimentSessions = ExperimentSession.objects.filter(experiment_id__exact=expID)
+	experiment = Experiment.objects.get(id=expID)
+	return render_to_response('adminInterface/experimentView.html', 
+							  {'experiment': experiment,
+							   'experimentComponentsList': experimentComponentsList,
+							   'experimentSessions': experimentSessions
+							   }, 
+							  context_instance=RequestContext(request))
+	
 
 def addComponent(request):
 	"""This adds a component to an experiment"""
@@ -115,31 +214,6 @@ def deleteSession(request):
 	
 	return HttpResponseRedirect('/experiments/view/?id=' + str(expID))
 
-
-
-@login_required
-def experiments(request):
-	"""This page lists all experiments in the system."""
-	experiments = Experiment.objects.all()
-	return render_to_response('adminInterface/archive.html', 
-							  {'experiments': experiments}, 
-							  context_instance=RequestContext(request))
-
-
-@login_required
-def viewExperiment(request):
-	"""This page lists all experiments in the system."""
-	expID = request.GET.get('id')
-	experimentComponentsList = ExperimentComponents.objects.filter(experiment_id__exact=expID)
-	experimentSessions = ExperimentSession.objects.filter(experiment_id__exact=expID)
-	experiment = Experiment.objects.get(id=expID)
-	return render_to_response('adminInterface/experimentView.html', 
-							  {'experiment': experiment,
-							   'experimentComponentsList': experimentComponentsList,
-							   'experimentSessions': experimentSessions
-							   }, 
-							  context_instance=RequestContext(request))
-	
 
 @login_required
 def joinSession(request):
@@ -243,6 +317,44 @@ def rexReconcile(request):
 						  {'sid': sid, 'pname': pname}, 
 						  context_instance=RequestContext(request))
 
+
+def rexComponentSubmit(request):
+	"""Accepts the rex component form and updates the database"""
+	
+	comID = request.POST.get("comIM")
+	
+	componentParams = rexParameters(	"Available Points",
+										request.POST.get("Available Points"),
+										"Prompt Text", 
+										request.POST.get("Prompt Text"),
+										"Participants Label", 
+										request.POST.get("Participants Label"),
+										"Amount Label", 
+										request.POST.get("Amount Label"),
+										"Submit Label", 
+										request.POST.get("Submit Label"),
+										"Waiting Text", 
+										request.POST.get("Waiting Text"),
+										"Accept Text", 
+										request.POST.get("Accept Text"),
+										"Accept Button Label", 
+										request.POST.get("Accept Button Label")
+									)
+
+	c = Component.objects.get(id=comID)
+	c.name = request.POST.get("componentName")
+	c.description = request.POST.get("componentDescription")
+	c.parameters = pickle.dumps(componentParams)
+	
+	c.save()
+	
+	response = "Component Saved"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+
 def startSession(request):
 	"""Initiates the experiment session"""	
 
@@ -338,6 +450,42 @@ class offer(object):
 		self.toParticipant = toParticipant
 		self.amount = amount
 		self.timestamp = time()
+
+
+class rexParameters(object):
+	"""A Data structure for holding parameters"""
+	def __init__(self, 	AvailablePoints,
+						AvailablePointsValue,
+						PromptText,
+						PromptTextValue,
+						ParticipantsLabel,
+						ParticipantsLabelValue,
+						AmountLabel,
+						AmountLabelValue,
+						SubmitLabel,
+						SubmitLabelValue,
+						WaitingText,
+						WaitingTextValue,
+						AcceptText,
+						AcceptTextValue,
+						AcceptButtonLabel,
+						AcceptButtonLabelValue):
+		self.AvailablePoints = AvailablePoints
+		self.AvailablePointsValue = AvailablePointsValue
+		self.PromptText = PromptText
+		self.PromptTextValue = PromptTextValue
+		self.ParticipantsLabel = ParticipantsLabel
+		self.ParticipantsLabelValue = ParticipantsLabelValue
+		self.AmountLabel = AmountLabel
+		self.AmountLabelValue = AmountLabelValue
+		self.SubmitLabel = SubmitLabel
+		self.SubmitLabelValue = SubmitLabelValue
+		self.WaitingText = WaitingText
+		self.WaitingTextValue = WaitingTextValue
+		self.AcceptText = AcceptText
+		self.AcceptTextValue = AcceptTextValue
+		self.AcceptButtonLabel = AcceptButtonLabel
+		self.AcceptButtonLabelValue = AcceptButtonLabelValue
 
 
 def scratch(request):

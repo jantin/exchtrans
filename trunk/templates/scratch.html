@@ -1,0 +1,87 @@
+{% extends "adminBase.html" %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
+
+<style type="text/css">
+
+.indicator
+{
+	width: 16px;
+	height: 16px;
+	background-color: #FF9900;
+	position: absolute;
+	overflow: hidden;
+	border: none;
+}
+
+.slider4
+{
+	width: 361px;
+	height: 15px;
+	background-image: url(images/slider_back.jpg);
+	position:relative;
+	border: 1px solid #000;
+	clear:both;
+}
+#indicator1{
+	background-image:url(images/indicator1.gif);
+	background-color: #000;
+	display: none;
+}
+
+.question{
+	width:360px;
+}
+
+.leftScale{
+	float:left;
+}
+
+.rightScale{
+	float:right;
+}
+
+</style>
+
+{% endblock %}
+
+{% block bodyid %}tab2{% endblock %}
+
+{% block sectionDivID %}editor{% endblock %}
+
+{% block adminContent %}
+
+<!--
+	TODO Hide the marker initially. On click, make it visible
+-->
+
+<div class="question">
+	<p>This is the question</p>
+	<div class="slider4" id="sliderArea">
+		<div class="indicator" id="indicator1">&nbsp;</div>
+	</div>
+	<div class="leftScale">Not Much</div><div class="rightScale">Very Much</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(
+		function()
+		{
+			$('.slider4').Slider(
+				{
+					accept : '#indicator1',
+					restricted: true,
+					fractions : 20,
+					values: [
+						[0,0]
+					]
+				}
+			);
+			
+			$("#sliderArea").click( function() { $("#indicator1").css("display","inline"); } );
+		}
+	);
+</script>
+{% endblock %}

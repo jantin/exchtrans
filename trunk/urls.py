@@ -15,6 +15,11 @@ urlpatterns = patterns('',
 	(r'^experiments/edit/newExperiment/$', 'exchtran.et.views.newExperiment'),	
 	(r'^experiments/newSession/$', 'exchtran.et.views.newSession'),	
 
+	(r'^components/$', 'exchtran.et.views.components'),
+	(r'^components/create/$', 'exchtran.et.views.componentCreate'),
+	(r'^components/edit/$', 'exchtran.et.views.componentEdit'),
+	
+
 	(r'^users/$', 'exchtran.et.views.users'),
 	
 	(r'^scratch/$', 'exchtran.et.views.scratch'),
@@ -42,6 +47,7 @@ urlpatterns = patterns('',
 	(r'^rex/wait/$', 'exchtran.et.views.rexWait'),
 	(r'^rex/reconcile/$', 'exchtran.et.views.rexReconcile'),
 	(r'^rex/CheckAllOffered/$', 'exchtran.et.views.rexCheckAllOffered'),
+	(r'^rex/component/submit/$', 'exchtran.et.views.rexComponentSubmit'),
 	
 	# API
 	(r'^api/sessionStatus/$', 'exchtran.et.api.sessionStatus'),

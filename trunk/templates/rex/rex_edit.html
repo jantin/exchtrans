@@ -1,0 +1,85 @@
+{% extends "adminBase.html" %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.thickbox.js"></script>
+<link rel="stylesheet" href="/site_media/css/thickbox.css" type="text/css" media="screen" />
+
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+	    var options = { 
+	        target:        '#message',   // target element(s) to be updated with server response 
+	    }; 
+
+	    // bind to the form's submit event 
+	    $('#componentForm').submit(function() { 
+	        $(this).ajaxSubmit(options); 
+	        return false; 
+	    }); 
+	});
+</script>
+
+{% endblock %}
+
+{% block bodyid %}tab3{% endblock %}
+
+{% block sectionDivID %}components{% endblock %}
+
+{% block adminContent %}
+<div id="breadCrumbs">
+<a href="/components">Components</a> » {{ component.name }}
+</div>
+
+<h1>Editing {{ component.name }}</h1>
+<form action="/rex/component/submit/" method="post" accept-charset="utf-8" id="componentForm">
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr>
+		<th>Component Name</th>
+		<td><input type="text" name="componentName" value="{{ component.name }}" id="pointCount" size="40" maxlength="200"></td>
+	</tr>
+	<tr>
+		<th>Component Description</th>
+		<td><textarea name="componentDescription" rows="2" cols="40">{{ component.description }}</textarea></td>
+	</tr>
+	<tr>
+		<th>{{parameters.AvailablePoints}}</th>
+		<td><input type="text" name="{{parameters.AvailablePoints}}" value="{{ parameters.AvailablePointsValue }}" id="pointCount" size="2" maxlength="2"></td>
+	</tr>
+	<tr>
+		<th>{{ parameters.PromptText }} (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td><textarea name="{{parameters.PromptText}}" rows="2" cols="40">{{ parameters.PromptTextValue }}</textarea></td>
+	</tr>
+	<tr>
+		<th>{{ parameters.ParticipantsLabel }} (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td><textarea name="{{parameters.ParticipantsLabel}}" rows="2" cols="40">{{ parameters.ParticipantsLabelValue }}</textarea></td>
+	</tr>
+	<tr>
+		<th>{{ parameters.AmountLabel }} (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td><textarea name="{{parameters.AmountLabel}}" rows="2" cols="40">{{ parameters.AmountLabelValue }}</textarea></td>
+	</tr>
+	<tr>
+		<th>{{ parameters.SubmitLabel }} (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td><textarea name="{{parameters.SubmitLabel}}" rows="2" cols="40">{{ parameters.SubmitLabelValue }}</textarea></td>
+	</tr>
+	<tr>
+		<th>{{ parameters.WaitingText }} (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td><textarea name="{{parameters.WaitingText}}" rows="2" cols="40">{{ parameters.WaitingTextValue }}</textarea></td>
+	</tr>
+	<tr>
+		<th>{{ parameters.AcceptText }} (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td><textarea name="{{parameters.AcceptText}}" rows="2" cols="40">{{ parameters.AcceptTextValue }}</textarea></td>
+	</tr>
+	<tr>
+		<th>{{ parameters.AcceptButtonLabel }} (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td><textarea name="{{parameters.AcceptButtonLabel}}" rows="2" cols="40">{{ parameters.AcceptButtonLabelValue }}</textarea></td>
+	</tr>
+</table>
+	<input type="hidden" name="comIM" value="{{ component.id }}">
+	<p><input type="submit" value="Save Changes"></p>
+	<div id="message">
+
+	</div>
+</form>
+{% endblock %}

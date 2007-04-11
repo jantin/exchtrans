@@ -36,6 +36,8 @@ class Experiment(models.Model):
 	status = models.ForeignKey(experimentStatus)
 	dateCreated = models.DateField(auto_now_add=True)
 	dateModified = models.DateField(auto_now=True)
+	minPlayers = models.IntegerField()
+	maxPlayers = models.IntegerField()
 	
 	def __str__(self):
 		return self.name
@@ -72,11 +74,27 @@ class Participant(models.Model):
 		pass
 	
 
+class ComponentTypes(models.Model):
+	componentType = models.CharField(maxlength=255)
+	kickoffFunction = models.CharField(maxlength=255)
+	editTemplate = models.CharField(maxlength=255)
+	
+	def __str__(self):
+		return self.componentType
+	
+	class Admin:
+		pass
+	
+
+
 class Component(models.Model):
 	name = models.CharField(maxlength=255)
-	description = models.TextField()
-	parameters = models.TextField()
-	functionName = models.CharField(maxlength=255)
+	description = models.TextField(null=True)
+	parameters = models.TextField(null=True)
+	dateCreated = models.DateField(auto_now_add=True)
+	dateModified = models.DateField(auto_now=True)
+	componentType = models.ForeignKey(ComponentTypes)
+	
 	
 	def __str__(self):
 		return self.name
