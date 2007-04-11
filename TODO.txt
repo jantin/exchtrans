@@ -1,0 +1,16 @@
+Enable plugin vars
+Questionnaire with slider scale questions
+	instructions for set
+	question text
+	page break
+Session vars
+	-min/max players
+Monitor window
+
+
+
+* Enable components to have custom names
+
+* Make experiment title and description text into form fields on experiment edit page.
+
+* Distinguish between generic and custom (preexisting) component in Add component dropdown.

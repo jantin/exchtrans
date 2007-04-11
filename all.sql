@@ -14,12 +14,19 @@ CREATE TABLE `et_sessionvar` (
     `key` longtext NOT NULL,
     `value` longtext NOT NULL
 );
+CREATE TABLE `et_componenttypes` (
+    `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `componentType` varchar(255) NOT NULL,
+    `kickoffFunction` varchar(255) NOT NULL
+);
 CREATE TABLE `et_component` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `name` varchar(255) NOT NULL,
-    `description` longtext NOT NULL,
-    `parameters` longtext NOT NULL,
-    `functionName` varchar(255) NOT NULL
+    `description` longtext NULL,
+    `parameters` longtext NULL,
+    `dateCreated` date NOT NULL,
+    `dateModified` date NOT NULL,
+    `componentType_id` integer NOT NULL REFERENCES `et_componenttypes` (`id`)
 );
 CREATE TABLE `et_sessionlog` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -71,6 +78,7 @@ ALTER TABLE `et_experiment` ADD CONSTRAINT status_id_refs_id_8bc36f5 FOREIGN KEY
 CREATE INDEX et_participant_status_id ON `et_participant` (`status_id`);
 CREATE INDEX et_participant_experimentSession_id ON `et_participant` (`experimentSession_id`);
 CREATE INDEX et_sessionvar_experimentSession_id ON `et_sessionvar` (`experimentSession_id`);
+CREATE INDEX et_component_componentType_id ON `et_component` (`componentType_id`);
 CREATE INDEX et_sessionlog_participant_id ON `et_sessionlog` (`participant_id`);
 CREATE INDEX et_sessionlog_experimentComponent_id ON `et_sessionlog` (`experimentComponent_id`);
 CREATE INDEX et_experimentcomponents_experiment_id_id ON `et_experimentcomponents` (`experiment_id_id`);

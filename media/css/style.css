@@ -1,5 +1,5 @@
 body {
-	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-family: Arial, Helvetica, sans-serif;
 	margin:0;
 	margin-top:10px;
 	padding:0;
@@ -38,6 +38,7 @@ body {
 
 #editor, 
 #waiting, 
+#components, 
 #experimentView, 
 #users, 
 #dashboard, 
@@ -104,7 +105,7 @@ select {
 }
 
 textarea{
-	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 }
 
 .buttonBig {
@@ -113,7 +114,7 @@ textarea{
 	border-left-color: #CCCCCC;
 	background-color: #FFFFFF;
 	font-weight: bold;
-	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	width:100px;
 	height:2.5em;
 }
@@ -130,7 +131,7 @@ textarea{
 	border-left-color: #CCCCCC;
 	background-color: #FFFFFF;
 	font-weight: bold;
-	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	height:2em;
 	font-size: .8em;
 }
@@ -286,7 +287,7 @@ textarea{
 ul#tabnav { /* general settings */
 	text-align: left; /* set to left, right or center */
 	margin: 1em 0 1em 0; /* set margins as desired */
-	font: 16px verdana, arial, sans-serif; /* set font as desired */
+	font: 16px Helvetica, arial, sans-serif; /* set font as desired */
 	border-bottom: 1px solid #ccc; /* set border COLOR as desired */
 	list-style-type: none;
 	padding: 3px 0px 3px 0px; /* THIRD number must change with respect to padding-top (X) below */

@@ -1,0 +1,37 @@
+{% extends "adminBase.html" %}
+
+{% block bodyid %}tab3{% endblock %}
+
+{% block sectionDivID %}components{% endblock %}
+
+{% block adminContent %}
+
+<h1>Components</h1>
+
+<form action="/components/create/" method="post" accept-charset="utf-8">
+	<p>Component Name:<br/>
+	<input type="text" name="componentName" value="" id="componentName"></p>
+	<p>Component Type:<br/>
+	<select name="componentType">
+		{% for ct in componentTypes %}
+			<option value="{{ ct.id }}">{{ ct.componentType }}</option>
+		{% endfor %}
+	</select>
+	<p><input type="submit" value="Submit"></p>
+</form>
+
+<table class="experimentTable">
+	<thead>
+	<tr><th>Name</th><th>Component Type</th><th>Last Modified</th><th>Actions</th></tr>
+	</thead>
+	{% for c in components %}
+	<tr class="{% cycle row1,row2 %}">
+		<td>{{ c.name }}</td>
+		<td>{{ c.componentType }}</td>
+		<td>{{ c.dateModified }}</td>
+		<td><a href="/components/edit/?id={{ c.id }}">Edit</a></td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endblock %}
