@@ -3,7 +3,6 @@
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/heartbeat.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/getParams.js"></script>
 {% endblock %}
 
 
@@ -15,13 +14,15 @@
 <script type="text/javascript">
 $(document).ready(function() {
 		$.jheartbeat.set({
-			url: "/api/sessionStatus/?sid={{ sid }}",
+			url: "/api/sessionStatus/?sid={{ sid }}&pname={{ partName }}",
 			delay: 3000
 		}, function () {
 			var statusText = document.getElementById('HeartBeatDIV').innerHTML;
 			if(statusText == "Running"){
-				
-				location.href = "/session/drive/?sid=" + $.getURLParam("sid") + "&pname=" + $.getURLParam("pname")
+				location.href = "/session/drive/?sid={{ sid }}&pname={{ partName }}";
+			}
+			if(statusText == "Booted"){
+				location.href = "/session/booted/?sid={{ sid }}&pname={{ partName }}";
 			}
 		});
 	});
