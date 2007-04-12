@@ -5,21 +5,30 @@
 {% block sectionDivID %}components{% endblock %}
 
 {% block adminContent %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 
 <h1>Components</h1>
-
-<form action="/components/create/" method="post" accept-charset="utf-8">
-	<p>Component Name:<br/>
-	<input type="text" name="componentName" value="" id="componentName"></p>
-	<p>Component Type:<br/>
-	<select name="componentType">
-		{% for ct in componentTypes %}
-			<option value="{{ ct.id }}">{{ ct.componentType }}</option>
-		{% endfor %}
-	</select>
-	<p><input type="submit" value="Submit"></p>
-</form>
-
+<div class="helpText"> 
+<p>Components are the building blocks of experiments. There are two generic
+component types: questionnaires and reciprocal exchanges. You can create new
+components with the link below or by duplicating an existing component.</p>
+</div>
+<p><a href="#" onclick="$('.createNewThing').slideToggle(500);">Create a new component</a></p>
+<div class="createNewThing">
+	<form action="/components/create/" method="post" accept-charset="utf-8">
+		<p><label for="componentName">Component Name:<br/>
+		<input type="text" name="componentName" value="" id="componentName"></label></p>
+		<p><label for="componentType">Component Type:<br/>
+		<select name="componentType">
+			{% for ct in componentTypes %}
+				<option value="{{ ct.id }}">{{ ct.componentType }}</option>
+			{% endfor %}
+		</select></label></p>
+		<p><input type="button" value="Cancel" class="buttonSmall" onclick="$('.createNewThing').slideToggle(500);"/> <input type="submit" value="Create Component" class="buttonSmall"/></p>
+	</form>	
+</div>
+<br/><br/>
+<h3>Existing components table</h3>
 <table class="experimentTable">
 	<thead>
 	<tr><th>Name</th><th>Component Type</th><th>Last Modified</th><th>Actions</th></tr>
@@ -29,7 +38,7 @@
 		<td>{{ c.name }}</td>
 		<td>{{ c.componentType }}</td>
 		<td>{{ c.dateModified }}</td>
-		<td><a href="/components/edit/?id={{ c.id }}">Edit</a></td>
+		<td><a href="/components/edit/?id={{ c.id }}">Edit</a> | <a href="/components/delete/?cid={{ c.id }}">Delete</a></td>
 	</tr>
 	{% endfor %}
 </table>

@@ -1,0 +1,42 @@
+{% extends "adminBase.html" %}
+
+{% block bodyid %}tab2{% endblock %}
+
+{% block sectionDivID %}experiments{% endblock %}
+
+{% block adminContent %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+
+<h1>Experiments</h1>
+<div class="helpText"> 
+<p>An experiment is an ordered collection of components. You can create a new experiment with the link below.</p>
+</div>
+<p><a href="#" onclick="$('.createNewThing').slideToggle(500);">Create a new experiment</a></p>
+<div class="createNewThing">
+	<form action="/editor/newExperiment/" method="post" accept-charset="utf-8">
+		<p><label for="experimentName">Name:<br>
+		<input type="text" name="experimentName" id="experimentName" class="inputSmall" value="" size="20" /></label></p>
+		<p><label for="experimentDescription">Description:<br>
+		<textarea rows="4" cols="30" name="experimentDescription" id="experimentDescription" ></textarea></label></p>
+		<p><input type="button" value="Cancel" class="buttonSmall" onclick="$('.createNewThing').slideToggle(500);"/> <input class="buttonSmall" type="submit" value="Create Experiment"></p>
+	</form>
+</div>
+<br/><br/>
+<h3>Existing experiments table</h3>
+<table class="experimentTable">
+	<thead>
+	<tr><th>Date Created</th><th>Name</th><th>Actions</th></tr>
+	</thead>
+	{% for e in experiments %}
+	<tr class="{% cycle row1,row2 %}">
+		<td>{{ e.dateCreated }}</td>
+		<td>{{ e.name }}</td>
+		<!--
+			TODO Add Delete confirmation
+		-->
+		<td><a href="/experiments/view/?id={{ e.id }}">View</a> | <a href="/experiments/edit/?id={{ e.id }}">Edit</a> | <a href="/experiments/delete/?eid={{ e.id }}">Delete</a></td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endblock %}

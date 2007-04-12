@@ -1,0 +1,47 @@
+{% extends "adminBase.html" %}
+
+{% block bodyid %}tab1{% endblock %}
+
+{% block sectionDivID %}sessions{% endblock %}
+
+{% block adminContent %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+
+
+
+<h1>Sessions</h1>
+<div class="helpText"> 
+<p>A session is a running instance of an experiment. When you are ready to run an
+experiment with participants, you should create a new session with that experiment.
+Participants can join sessions and experimenters can monitor sessions. Data
+collected while running an experiment is stored with the session.</p>
+</div>
+<p><a href="#" onclick="$('.createNewThing').slideToggle(500);">Create a new session</a></p>
+<div class="createNewThing">
+	<form action="/experiments/newSession/" method="get" accept-charset="utf-8">
+		<p><label for="id">Select an experiment:<br/>
+		<select name="id">
+			{% for e in experiments %}
+				<option value="{{ e.id }}">{{ e.name }}</option>
+			{% endfor %}
+		</select></label></p>
+		<p><input type="button" value="Cancel" class="buttonSmall" onclick="$('.createNewThing').slideToggle(500);"/> <input type="submit" value="Start Session" class="buttonSmall"/></p>
+	</form>
+</div>
+<br/><br/>
+<h3>Existing sessions table</h3>
+<table class="experimentTable">
+	<thead>
+	<tr><th>ID</th><th>Status</th><th>Experiment Name</th><th>Actions</th></tr>
+	</thead>
+	{% for e in expSessions %}
+	<tr class="{% cycle row1,row2 %}">
+		<td>{{ e.id }}</td>
+		<td>{{ e.status.statusText }}</td>
+		<td>{{ e.experiment_id.name }}</td>
+		<td><a href='/session/join/?sid={{ e.id }}'>Join</a> | <a href='/sessions/monitor/?sid={{ e.id }}'>Monitor</a> | <a href="/session/delete/?sid={{ e.id }}">Delete</a></td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endblock %}
