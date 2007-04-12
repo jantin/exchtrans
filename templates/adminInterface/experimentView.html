@@ -12,8 +12,8 @@
 <p>{{ experiment.description }}</p>
 <p><a href="/experiments/edit/?id={{ experiment.id }}">Edit Experiment</a></p>
 <h3>Statistics</h3>
-Total Runs: 4<br/>
-Last Run: Feb. 2, 2007
+Total Sessions: 4<br/>
+Last Session: Feb. 2, 2007
 <br/><br/>
 Created on: Jan. 1, 2007<br/>
 Created by: Coye Cheshire
@@ -35,7 +35,7 @@ Last modified by: Jon Lesser
 	<tr class="{% cycle row1,row2 %}">
 		<td>{{ e.id }}</td>
 		<td>{{ e.dateStarted }}</td>
-		<td><a href="/session/join/?id={{ e.id }}">Join</a> | <a href="/dashboard/monitor/?id={{ e.id }}">Monitor</a></td>
+		<td><a href="/session/join/?sid={{ e.id }}">Join</a> | <a href="/dashboard/monitor/?sid={{ e.id }}">Monitor</a> | <a href="/dashboard/monitor/?sid={{ e.id }}">Stop</a></td>
 	</tr>
 	{% endfor %}
 </table>

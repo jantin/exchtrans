@@ -3,9 +3,8 @@
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.thickbox.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.inplace.js"></script>
 
-<link rel="stylesheet" href="/site_media/css/thickbox.css" type="text/css" media="screen" />
 {% endblock %}
 
 {% block bodyid %}tab2{% endblock %}
@@ -28,18 +27,44 @@ $(document).ready(
 
 			}
 		);
+		$(".editExpInput").editInPlace({
+			url: "/api/updateField/",
+			params: "ajax=yes"
+		});
+		$(".editExpDescription").editInPlace({
+			url: "/api/updateField/",
+			params: "ajax=yes",
+			field_type: "textarea",
+		    textarea_rows: "5",
+		    textarea_cols: "35"
+		});
 
 	}
 );
+
+function saveComponentOrder (){
+	list = $.SortSerialize("componentsList");
+	$.post("/api/saveComponentChanges/", list);
+	$("#orderSaveConfirm").html("Order Saved");
+	$('#orderSaveConfirm').fadeIn('3000');
+	setTimeout("$('#orderSaveConfirm').fadeOut('3000');", 2000)
+}
+
 
 </script>
 <div id="breadCrumbs">
 <a href="/experiments">Experiments</a> » <a href="/experiments/view/?id={{ expDetails.id }}">{{ expDetails.name }}</a> » Editing {{ expDetails.name }}
 </div>
-<h3>Title</h3>
-<p><input type="text" name="title" value="{{ expDetails.name }}" id="title"/></p>
-<h3>Description</h3>
-<p><textarea name="description" rows="4" cols="40">{{ expDetails.description }}</textarea></p>
+<h3>Experiment Name</h3>
+<p class="editExpInput" id="name___{{ expDetails.id }}">{{ expDetails.name }}</p>
+<h3>Experiment Description</h3>
+<p class="editExpDescription" id="description___{{ expDetails.id }}">{{ expDetails.description }}</p>
+<h3>Minimum Players</h3>
+<p class="editExpInput" id="minPlayers___{{ expDetails.id }}">{{ expDetails.minPlayers }}</p>
+<h3>Maximum Players</h3>
+<p class="editExpInput" id="maxPlayers___{{ expDetails.id }}">{{ expDetails.maxPlayers }}</p>
+
+
 <h3>Components</h3>
 	<form action="/experiments/edit/addComponent/" method="post" accept-charset="utf-8"><p>
 		<select name="addComponentID">
@@ -54,43 +79,22 @@ $(document).ready(
 		<input class="buttonSmall" type="submit" value="Add Component"></p>
 	</form>
 	
-	<form action="/experiments/edit/updateExperiment" method="post" accept-charset="utf-8">
-	<div class="components">
+	<form action="/experiments/edit/updateExperiment/" method="post" accept-charset="utf-8">
+	<div class="components" id="componentsList">
 		{% for ec in experimentComponentsList %}
-		<div id="component{{forloop.counter}}" class="component">
+		<div id="component___{{ ec.id }}" class="component">
 			<div class="componentTopPane">
-				<div class="componentOrderField">
-					<input type="text" name="order" value="{{ ec.order }}" id="order" size="2" maxlength="2">
-				</div>
 				<div class="componentName">
-					{{ ec.component_id.name }} (<a href="#" onclick="$('#componentBottomPane{{forloop.counter}}').BlindToggleVertically(500);return false;">Details</a>)
+					{{ ec.component_id.name }}
 				</div>
 				<div class="componentDelete">
-					<a href="#" onclick="$('#component{{forloop.counter}}').DropOutDown(200);">Delete</a>
+					<a href="/experiments/edit/removeComponent/?expCompID={{ ec.id }}&expID={{ ec.experiment_id.id }}">Delete</a>
 				</div>
-			</div>
-			<div id="componentBottomPane{{forloop.counter}}" class="componentBottomPane">
-				<table border="0" cellspacing="5" cellpadding="5">
-					<tr><th>Number of Repeats: </th><td><input type="text" name="repeatCount" value="" id="repeatCount" size="2" maxlength="2"></td></tr>
-					<tr><th>Available Points: </th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="6"></td></tr>
-					<tr><th>Prompt Text (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="6"></td></tr>
-					<tr><th>Participants Label (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):
-					</th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="10"></td></tr>
-					<tr><th>Amount Label (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):
-					</th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="10"></td></tr>
-					<tr><th>Submit Label (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):
-					</th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="10"></td></tr>
-					<tr><th>Waiting Text (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):
-					</th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="10"></td></tr>
-					<tr><th>Accept Text (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):
-					</th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="10"></td></tr>
-					<tr><th>Accept Button Label (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):
-					</th><td><input type="text" name="pointCount" value="" id="pointCount" size="6" maxlength="10"></td></tr>
-				</table>
 			</div>
 		</div>
 		{% endfor %}
 	</div>
-	<p><input class="buttonSmall" type="submit" value="Save Changes"></p>
+	<p><input class="buttonSmall" type="submit" value="Save Order" onclick="saveComponentOrder(); return false;"></p>
+	<div id="orderSaveConfirm"></div>
 </form>
 {% endblock %}

@@ -15,7 +15,10 @@
 
 	    // bind to the form's submit event 
 	    $('#componentForm').submit(function() { 
-	        $(this).ajaxSubmit(options); 
+	        $(this).ajaxSubmit(options);
+			$("#message").html("Component Saved");
+			$('#message').fadeIn('3000');
+			setTimeout("$('#message').fadeOut('3000');", 2000)
 	        return false; 
 	    }); 
 	});
@@ -77,7 +80,7 @@
 	</tr>
 </table>
 	<input type="hidden" name="comIM" value="{{ component.id }}">
-	<p><input type="submit" value="Save Changes"></p>
+	<p><input type="submit" value="Save Changes" class="buttonSmall"></p>
 	<div id="message">
 
 	</div>
