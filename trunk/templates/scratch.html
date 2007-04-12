@@ -4,45 +4,71 @@
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
 
-<style type="text/css">
-
-.indicator
+<style type="text/css" media="all">
+html
 {
-	width: 16px;
-	height: 16px;
-	background-color: #FF9900;
-	position: absolute;
-	overflow: hidden;
+	height: 100%;
+}
+img{
 	border: none;
 }
-
-.slider4
+body
 {
-	width: 361px;
-	height: 15px;
-	background-image: url(images/slider_back.jpg);
-	position:relative;
-	border: 1px solid #000;
-	clear:both;
+	background: #fff;
+	height: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
 }
-#indicator1{
-	background-image:url(images/indicator1.gif);
-	background-color: #000;
-	display: none;
+.groupWrapper
+{
+	width: 32%;
+	float: left;
+	margin-right: 1%;
+	min-height: 400px;
+}
+.serializer
+{
+	clear: both;
+}
+.groupItem
+{
+	margin-bottom: 20px;
+}
+.groupItem .itemHeader
+{
+	line-height: 28px;
+	background-color: #DAFF9F;
+	border-top: 2px solid #B5EF59;
+	color: #000;
+	padding: 0 10px;
+	cursor: move;
+	font-weight: bold;
+	font-size: 16px;
+	height: 28px;
+	position: relative;
 }
 
-.question{
-	width:360px;
+.groupItem .itemHeader a
+{
+	position: absolute;
+	right: 10px;
+	top: 0px;
+	font-weight: normal;
+	font-size: 11px;
+	text-decoration: none;
 }
-
-.leftScale{
-	float:left;
+.sortHelper
+{
+	border: 3px dashed #666;
+	width: auto !important;
 }
-
-.rightScale{
-	float:right;
+.groupWrapper p
+{
+	height: 1px;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
 }
-
 </style>
 
 {% endblock %}
@@ -53,35 +79,135 @@
 
 {% block adminContent %}
 
-<!--
-	TODO Hide the marker initially. On click, make it visible
--->
 
-<div class="question">
-	<p>This is the question</p>
-	<div class="slider4" id="sliderArea">
-		<div class="indicator" id="indicator1">&nbsp;</div>
+
+<div id="sort1" class="groupWrapper">
+	<div id="newsFeeder" class="groupItem">
+
+		<div class="itemHeader">Feeds<a href="#" class="closeEl">[-]</a></div>
+		<div class="itemContent">
+			<ul>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+			</ul>
+		</div>
 	</div>
-	<div class="leftScale">Not Much</div><div class="rightScale">Very Much</div>
+	<div id="news" class="groupItem">
+		<div class="itemHeader">News<a href="#" class="closeEl">[-]</a></div>
+		<div class="itemContent">
+
+			<ul>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+			</ul>
+		</div>
+
+	</div>
+	<p>&nbsp;</p>
+</div>
+<div id="sort2" class="groupWrapper">
+	<div id="shop" class="groupItem">
+		<div class="itemHeader">Shopping<a href="#" class="closeEl">[-]</a></div>
+		<div class="itemContent">
+			<ul>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+			</ul>
+		</div>
+	</div>
+	<p>&nbsp;</p>
+
+</div>
+<div id="sort3" class="groupWrapper">
+	<div id="links" class="groupItem">
+		<div class="itemHeader">Links<a href="#" class="closeEl">[-]</a></div>
+		<div class="itemContent">
+			<ul>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+			</ul>
+		</div>
+	</div>
+	<div id="images" class="groupItem">
+		<div class="itemHeader">Images<a href="#" class="closeEl">[-]</a></div>
+
+		<div class="itemContent">
+			<ul>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+				<li>orem ipsum dolor sit amet, consectetuer adipiscing elit</li>
+			</ul>
+
+		</div>
+	</div>
+	<p>&nbsp;</p>
+</div>
+<script type="text/javascript">
+$(document).ready(
+	function () {
+		$('a.closeEl').bind('click', toggleContent);
+		$('div.groupWrapper').Sortable(
+			{
+				accept: 'groupItem',
+				helperclass: 'sortHelper',
+				activeclass : 	'sortableactive',
+				hoverclass : 	'sortablehover',
+				handle: 'div.itemHeader',
+				tolerance: 'pointer',
+				onChange : function(ser)
+				{
+				},
+				onStart : function()
+				{
+					$.iAutoscroller.start(this, document.getElementsByTagName('body'));
+				},
+				onStop : function()
+				{
+					$.iAutoscroller.stop();
+				}
+			}
+		);
+	}
+);
+var toggleContent = function(e)
+{
+	var targetContent = $('div.itemContent', this.parentNode.parentNode);
+	if (targetContent.css('display') == 'none') {
+		targetContent.slideDown(300);
+		$(this).html('[-]');
+	} else {
+		targetContent.slideUp(300);
+		$(this).html('[+]');
+	}
+	return false;
+};
+function serialize(s)
+{
+	list = $.SortSerialize("sort1");
+	alert(list.hash);
+	serial = $.SortSerialize(s);
+	alert(serial.hash);
+};
+</script>
+<div  class="serializer">
+<a href="#" onClick="serialize(); return false;" >serialize all lists</a>
+<a href="#" onClick="serialize('sort1'); return false;" >serialize list 1</a>
+<a href="#" onClick="serialize('sort2'); return false;" >serialize list 2</a>
+<a href="#" onClick="serialize('sort3'); return false;" >serialize list 3</a>
+
+<a href="#" onClick="serialize(['sort1', 'sort3']); return false;" >serialize lists 2 and 3</a>
 </div>
 
-<script type="text/javascript">
-	$(document).ready(
-		function()
-		{
-			$('.slider4').Slider(
-				{
-					accept : '#indicator1',
-					restricted: true,
-					fractions : 20,
-					values: [
-						[0,0]
-					]
-				}
-			);
-			
-			$("#sliderArea").click( function() { $("#indicator1").css("display","inline"); } );
-		}
-	);
-</script>
 {% endblock %}
