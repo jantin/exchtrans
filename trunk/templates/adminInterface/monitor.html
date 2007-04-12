@@ -26,12 +26,20 @@
 		{{ monitorSession.experiment_id.name }}
 	</div>
 	<div id="sessionInfo">
-		<strong>Session ID:</strong> {{ monitorSession.id }}<br/>
-		<strong>Status:</strong> {{ monitorSession.status.statusText }}<br/>
-		<strong>Current participants:</strong><br/>
+		<p><strong>Session ID:</strong> {{ monitorSession.id }}</p>
+		<p><strong>Status:</strong> {{ monitorSession.status.statusText }}</p>
+		<p><strong>Current participants:</strong>
+		{% if noParticipants  %}
+			None </p>
+		{% else %}
 			{% for p in participants %}
-				{{ p.name }}<br/>
+				<br/>
+				{{ p.name }} (<a href="/session/bootParticipant/?pid={{ p.id }}&sid={{ monitorSession.id }}">X</a>)
 			{% endfor %}
+			</p>
+		{% endif %}
+
+
 	</div>
 	{% if running %}
 	<a href="/session/stop/?sid={{ monitorSession.id }}">Stop Session</a>

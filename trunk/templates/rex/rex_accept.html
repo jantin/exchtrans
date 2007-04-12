@@ -1,9 +1,11 @@
 {% extends "rex/rex_base.html" %}
 
 {% block actionArea %}
-You were received some number of points from a player.
+<div class="AcceptText">
+	{{ parameters.AcceptTextValue}}
+</div>
 
-<a href="/session/drive/?sid={{ sid }}&pname={{ pname }}">Accept</a>
+<a href="/session/drive/?sid={{ sid }}&pname={{ pname }}">{{ parameters.AcceptButtonLabelValue}}</a>
 {% endblock %}
 
 {% block rightCol %}{% endblock %}
