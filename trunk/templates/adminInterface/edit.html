@@ -78,7 +78,9 @@ function saveComponentOrder (){
 		<input type="hidden" name="expID" value="{{ expID }}" id="expID">
 		<input class="buttonSmall" type="submit" value="Add Component"></p>
 	</form>
-	
+	<!--
+		TODO Add ability to repeat a component multiple times
+	-->
 	<form action="/experiments/edit/updateExperiment/" method="post" accept-charset="utf-8">
 	<div class="components" id="componentsList">
 		{% for ec in experimentComponentsList %}

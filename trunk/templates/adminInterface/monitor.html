@@ -6,11 +6,11 @@
 
 {% block adminContent %}
 <div id="breadCrumbs">
-	<a href="/dashboard">Dashboard</a> » Monitoring {{ monitorSession.experiment_id.name }} (session {{ monitorSession.id }})
+	<a href="/sessions">Sessions</a> » Monitoring {{ monitorSession.experiment_id.name }} (session {{ monitorSession.id }})
 </div>
 <h1>Monitor</h1>
 <div id="changeSession">
-	<form name="changeSession" action="/dashboard/monitor/" method="get" id="changeSession">
+	<form name="changeSession" action="/sessions/monitor/" method="get" id="changeSession">
 		<p><label for="id">Change Session:<br>
 		<select name="sid">
 			{% for s in expSessions %}
