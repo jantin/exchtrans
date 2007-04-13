@@ -55,23 +55,32 @@ function saveComponentOrder (){
 <div id="breadCrumbs">
 <a href="/experiments">Experiments</a> » <a href="/experiments/view/?id={{ expDetails.id }}">{{ expDetails.name }}</a> » Editing {{ expDetails.name }}
 </div>
-<h3>Experiment Name</h3>
-<p class="editExpInput" id="name___{{ expDetails.id }}">{{ expDetails.name }}</p>
-<h3>Experiment Description</h3>
-<p class="editExpDescription" id="description___{{ expDetails.id }}">{{ expDetails.description }}</p>
-<h3>Minimum Players</h3>
-<p class="editExpInput" id="minPlayers___{{ expDetails.id }}">{{ expDetails.minPlayers }}</p>
-<h3>Maximum Players</h3>
-<p class="editExpInput" id="maxPlayers___{{ expDetails.id }}">{{ expDetails.maxPlayers }}</p>
-
-
-<h3>Components</h3>
+<h2>Details</h2>
+<div class="floatForm">
+	<div class="floatRow">
+		<div class="floatLabel">Experiment Name</div>
+		<div class="floatContent editExpInput" id="name___{{ expDetails.id }}">{{ expDetails.name }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Experiment Description</div>
+		<div class="floatContent editExpDescription" id="description___{{ expDetails.id }}">{{ expDetails.description }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Minimum Players</div>
+		<div class="floatContent editExpInput" id="minPlayers___{{ expDetails.id }}">{{ expDetails.minPlayers }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Maximum Players</div>
+		<div class="floatContent editExpInput" id="maxPlayers___{{ expDetails.id }}">{{ expDetails.maxPlayers }}</div>
+	</div>
+</div>
+<br clear="both">
+<h2>Components</h2>
 	<form action="/experiments/edit/addComponent/" method="post" accept-charset="utf-8"><p>
 		<select name="addComponentID">
-			<option value="">----</option>
 			{% for c in componentList %}
 			<option value="{{ c.id }}">
-				{{ c.name }}
+				{{ c.name }} ({{ c.componentType }})
 			</option>
 			{% endfor %}
 		</select>
@@ -91,6 +100,9 @@ function saveComponentOrder (){
 				</div>
 				<div class="componentDelete">
 					<a href="/experiments/edit/removeComponent/?expCompID={{ ec.id }}&expID={{ ec.experiment_id.id }}">Delete</a>
+				</div>
+				<div class="componentDetails">
+					Iterations: <span class="editExpInput">3</span>
 				</div>
 			</div>
 		</div>
