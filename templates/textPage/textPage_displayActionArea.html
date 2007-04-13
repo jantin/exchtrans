@@ -1,0 +1,26 @@
+{% extends "rex/rex_base.html" %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="/site_media/css/textPage.css" />
+{% endblock %}
+
+{% block actionArea %}
+
+{% endblock %}
+
+{% block rightCol %}{% endblock %}
+
+{% block bottomBar %}
+<div id="currentPointsBox">
+	<p>{{ parameters.AvailablePoints }}</p>
+	<div class="largePoints">
+		--
+	</div>
+</div>
+<div id="cumulativePointsBox">
+	<p>Cumulative Points: </p>
+	<div class="largePoints">
+		{{ cumulativePoints }}
+	</div>
+</div>
+{% endblock %}

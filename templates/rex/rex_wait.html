@@ -35,4 +35,17 @@ $(document).ready(function() {
 
 {% block rightCol %}{% endblock %}
 
-{% block bottomBar %}bottomBar{% endblock %}
+{% block bottomBar %}
+<div id="currentPointsBox">
+	<p>{{ parameters.AvailablePoints }}</p>
+	<div class="largePoints">
+		--
+	</div>
+</div>
+<div id="cumulativePointsBox">
+	<p>Cumulative Points: </p>
+	<div class="largePoints">
+		{{ cumulativePoints }}
+	</div>
+</div>
+{% endblock %}
