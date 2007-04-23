@@ -1,4 +1,3 @@
-Enable plugin vars
 Questionnaire with slider scale questions
 	instructions for set
 	question text
@@ -8,9 +7,14 @@ Session vars
 Monitor window
 
 
+Confirm offers.
+
+
 
 * Enable components to have custom names
 
 * Make experiment title and description text into form fields on experiment edit page.
 
 * Distinguish between generic and custom (preexisting) component in Add component dropdown.
+
+

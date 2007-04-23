@@ -66,6 +66,7 @@ class Participant(models.Model):
 	dateCreated = models.DateField(auto_now_add=True)
 	currentComponent = models.IntegerField(null=True)
 	currentIteration = models.IntegerField(null=True)
+	cumulativePoints = models.IntegerField(null=True,default=0)
 	
 	def __str__(self):
 		return self.name
