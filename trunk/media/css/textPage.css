@@ -1,0 +1,18 @@
+.fullBox{
+	width:800px;
+	margin:100px auto 0px auto;
+}
+
+.fullHeading{
+	font-size:2em;
+}
+
+.fullBody{
+	
+}
+
+.continueButton{
+	position:absolute;
+	top:520px;
+	left:840px;
+}

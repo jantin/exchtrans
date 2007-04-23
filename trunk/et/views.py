@@ -2,20 +2,25 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
+from django.core.exceptions import ObjectDoesNotExist
 from et.models import *
+from et.common import *
+from et.textPage import *
 import pickle
 from time import time
 
 def profile_redirect(request):
 	"""The generic login view directs to a profile page. This redirects accounts/profile to somewhere else"""
-	return HttpResponseRedirect('/dashboard')
+	return HttpResponseRedirect('/sessions')
 
 @login_required
-def dashboard(request):
+def sessions(request):
 	"""This page shows the 'Waiting for participants' and 'In progress' experiments."""
 	expSessions = ExperimentSession.objects.all()
-	return render_to_response('adminInterface/dashboard.html', 
-							  {'expSessions': expSessions}, 
+	experiments = Experiment.objects.all()
+	return render_to_response('adminInterface/sessions.html', 
+							  {'expSessions': expSessions,
+							'experiments': experiments}, 
 							  context_instance=RequestContext(request))
 
 @login_required
@@ -34,15 +39,22 @@ def monitor(request):
 	else:
 		running = False
 	
+	if(len(participants) > 0):
+		noParticipants = False
+	else:
+		noParticipants = True
+	
+
 	return render_to_response('adminInterface/monitor.html', 
 							  {'expSessions': expSessions, 
 							   'monitorSession':monitorSession,
 							   'participants':participants,
+							   'noParticipants':noParticipants,
 							   'running':running},
 							  context_instance=RequestContext(request))
 	
 
-
+@login_required
 def components(request):
 	"""This page lists all components in the system."""
 	components = Component.objects.all()
@@ -52,7 +64,7 @@ def components(request):
 								'componentTypes': componentTypes}, 
 							  context_instance=RequestContext(request))
 
-
+@login_required
 def componentEdit(request):
 	"""This page displays a single component for editing"""
 	comID = request.GET.get('id')
@@ -70,7 +82,7 @@ def componentEdit(request):
 # TODO export component
 # TODO load component
 
-
+@login_required
 def componentCreate(request):
 	"""This function creates a new component instance"""
 	# Get information from POST vars
@@ -86,24 +98,30 @@ def componentCreate(request):
 		componentParams = rexParameters(	"Available Points",
 											"25",
 											"Prompt Text", 
-											"Prompt Text Value",
+											"The experimenter gave you 25 points to offer this round. Select a player below to make an offer to that player",
 											"Participants Label", 
-											"Participants Label Value",
+											"Make offer to: ",
 											"Amount Label", 
-											"Amount Label Value",
+											"Offer amount: ",
 											"Submit Label", 
-											"Submit Label Value",
+											"Submit Offer",
 											"Waiting Text", 
-											"Waiting Text Value",
+											"Waiting for other players...",
 											"Accept Text", 
-											"Accept Text Value",
+											"Listed below are offers you received.",
 											"Accept Button Label", 
-											"Accept Button Label Value")
+											"Accept")
 	
 	
 	if (componentType.componentType == "Questionnaire"):
 		componentParams = {}
 	
+	if (componentType.componentType == "Text Page"):
+		componentParams = textPageObj(	"",
+										"",
+										"",
+										""
+									)
 	
 	# Add component to the database
 	c = Component(	name = componentName,
@@ -114,6 +132,15 @@ def componentCreate(request):
 	
 	return HttpResponseRedirect('/components/edit/?id=' + str(c.id))
 
+@login_required
+def componentDelete(request):
+	# TODO Don't delete, add a field to the model for inactive or something like that.
+	"""This creates a new experiment session"""
+	cid = request.GET.get('cid')
+	comp = Component.objects.get(id=cid)
+	comp.delete()
+	
+	return HttpResponseRedirect('/components')
 
 
 @login_required
@@ -125,11 +152,12 @@ def editor(request):
 							  { 'experimentList': experimentList }, 
 							  context_instance=RequestContext(request))
 
+@login_required
 def edit(request):
 	"""This view allows you to edit an existing experiment"""
 	expID = request.GET.get('id')
 	expDetails = Experiment.objects.get(id=expID)
-	componentList = Component.objects.values()
+	componentList = Component.objects.all()
 	experimentComponentsList = ExperimentComponents.objects.filter(experiment_id__exact=expID)	
 
 	return render_to_response('adminInterface/edit.html', 
@@ -143,7 +171,7 @@ def edit(request):
 def experiments(request):
 	"""This page lists all experiments in the system."""
 	experiments = Experiment.objects.all()
-	return render_to_response('adminInterface/archive.html', 
+	return render_to_response('adminInterface/experiments.html', 
 							  {'experiments': experiments}, 
 							  context_instance=RequestContext(request))
 
@@ -162,7 +190,7 @@ def viewExperiment(request):
 							   }, 
 							  context_instance=RequestContext(request))
 	
-
+@login_required
 def addComponent(request):
 	"""This adds a component to an experiment"""
 	if (request.POST.get('addComponentID') != ""):
@@ -180,20 +208,51 @@ def addComponent(request):
 	
 	return HttpResponseRedirect('/experiments/edit/?id=' + request.POST.get('expID'))
 
+@login_required
+def removeComponent(request):
+	# TODO convert this to a POST operation
+	"""This removes a component from an experiment"""
+	if (request.GET.get('removeComponentID') != ""):
+		
+		expID = request.GET.get('expID')
+		expCompID = request.GET.get('expCompID');
+			
+		# insert the new component into the database
+		ec = ExperimentComponents.objects.get(id=expCompID)
+		ec.delete()
+	
+		# redirect back to the experiment editing page
+	return HttpResponseRedirect('/experiments/edit/?id=' + expID)
+
+@login_required
 def newExperiment(request):
 	"""This creates a new experiment"""
 	if (request.POST.get('experimentName') != ""):
 
 		# insert the new component into the database
-		e = Experiment(name=request.POST.get('experimentName'),
-					   description=request.POST.get('experimentDescription'),
-						status=experimentStatus.objects.get(statusText='active'))
+		e = Experiment	(	name = request.POST.get('experimentName'),
+					   		description = request.POST.get('experimentDescription'),
+							status = experimentStatus.objects.get(statusText='Waiting for participants'),
+							minPlayers = 4,
+							maxPlayers = 4
+						)
 		e.save()
 		
 		# redirect back to the experiment editing page
 
 	return HttpResponseRedirect('/experiments/edit/?id=' + str(e.id))
 
+@login_required
+def experimentDelete(request):
+	# TODO Don't delete, add a field to the model for inactive or something like that.
+	"""This creates a new experiment session"""
+	eid = request.GET.get('eid')
+	e = Experiment.objects.get(id=eid)
+	e.delete()
+	
+	return HttpResponseRedirect('/experiments')
+
+@login_required
 def newSession(request):
 	"""This creates a new experiment session"""
 	expID = request.GET.get('id')
@@ -201,18 +260,19 @@ def newSession(request):
 	expSesStat = experimentSessionStatus.objects.get(statusText="Not Ready")
 	e = ExperimentSession(experiment_id=expObject, status=expSesStat)
 	e.save()
+	sid = e.id
 	
-	return HttpResponseRedirect('/experiments/view/?id=' + expID)
+	return HttpResponseRedirect('/sessions/monitor/?sid=' + str(sid))
 
+@login_required
 def deleteSession(request):
+	# TODO Don't delete, add a field to the model for inactive or something like that.
 	"""This creates a new experiment session"""
 	sid = request.GET.get('sid')
-	expObject = Experiment.objects.get(id=expID)
-	expSesStat = experimentSessionStatus.objects.get(statusText="Not Ready")
-	e = ExperimentSession(experiment_id=expObject, status=expSesStat)
-	e.save()
+	expSes = ExperimentSession.objects.get(id=sid)
+	expSes.delete()
 	
-	return HttpResponseRedirect('/experiments/view/?id=' + str(expID))
+	return HttpResponseRedirect('/sessions')
 
 
 @login_required
@@ -227,7 +287,7 @@ def joinSession(request):
 	p.save()
 	
 	# Set participant's name
-	p.name = p.dateCreated.strftime("%Y-%m-%d") + "_" + str(p.id).rjust(4,"0")
+	p.name = p.dateCreated.strftime("%Y-%m-%d") + "_" + str(p.id).rjust(6,"0")
 	p.save()
 	
 	if(expSes.status.statusText == "Not Ready"):
@@ -236,7 +296,7 @@ def joinSession(request):
 	
 	return HttpResponseRedirect('/session/wait/?pname=' + p.name + '&sid=' + sid)
 	
-
+@login_required
 def wait(request):
 	"""Put the participant at a waiting screen."""
 	return render_to_response('session/waiting.html', 
@@ -245,31 +305,39 @@ def wait(request):
 						   'sid': request.GET.get('sid')}, 
 						  context_instance=RequestContext(request))
 
-
-def rexInit(request):
-	"""Asks the participant to make an offer to other participants"""
-	
-	return render_to_response('rex/rex_offer.html', 
-						  {'waitReason': "Waiting for experimenter to start"}, 
-						  context_instance=RequestContext(request))
-
-
+@login_required
 def rexOffer(request):
 	"""Asks the participant to make an offer to other participants"""
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
 	
-	return render_to_response('rex/rex_offer.html', 
-						  {'sid': sid, 'pname': pname}, 
-						  context_instance=RequestContext(request))
+	p = Participant.objects.get(name=pname)
+	cumulativePoints = p.cumulativePoints
+	sesVars = loadSessionVars(sid)
+	parameters = pickle.loads(sesVars.componentsList[p.currentComponent].component_id.parameters)
+	otherParticipants = Participant.objects.filter(experimentSession=sid).exclude(name=pname)
 	
-
+	
+	return render_to_response('rex/rex_offer.html', 
+							{	'sid': sid, 
+								'pname': pname,
+								'parameters': parameters,
+								'otherParticipants': otherParticipants,
+								'cumulativePoints': cumulativePoints
+							}, 
+						  	context_instance=RequestContext(request))
+	
+@login_required
 def rexOfferSubmit(request):
 	"""Validates the particpant's offer and passes them on to the waiting screen"""
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
 	sessionObj = ExperimentSession.objects.get(id=sid)
-	offerList = []
+	p = Participant.objects.get(name=pname)
+	cumulativePoints = p.cumulativePoints
+	
+	sesVars = loadSessionVars(sid)
+	parameters = pickle.loads(sesVars.componentsList[p.currentComponent].component_id.parameters)
 	
 	toParticipant = request.POST.get('toParticipant')
 	fromParticipant = pname
@@ -277,21 +345,29 @@ def rexOfferSubmit(request):
 	
 	offerObj = offer(toParticipant,fromParticipant,offerAmount)
 	
-	sv = SessionVar(experimentSession=sessionObj, key="offers", value=pickle.dumps(offerObj))
+	sesVarKey = "offer_" + str(p.currentComponent) + "_" + str(p.currentIteration)
+	sv = SessionVar(experimentSession=sessionObj, key=sesVarKey, value=pickle.dumps(offerObj))
 	sv.save()
 	
 	return render_to_response('rex/rex_wait.html', 
-						  {'sid': sid, 'pname': pname, 'waitReason':"Waiting for other players..."}, 
+						  	{	'sid': sid, 
+								'pname': pname, 
+								'parameters': parameters,
+								'cumulativePoints': cumulativePoints
+							}, 
 						  context_instance=RequestContext(request))
 
-
+@login_required
 def rexCheckAllOffered(request):
 	"""Checks to see if all the participants have made an offer"""
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
 	sessionObj = ExperimentSession.objects.get(id=sid)
 	
-	offers = SessionVar.objects.filter(experimentSession=sessionObj, key="offers")
+	p = Participant.objects.get(name=pname)
+	sesVarKey = "offer_" + str(p.currentComponent) + "_" + str(p.currentIteration)
+
+	offers = SessionVar.objects.filter(experimentSession=sessionObj, key=sesVarKey)
 	participantsList = Participant.objects.filter(experimentSession__exact=sid)
 	
 	if(len(participantsList) == len(offers)):
@@ -299,25 +375,50 @@ def rexCheckAllOffered(request):
 	else:
 		response = "Not Ready"
 	
+	if(sessionObj.status.statusText == "Canceled"):
+		response = "Canceled"
 	
 	return render_to_response('api.html', 
 						  {'response': response}, 
 						  context_instance=RequestContext(request))
 
+@login_required
 def rexReconcile(request):
-	"""Asks the participant to make an offer to other participants"""
+	"""Sorts through all the offers made to figure out who receives what."""
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
 	sessionObj = ExperimentSession.objects.get(id=sid)
-	offers = SessionVar.objects.filter(experimentSession=sessionObj, key="offers")
-	offers.delete()
+	sesVars = loadSessionVars(sid)
+	p = Participant.objects.get(name=pname)
 	
+	parameters = pickle.loads(sesVars.componentsList[p.currentComponent].component_id.parameters)
+	
+	sesVarKey = "offer_" + str(p.currentComponent) + "_" + str(p.currentIteration)
+	offers = SessionVar.objects.filter(experimentSession=sessionObj, key=sesVarKey)
+	
+	myOffers = []
+	for o in offers:
+		offerObj = pickle.loads(o.value)
+		if (offerObj.toParticipant == pname):
+			myOffer = {}
+			myOffer['from'] = offerObj.fromParticipant
+			myOffer['amount'] = offerObj.amount
+			myOffers.append(myOffer)
+			p.cumulativePoints = p.cumulativePoints + long(offerObj.amount)
+			p.save()
+		
+		cumulativePoints = p.cumulativePoints
 	
 	return render_to_response('rex/rex_accept.html', 
-						  {'sid': sid, 'pname': pname}, 
-						  context_instance=RequestContext(request))
+							{	'sid': sid, 
+								'pname': pname,
+								'parameters': parameters,
+								'myOffers': myOffers,
+								'cumulativePoints': cumulativePoints
+							}, 
+						  	context_instance=RequestContext(request))
 
-
+@login_required
 def rexComponentSubmit(request):
 	"""Accepts the rex component form and updates the database"""
 	
@@ -354,7 +455,7 @@ def rexComponentSubmit(request):
 						  context_instance=RequestContext(request))
 
 
-
+@login_required
 def startSession(request):
 	"""Initiates the experiment session"""	
 
@@ -377,28 +478,64 @@ def startSession(request):
 	sv = SessionVar(experimentSession=sessionObj, key="sesVars", value=pickle.dumps(sesVars))
 	sv.save()
 	
-	if(sessionObj.status.statusText == "Ready"):
+	if(sessionObj.status.statusText != "Not Ready"):
 		# Change status to Running
 		sesStatus = experimentSessionStatus.objects.get(statusText="Running")
 		sessionObj.status = sesStatus
 		sessionObj.save()
 	
-	return HttpResponseRedirect('/dashboard/monitor/?sid=' + sid)
+	return HttpResponseRedirect('/sessions/monitor/?sid=' + sid)
 
+@login_required
 def stopSession(request):
 	"""Stops the session"""
 	sid = request.GET.get('sid')
 	expSes = ExperimentSession.objects.get(id=sid)
 	
+	# Delete sesVars
+	SessionVar.objects.filter(experimentSession=expSes).delete()
+	
+	# Delete participants
+	Participant.objects.filter(experimentSession__exact=sid).delete()
+	
 	if(expSes.status.statusText == "Running"):
-		# Change status to Running
-		sesStatus = experimentSessionStatus.objects.get(statusText="Ready")
+		# Change status from Running to canceled
+		sesStatus = experimentSessionStatus.objects.get(statusText="Canceled")
 		expSes.status = sesStatus
 		expSes.save()
 	
-	return HttpResponseRedirect('/dashboard/monitor/?sid=' + sid)
+	return HttpResponseRedirect('/sessions/monitor/?sid=' + sid)
 
+@login_required
+def endSession(request):
+	"""This function handles what happens when the experiment is over."""
 
+	# TODO delete participant, if last participant, kill sesVars, add end date to session.
+	return render_to_response('session/end.html', 
+						  {'response': "Experiment finished"}, 
+						  context_instance=RequestContext(request))
+
+@login_required
+def bootParticipant(request):
+	# TODO Don't delete, add a field to the model for inactive or something like that.
+	"""Boots participants by deleting them"""
+	sid = request.GET.get('sid')
+	pid = request.GET.get('pid')
+	p = Participant.objects.get(id=pid)
+	p.delete()
+	
+	return HttpResponseRedirect('/sessions/monitor/?sid=' + sid)
+
+@login_required
+def booted(request):
+	"""Moves booted participants to a booted screen"""
+	
+	return render_to_response('session/booted.html', 
+						  {'response': "booted"}, 
+						  context_instance=RequestContext(request))
+	
+
+@login_required
 def driveSession(request):
 	"""Moves participants along the session"""
 	pname = request.GET.get('pname')
@@ -410,31 +547,28 @@ def driveSession(request):
 		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
 	
 	# Get the participant object and load session variables
-	p = Participant.objects.get(name=pname)
-	sv = SessionVar.objects.get(experimentSession=expSes,key="sesVars")
-	sesVars = pickle.loads(sv.value)
+	try:
+		p = Participant.objects.get(name=pname)
+	except ObjectDoesNotExist:
+		# TODO kill the session here in this case
+		return HttpResponseRedirect("/session/booted/")
 	
-	
+	sesVars = loadSessionVars(sid)
+		
 	if(sesVars.componentsList[p.currentComponent].iterations == p.currentIteration):
 		p.currentComponent = p.currentComponent + 1
 		p.currentIteration = 0
 		if(len(sesVars.componentsList) == p.currentComponent):
-			return HttpResponseRedirect('/session/end')
+			return HttpResponseRedirect('/session/end/?sid=' + sid)
 	
 	p.currentIteration = p.currentIteration + 1
 	p.save()
 	
-	componentFunctionName = sesVars.componentsList[sesVars.currentComponent].component_id.functionName
+	componentFunctionName = sesVars.componentsList[p.currentComponent].component_id.componentType.kickoffFunction
+	print componentFunctionName
 	return HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
 
 
-
-class rex:
-	"""This class drives reciprocal exchange"""
-	def __init__(self, participants, params):
-		self.participants = participants
-		self.params = params
-	
 class sessionVariables:
 	"""A data structure for session variables (not http sessions)"""	
 	def __init__(self, componentsList, currentComponent, currentIteration, participantsList):
@@ -442,6 +576,7 @@ class sessionVariables:
 		self.currentComponent = currentComponent
 		self.currentIteration = currentIteration
 		self.participantsList = participantsList
+
 
 class offer(object):
 	"""A Data structure for holding participant offers"""
@@ -487,7 +622,7 @@ class rexParameters(object):
 		self.AcceptButtonLabel = AcceptButtonLabel
 		self.AcceptButtonLabelValue = AcceptButtonLabelValue
 
-
+@login_required
 def scratch(request):
 	"""outputs scratch template for UI dev"""
 	return render_to_response('scratch.html', 

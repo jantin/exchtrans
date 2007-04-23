@@ -42,7 +42,9 @@ body {
 #experimentView, 
 #users, 
 #dashboard, 
-#archive, 
+#archive,
+#experiments,
+#sessions,
 #monitor,
 #mainContent {
 	width:970px;
@@ -145,6 +147,15 @@ textarea{
 	width:100%;
 }
 
+.helpText{
+	width:500px;
+}
+
+.createNewThing{
+	display:none;
+}
+
+
 /* Monitor Experiments */
 
 #changeSession{
@@ -160,7 +171,7 @@ textarea{
 
 
 
-/* Dashboard Experiments */
+/* Sessions */
 
 #expSessions{
 	width:25em;
@@ -182,14 +193,14 @@ textarea{
 
 .sortHelper{
 	border: 3px dashed #666;
-	width: 700px !important;
+	width: 400px !important;
 }
 
 .components{
 }
 
 .component{
-	width:700px;
+	width:400px;
 	border:2px solid #999;
 	margin-bottom:15px;
 }
@@ -197,6 +208,7 @@ textarea{
 .componentTopPane{
 	padding-left:6px;
 	padding-right:6px;
+	background-color:#FFF;
 	
 	
 	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
@@ -212,9 +224,7 @@ textarea{
 
 .componentName{
 	float: left;
-	text-align:center;
 	margin-top:6px;
-	width:70%;
 	margin-bottom:10px;
 	font-weight: bold;
 	font-size: 16px;
@@ -228,6 +238,12 @@ textarea{
 	width:20%;
 }
 
+.componentDetails{
+	clear:both;
+	margin-top:6px;
+	padding-bottom:10px;
+}
+
 .componentBottomPane{
 	padding:6px;
 	background-color:#FFF;
@@ -237,49 +253,28 @@ textarea{
 	clear: both;
 }
 
+.floatForm{
 
-/* Reciprocal Exchange (rex)  */
+}
 
-#actionArea, #bottomBar{
+.floatRow{
 	float:left;
-	width:650px;
+	padding-bottom:10px;
+	clear:both;
 }
 
-#actionArea{
-	background:#FFF;
-	border-bottom:1px dotted #CCC;
-	padding:10px;
-	
-	
-	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
-	min-height:370px;
-	height:auto !important;
-	height:370px;
+.floatLabel{
+	float:left;
+	width:170px;
+	font-weight: bold;
+	margin-right:10px;
 }
 
-#bottomBar{
-	background:#FFF;
-	padding:10px;
-	
-	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
-	min-height:209px;
-	height:auto !important;
-	height:209px;
+.floatContent{
+	float:left;
+
 }
 
-#rightCol{
-	float:right;
-	width:279px;
-	background:#FFF;
-	border-left:1px dotted #CCC;
-	padding:10px;
-	
-	
-	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
-	min-height:600px;
-	height:auto !important;
-	height:600px;
-}
 
 
 /* Tabs  */
