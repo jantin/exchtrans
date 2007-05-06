@@ -28,7 +28,7 @@ def textPageDisplay(request):
 	p = Participant.objects.get(name=pname)
 	cumulativePoints = p.cumulativePoints
 	sesVars = loadSessionVars(sid)
-	parameters = pickle.loads(sesVars.componentsList[p.currentComponent].component_id.parameters)
+	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
 	
 	if (parameters.template == "Full"):
 		template = "textPage/textPage_displayFull.html"
