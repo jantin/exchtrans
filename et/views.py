@@ -8,6 +8,7 @@ from et.common import *
 from et.textPage import *
 import pickle
 from time import time
+from time import sleep
 
 def profile_redirect(request):
 	"""The generic login view directs to a profile page. This redirects accounts/profile to somewhere else"""
@@ -314,7 +315,7 @@ def rexOffer(request):
 	p = Participant.objects.get(name=pname)
 	cumulativePoints = p.cumulativePoints
 	sesVars = loadSessionVars(sid)
-	parameters = pickle.loads(sesVars.componentsList[p.currentComponent].component_id.parameters)
+	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
 	otherParticipants = Participant.objects.filter(experimentSession=sid).exclude(name=pname)
 	
 	
@@ -337,7 +338,7 @@ def rexOfferSubmit(request):
 	cumulativePoints = p.cumulativePoints
 	
 	sesVars = loadSessionVars(sid)
-	parameters = pickle.loads(sesVars.componentsList[p.currentComponent].component_id.parameters)
+	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
 	
 	toParticipant = request.POST.get('toParticipant')
 	fromParticipant = pname
@@ -391,7 +392,7 @@ def rexReconcile(request):
 	sesVars = loadSessionVars(sid)
 	p = Participant.objects.get(name=pname)
 	
-	parameters = pickle.loads(sesVars.componentsList[p.currentComponent].component_id.parameters)
+	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
 	
 	sesVarKey = "offer_" + str(p.currentComponent) + "_" + str(p.currentIteration)
 	offers = SessionVar.objects.filter(experimentSession=sessionObj, key=sesVarKey)
@@ -474,6 +475,7 @@ def startSession(request):
 	SessionVar.objects.filter(experimentSession=sessionObj).delete()
 	
 	# Make a sessionVariables object, pickle it, store it in SessionVar table
+	# TODO Don't need current component and current iteration in sessionVaiables object
 	sesVars = sessionVariables(componentsList, 0, 0, participantsList)
 	sv = SessionVar(experimentSession=sessionObj, key="sesVars", value=pickle.dumps(sesVars))
 	sv.save()
@@ -538,36 +540,59 @@ def booted(request):
 @login_required
 def driveSession(request):
 	"""Moves participants along the session"""
+	print "\n----\n 1 \n----\n"
 	pname = request.GET.get('pname')
 	sid = request.GET.get('sid')
 	expSes = ExperimentSession.objects.get(id=sid)
-	
+	sesVars = loadSessionVars(sid)
+	print "\n----\n 2 \n----\n"
 	# Quick check to make sure the session is still running.
 	if(expSes.status.statusText != "Running"):
 		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
 	
-	# Get the participant object and load session variables
+	# Get the participant object
 	try:
 		p = Participant.objects.get(name=pname)
 	except ObjectDoesNotExist:
 		# TODO kill the session here in this case
 		return HttpResponseRedirect("/session/booted/")
+	print "\n----\n 3 \n----\n"
+	'''
+	print "\n---------------\n\n"
+	print "p.currentComponent: "
+	print p.currentComponent
 	
-	sesVars = loadSessionVars(sid)
-		
-	if(sesVars.componentsList[p.currentComponent].iterations == p.currentIteration):
+	print "len(sesVars.componentsList): "
+	print len(sesVars.componentsList)
+	
+	print "p.currentIteration: "
+	print p.currentIteration
+	
+	print "\n---------------\n\n"
+	
+	print "sesVars.componentsList[p.currentComponent].iterations: "
+	print sesVars.componentsList[int(p.currentComponent)].iterations
+	'''
+	
+	
+	if(sesVars.componentsList[int(p.currentComponent)].iterations == p.currentIteration):
 		p.currentComponent = p.currentComponent + 1
 		p.currentIteration = 0
+
 		if(len(sesVars.componentsList) == p.currentComponent):
 			return HttpResponseRedirect('/session/end/?sid=' + sid)
-	
+	print "\n----\n 4 \n----\n"
 	p.currentIteration = p.currentIteration + 1
 	p.save()
+	print "\n----\n 5 \n----\n"
+	componentFunctionName = sesVars.componentsList[int(p.currentComponent)].component_id.componentType.kickoffFunction
 	
-	componentFunctionName = sesVars.componentsList[p.currentComponent].component_id.componentType.kickoffFunction
-	print componentFunctionName
-	return HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
-
+	try:
+		resp = HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
+	except IOError, (errno, strerror):
+		print "OMG! I/O error(%s): %s" % (errno, strerror)
+	print "\n----\n 6 \n----\n"
+	return resp
 
 class sessionVariables:
 	"""A data structure for session variables (not http sessions)"""	
