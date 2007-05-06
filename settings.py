@@ -75,6 +75,6 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'exchtran.et',
+    'et',
 	'django.contrib.admin',
 )
