@@ -53,6 +53,10 @@ urlpatterns = patterns('',
 	(r'^textPage/display/$', 'exchtran.et.textPage.textPageDisplay'),
 	(r'^textPage/submit/$', 'exchtran.et.textPage.textPageEdit'),
 	
+	# Questionnaire
+	(r'^questionnaire/display/$', 'exchtran.et.questionnaire.questionnaireDisplay'),
+	(r'^questionnaire/edit/$', 'exchtran.et.questionnaire.questionnaireEdit'),
+	
 	# Rex: Reciprocal Exchange
 	(r'^rexOffer/$', 'exchtran.et.views.rexOffer'),
 	(r'^rexOffer/submit/$', 'exchtran.et.views.rexOfferSubmit'),
@@ -68,7 +72,7 @@ urlpatterns = patterns('',
 	(r'^api/saveComponentChanges/$', 'exchtran.et.api.saveComponentChanges'),
 	
 	# Media Files
-	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/jonlesser/Documents/Berkeley/07Spring/ExchTrans/svn/exchtran/media'}),
+	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/opt/local/lib/python2.4/site-packages/exchtran/media'}),
 	
 	# Admin pages
 	(r'^admin/', include('django.contrib.admin.urls')),

@@ -9,23 +9,41 @@ from views import *
 import pickle
 from time import time
 
-class textPageObj(object):
-	"""A Data structure holding a textPage"""
-	def __init__(	self, 
-					heading = "Enter heading here", 
-					body = "Enter text here", 
-					buttonLabel = "Submit", 
-					template = ""):
-		self.heading = heading
-		self.body = body
-		self.buttonLabel = buttonLabel
-		self.template = template
-		self.timestamp = time()
+class freeTextQ(object):
+	"""A Data structure for freeText questions"""
+	def __init__(	self, 	
+					questionText = "Click to edit question text", 
+					inputType = "textarea", 
+					textAreaCols = 30, 
+					textAreaRows = 5, 
+					inputWidth = 30):
+		self.questionText = questionText
+		self.inputType = inputType
+		self.inputWidth = inputWidth
+		self.textAreaCols = textAreaCols
+		self.textAreaRows = textAreaRows
 
+class radioButtonQ(object):
+	"""A Data structure for radio button questions"""
+	def __init__(	self, 
+					questionText = "Click to edit question text", 
+					questionText = ["option1", "option2"]):
+		self.questionText = questionText
+		self.questionChoices = questionChoices
+
+class sliderQ(object):
+	"""A Data structure for slider questions"""
+	def __init__(	self, 	
+					questionText = "Click to edit question text", 
+					sliderWidth = 400, 
+					sliderStops = 20):
+		self.questionText = questionText
+		self.sliderWidth = sliderWidth
+		self.sliderStops = sliderStops
 
 @login_required
-def textPageDisplay(request):
-	"""Displays the text page"""
+def questionnaireDisplay(request):
+	"""Displays the questionnaire"""
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
 	
@@ -48,8 +66,8 @@ def textPageDisplay(request):
 						  	context_instance=RequestContext(request))
 
 @login_required
-def textPageEdit(request):
-	"""Saves the contents of the text page form"""
+def questionnaireEdit(request):
+	"""Implements editing of questionnaire"""
 		
 	comID = request.POST.get("comIM")
 	
@@ -70,4 +88,3 @@ def textPageEdit(request):
 	return render_to_response('api.html', 
 						  {'response': response}, 
 						  context_instance=RequestContext(request))
-

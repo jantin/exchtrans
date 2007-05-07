@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
-from et.models import *
+from models import *
 import pickle
 from time import time
 
