@@ -3,8 +3,8 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
-from et.models import *
-from et.common import *
+from models import *
+from common import *
 
 def sessionStatus(request):
 	"""Wait screen pings this function to determine when it should move the participant forward"""

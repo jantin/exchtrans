@@ -3,9 +3,9 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
-from et.models import *
-from et.common import *
-from et.textPage import *
+from models import *
+from common import *
+from textPage import *
 import pickle
 from time import time
 from time import sleep
@@ -96,33 +96,14 @@ def componentCreate(request):
 	# Set default parameters
 	# TODO Add better defaults
 	if (componentType.componentType == "Reciprocal Exchange"):
-		componentParams = rexParameters(	"Available Points",
-											"25",
-											"Prompt Text", 
-											"The experimenter gave you 25 points to offer this round. Select a player below to make an offer to that player",
-											"Participants Label", 
-											"Make offer to: ",
-											"Amount Label", 
-											"Offer amount: ",
-											"Submit Label", 
-											"Submit Offer",
-											"Waiting Text", 
-											"Waiting for other players...",
-											"Accept Text", 
-											"Listed below are offers you received.",
-											"Accept Button Label", 
-											"Accept")
+		componentParams = rexParameters()
 	
 	
 	if (componentType.componentType == "Questionnaire"):
 		componentParams = {}
 	
 	if (componentType.componentType == "Text Page"):
-		componentParams = textPageObj(	"",
-										"",
-										"",
-										""
-									)
+		componentParams = textPageObj()
 	
 	# Add component to the database
 	c = Component(	name = componentName,
@@ -540,12 +521,11 @@ def booted(request):
 @login_required
 def driveSession(request):
 	"""Moves participants along the session"""
-	print "\n----\n 1 \n----\n"
 	pname = request.GET.get('pname')
 	sid = request.GET.get('sid')
 	expSes = ExperimentSession.objects.get(id=sid)
 	sesVars = loadSessionVars(sid)
-	print "\n----\n 2 \n----\n"
+	
 	# Quick check to make sure the session is still running.
 	if(expSes.status.statusText != "Running"):
 		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
@@ -556,43 +536,26 @@ def driveSession(request):
 	except ObjectDoesNotExist:
 		# TODO kill the session here in this case
 		return HttpResponseRedirect("/session/booted/")
-	print "\n----\n 3 \n----\n"
-	'''
-	print "\n---------------\n\n"
-	print "p.currentComponent: "
-	print p.currentComponent
 	
-	print "len(sesVars.componentsList): "
-	print len(sesVars.componentsList)
-	
-	print "p.currentIteration: "
-	print p.currentIteration
-	
-	print "\n---------------\n\n"
-	
-	print "sesVars.componentsList[p.currentComponent].iterations: "
-	print sesVars.componentsList[int(p.currentComponent)].iterations
-	'''
-	
-	
+	# Check if the participant has done all iterations of the current component
 	if(sesVars.componentsList[int(p.currentComponent)].iterations == p.currentIteration):
+		# if so, increment the current component and restart the iteration count
 		p.currentComponent = p.currentComponent + 1
 		p.currentIteration = 0
-
+		
+		# If that was the l	ast component, redirect to the end screen
 		if(len(sesVars.componentsList) == p.currentComponent):
 			return HttpResponseRedirect('/session/end/?sid=' + sid)
-	print "\n----\n 4 \n----\n"
+	
+	# increment the current component iteration count and save participant vars to the DB.
 	p.currentIteration = p.currentIteration + 1
 	p.save()
-	print "\n----\n 5 \n----\n"
+	
+	# Determine the kick off function for the next component
 	componentFunctionName = sesVars.componentsList[int(p.currentComponent)].component_id.componentType.kickoffFunction
 	
-	try:
-		resp = HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
-	except IOError, (errno, strerror):
-		print "OMG! I/O error(%s): %s" % (errno, strerror)
-	print "\n----\n 6 \n----\n"
-	return resp
+	# redirect to the kickoff function of the next component
+	return HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
 
 class sessionVariables:
 	"""A data structure for session variables (not http sessions)"""	
@@ -614,22 +577,23 @@ class offer(object):
 
 class rexParameters(object):
 	"""A Data structure for holding parameters"""
-	def __init__(self, 	AvailablePoints,
-						AvailablePointsValue,
-						PromptText,
-						PromptTextValue,
-						ParticipantsLabel,
-						ParticipantsLabelValue,
-						AmountLabel,
-						AmountLabelValue,
-						SubmitLabel,
-						SubmitLabelValue,
-						WaitingText,
-						WaitingTextValue,
-						AcceptText,
-						AcceptTextValue,
-						AcceptButtonLabel,
-						AcceptButtonLabelValue):
+	def __init__(self, 	AvailablePoints = "Available Points",
+						AvailablePointsValue = "50",
+						PromptText = "Prompt Text",
+						PromptTextValue = "The experimenter gave you 25 points to offer this round. Select a player below to make an offer to that player",
+						ParticipantsLabel = "Participants Label",
+						ParticipantsLabelValue = "Make offer to: ",
+						AmountLabel = "Amount Label",
+						AmountLabelValue = "Offer amount: ",
+						SubmitLabel = "Submit Label",
+						SubmitLabelValue = "Submit Offer",
+						WaitingText = "Waiting Text",
+						WaitingTextValue = "Waiting for other players...",
+						AcceptText = "Accept Text",
+						AcceptTextValue = "Listed below are offers you received.",
+						AcceptButtonLabel = "Accept Button Label ",
+						AcceptButtonLabelValue = "Continue" 
+					):
 		self.AvailablePoints = AvailablePoints
 		self.AvailablePointsValue = AvailablePointsValue
 		self.PromptText = PromptText

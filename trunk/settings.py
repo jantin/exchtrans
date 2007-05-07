@@ -67,7 +67,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'exchtran.urls'
 
 TEMPLATE_DIRS = (
-    '/Users/jonlesser/Documents/Berkeley/07Spring/ExchTrans/svn/exchtran/templates',
+    '/opt/local/lib/python2.4/site-packages/exchtran/templates',
 )
 
 INSTALLED_APPS = (
@@ -75,6 +75,6 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'et',
+    'exchtran.et',
 	'django.contrib.admin',
 )
