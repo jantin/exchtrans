@@ -11,35 +11,61 @@ from time import time
 
 class freeTextQ(object):
 	"""A Data structure for freeText questions"""
-	def __init__(	self, 	
+	def __init__(	self,
 					questionText = "Click to edit question text", 
 					inputType = "textarea", 
 					textAreaCols = 30, 
 					textAreaRows = 5, 
-					inputWidth = 30):
+					inputWidth = 30,
+					questionType = "Free Text"
+					):
 		self.questionText = questionText
 		self.inputType = inputType
 		self.inputWidth = inputWidth
 		self.textAreaCols = textAreaCols
 		self.textAreaRows = textAreaRows
+		self.questionType = questionType
 
 class radioButtonQ(object):
 	"""A Data structure for radio button questions"""
 	def __init__(	self, 
 					questionText = "Click to edit question text", 
-					questionText = ["option1", "option2"]):
+					questionChoices = ["option1", "option2"],
+					questionType = "Radio Button"
+					):
 		self.questionText = questionText
 		self.questionChoices = questionChoices
+		self.questionType = questionType
 
 class sliderQ(object):
 	"""A Data structure for slider questions"""
 	def __init__(	self, 	
 					questionText = "Click to edit question text", 
+					leftScale = "Left Scale",
+					rightScale = "Right Scale",
 					sliderWidth = 400, 
-					sliderStops = 20):
+					sliderStops = 20,
+					questionType = "Slider"
+					):
 		self.questionText = questionText
+		self.leftScale = leftScale				
+		self.rightScale = rightScale
 		self.sliderWidth = sliderWidth
 		self.sliderStops = sliderStops
+		self.questionType = questionType
+
+
+class questionSet(object):
+	"""A Data structure for questionnaire question sets"""
+	def __init__(	self, 	
+					name = "Default Name", 
+					description = "Default Description", 
+					questions = [ freeTextQ(), radioButtonQ(), sliderQ() ]
+					):
+		self.name = name
+		self.description = description
+		self.questions = questions
+
 
 @login_required
 def questionnaireDisplay(request):
