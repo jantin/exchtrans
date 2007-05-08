@@ -58,12 +58,12 @@ urlpatterns = patterns('',
 	(r'^questionnaire/edit/$', 'exchtran.et.questionnaire.questionnaireEdit'),
 	
 	# Rex: Reciprocal Exchange
-	(r'^rexOffer/$', 'exchtran.et.views.rexOffer'),
-	(r'^rexOffer/submit/$', 'exchtran.et.views.rexOfferSubmit'),
-	(r'^rex/wait/$', 'exchtran.et.views.rexWait'),
-	(r'^rex/reconcile/$', 'exchtran.et.views.rexReconcile'),
-	(r'^rex/CheckAllOffered/$', 'exchtran.et.views.rexCheckAllOffered'),
-	(r'^rex/component/submit/$', 'exchtran.et.views.rexComponentSubmit'),
+	(r'^rexOffer/$', 'exchtran.et.rex.rexOffer'),
+	(r'^rexOffer/submit/$', 'exchtran.et.rex.rexOfferSubmit'),
+	(r'^rex/wait/$', 'exchtran.et.rex.rexWait'),
+	(r'^rex/reconcile/$', 'exchtran.et.rex.rexReconcile'),
+	(r'^rex/CheckAllOffered/$', 'exchtran.et.rex.rexCheckAllOffered'),
+	(r'^rex/component/submit/$', 'exchtran.et.rex.rexComponentSubmit'),
 	
 	# API
 	(r'^api/sessionStatus/$', 'exchtran.et.api.sessionStatus'),
