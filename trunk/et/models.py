@@ -79,6 +79,7 @@ class ComponentTypes(models.Model):
 	componentType = models.CharField(maxlength=255)
 	kickoffFunction = models.CharField(maxlength=255)
 	editTemplate = models.CharField(maxlength=255)
+	kickoffTemplate = models.CharField(maxlength=255)
 	
 	def __str__(self):
 		return self.componentType

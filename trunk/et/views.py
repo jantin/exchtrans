@@ -369,7 +369,6 @@ def booted(request):
 						  context_instance=RequestContext(request))
 	
 
-@login_required
 def driveSession(request):
 	"""Moves participants along the session"""
 	pname = request.GET.get('pname')
@@ -405,9 +404,11 @@ def driveSession(request):
 	# Determine the kick off function for the next component
 	componentFunctionName = sesVars.componentsList[int(p.currentComponent)].component_id.componentType.kickoffFunction
 	
+	# TODO Make this render kickoff template
 	# redirect to the kickoff function of the next component
 	return HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
 
+	
 class sessionVariables:
 	"""A data structure for session variables (not http sessions)"""	
 	def __init__(self, componentsList, currentComponent, currentIteration, participantsList):

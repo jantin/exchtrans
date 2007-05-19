@@ -58,12 +58,8 @@ class sliderQ(object):
 class questionSet(object):
 	"""A Data structure for questionnaire question sets"""
 	def __init__(	self, 	
-					name = "Default Name", 
-					description = "Default Description", 
 					questions = [ freeTextQ(), radioButtonQ(), sliderQ() ]
 					):
-		self.name = name
-		self.description = description
 		self.questions = questions
 
 
@@ -78,11 +74,6 @@ def questionnaireDisplay(request):
 	sesVars = loadSessionVars(sid)
 	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
 	
-	if (parameters.template == "Full"):
-		template = "textPage/textPage_displayFull.html"
-	else:
-		template = "textPage/textPage_displayActionArea.html"
-	
 	return render_to_response(template, 
 							{	'sid': sid, 
 								'pname': pname,
@@ -91,26 +82,119 @@ def questionnaireDisplay(request):
 							}, 
 						  	context_instance=RequestContext(request))
 
-@login_required
-def questionnaireEdit(request):
-	"""Implements editing of questionnaire"""
-		
-	comID = request.POST.get("comIM")
-	
-	componentParams = textPageObj(	request.POST.get("heading"),
-									request.POST.get("body"),
-									request.POST.get("buttonLabel"),
-									request.POST.get("template")
-								)
 
-	c = Component.objects.get(id=comID)
-	c.name = request.POST.get("componentName")
-	c.description = request.POST.get("componentDescription")
-	c.parameters = pickle.dumps(componentParams)
+@login_required
+def questionnaireAddQ(request):
+	"""Adds a questionnaire question"""
+	comId = request.POST.get('comId')
+	qType = request.POST.get('qType')
 	
-	c.save()
+	# Load the component from the DB
+	component = Component.objects.get(id=comId)
+
+	# Unpickle, update, and repickle the question set
+	qSet = pickle.loads(component.parameters)
+	exec("qSet.questions.append(" + qType + "())")	
+	component.parameters = pickle.dumps(qSet)
+	component.save()
+	return HttpResponseRedirect('/components/edit/?id=' + comId)
+
+
+@login_required
+def questionnaireDeleteQ(request):
+	"""Deletes a questionnaire question"""
+	comId = request.GET.get('comId')
+	qNum = int(request.GET.get('qid')) - 1
 	
-	response = "Component Saved"
+	# Load the component from the DB
+	component = Component.objects.get(id=comId)
+
+	# Unpickle, update, and repickle the question set
+	qSet = pickle.loads(component.parameters)
+	exec("qSet.questions.pop(" + str(qNum) + ")")	
+	component.parameters = pickle.dumps(qSet)
+	component.save()
+	return HttpResponseRedirect('/components/edit/?id=' + comId)
+
+
+@login_required
+def addRadioChoice(request):
+	"""Adds a radio button choice"""
+	comId = request.GET.get('comId')
+	qNum = int(request.GET.get('qid')) - 1
+	
+	# Load the component from the DB
+	component = Component.objects.get(id=comId)
+
+	# Unpickle, update, and repickle the question set
+	qSet = pickle.loads(component.parameters)
+	qSet.questions[qNum].questionChoices.append("Click to edit me")	
+	component.parameters = pickle.dumps(qSet)
+	component.save()
+	return HttpResponseRedirect('/components/edit/?id=' + comId)
+
+
+@login_required
+def deleteRadioChoice(request):
+	"""Adds a radio button choice"""
+	comId = request.GET.get('comId')
+	qNum = int(request.GET.get('qid')) - 1
+	qc = int(request.GET.get('qc')) - 1
+	
+	# Load the component from the DB
+	component = Component.objects.get(id=comId)
+
+	# Unpickle, update, and repickle the question set
+	qSet = pickle.loads(component.parameters)
+	qSet.questions[qNum].questionChoices.pop(qc)	
+	component.parameters = pickle.dumps(qSet)
+	component.save()
+	return HttpResponseRedirect('/components/edit/?id=' + comId)
+
+
+@login_required
+def editRadioChoice(request):
+	"""Adds a radio button choice"""
+	# element_id should be in the form of "<choice num>___<question num>___<Component ID>"
+	elementList = request.POST.get('element_id').split("___")
+	qc = int(elementList[0]) - 1
+	qNum = int(elementList[1]) - 1
+	comId = elementList[2]
+	newValue = request.POST.get('update_value')
+	
+	# Load the component from the DB
+	component = Component.objects.get(id=comId)
+
+	# Unpickle, update, and repickle the question set
+	qSet = pickle.loads(component.parameters)
+	qSet.questions[qNum].questionChoices[qc] = newValue
+	component.parameters = pickle.dumps(qSet)
+	component.save()
+
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': newValue}, 
+						  context_instance=RequestContext(request))
+
+
+@login_required
+def questionnaireEditParam(request):
+	"""Handles in place editing on questionnaire editing screen"""
+	# element_id should be in the form of "<Question Param Name>___<question num>___<Component ID>"
+	elementList = request.POST.get('element_id').split("___")
+	paramName = elementList[0]
+	qNum = int(elementList[1]) - 1
+	comId = elementList[2]
+	newValue = request.POST.get('update_value')
+	
+	# Load the component from the DB
+	component = Component.objects.get(id=comId)
+
+	# Unpickle, update, and repickle the question set
+	qSet = pickle.loads(component.parameters)
+	exec("qSet.questions[qNum]." + paramName + " = newValue")	
+	component.parameters = pickle.dumps(qSet)
+	component.save()
+
+	return render_to_response('api.html', 
+						  {'response': newValue}, 
 						  context_instance=RequestContext(request))

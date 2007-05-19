@@ -18,9 +18,12 @@
 		{{ parameters.body }}
 	</div>
 </div>
-<div class="continueButton">
-	<a href="/session/drive/?sid={{ sid }}&pname={{ pname }}"><input type="button" name="buttonLabel" value="{{ parameters.buttonLabel }}" class="buttonBig"></a>
-</div>
+
+<form action="/session/drive/" method="get" accept-charset="utf-8">
+	<input type="hidden" name="sid" value="{{sid}}" id="sid">
+	<input type="hidden" name="pname" value="{{pname}}" id="pname">
+	<input type="submit" name="buttonLabel" value="{{ parameters.buttonLabel }}" class="buttonBig">
+</form>
 
 
 

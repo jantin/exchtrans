@@ -23,7 +23,7 @@ $(document).ready(
 				activeclass : 	'sortableactive',
 				hoverclass : 	'sortablehover',
 				handle: 'div.componentTopPane',
-				tolerance: 'pointer',
+				tolerance: 'pointer'
 
 			}
 		);
@@ -59,19 +59,19 @@ function saveComponentOrder (){
 <div class="floatForm">
 	<div class="floatRow">
 		<div class="floatLabel">Experiment Name</div>
-		<div class="floatContent editExpInput" id="name___{{ expDetails.id }}">{{ expDetails.name }}</div>
+		<div class="floatContent editExpInput" id="name___{{ expDetails.id }}___Experiment">{{ expDetails.name }}</div>
 	</div>
 	<div class="floatRow">
 		<div class="floatLabel">Experiment Description</div>
-		<div class="floatContent editExpDescription" id="description___{{ expDetails.id }}">{{ expDetails.description }}</div>
+		<div class="floatContent editExpDescription" id="description___{{ expDetails.id }}___Experiment">{{ expDetails.description }}</div>
 	</div>
 	<div class="floatRow">
 		<div class="floatLabel">Minimum Players</div>
-		<div class="floatContent editExpInput" id="minPlayers___{{ expDetails.id }}">{{ expDetails.minPlayers }}</div>
+		<div class="floatContent editExpInput" id="minPlayers___{{ expDetails.id }}___Experiment">{{ expDetails.minPlayers }}</div>
 	</div>
 	<div class="floatRow">
 		<div class="floatLabel">Maximum Players</div>
-		<div class="floatContent editExpInput" id="maxPlayers___{{ expDetails.id }}">{{ expDetails.maxPlayers }}</div>
+		<div class="floatContent editExpInput" id="maxPlayers___{{ expDetails.id }}___Experiment">{{ expDetails.maxPlayers }}</div>
 	</div>
 </div>
 <br clear="both">
