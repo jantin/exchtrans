@@ -55,7 +55,12 @@ urlpatterns = patterns('',
 	
 	# Questionnaire
 	(r'^questionnaire/display/$', 'exchtran.et.questionnaire.questionnaireDisplay'),
-	(r'^questionnaire/edit/$', 'exchtran.et.questionnaire.questionnaireEdit'),
+	(r'^questionnaire/editParam/$', 'exchtran.et.questionnaire.questionnaireEditParam'),
+	(r'^questionnaire/addQuestion/$', 'exchtran.et.questionnaire.questionnaireAddQ'),
+	(r'^questionnaire/deleteQuestion/$', 'exchtran.et.questionnaire.questionnaireDeleteQ'),
+	(r'^questionnaire/addRadioChoice/$', 'exchtran.et.questionnaire.addRadioChoice'),
+	(r'^questionnaire/deleteRadioChoice/$', 'exchtran.et.questionnaire.deleteRadioChoice'),
+	(r'^questionnaire/editRadioChoice/$', 'exchtran.et.questionnaire.editRadioChoice'),	
 	
 	# Rex: Reciprocal Exchange
 	(r'^rexOffer/$', 'exchtran.et.rex.rexOffer'),

@@ -39,15 +39,16 @@ def rex_toolTipImages(request):
 
 def updateField(request):
 	"""updates a field in the database. Used with inline editing javascript"""
-	# element_id should be in the form of "<fieldName>___<experiment ID>"
+	# element_id should be in the form of "<fieldName>___<row ID>___<Model>"
 	elementList = request.POST.get('element_id').split("___")
 	fieldName = elementList[0]
-	expID = elementList[1]
+	objID = elementList[1]
+	model = elementList[2]
 	newValue = request.POST.get('update_value')
 	
-	expObj = Experiment.objects.get(id=expID)
-	exec("expObj." + fieldName + " = newValue")
-	expObj.save()
+	exec("obj = " + model + ".objects.get(id=objID)")
+	exec("obj." + fieldName + " = newValue")
+	obj.save()
 	
 	return render_to_response('api.html', 
 							  { 'response': newValue}, 

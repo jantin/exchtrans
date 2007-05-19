@@ -1,11 +1,15 @@
-.questionContainer{
-	border: 1px solid #999;
-	padding:15px;
+#questionSet{
 	width:500px;
+}
+
+.questionContainer{
+	border: 2px solid #999;
+	padding:15px;
+	width:100%;
 	margin-bottom:10px;
-	margin-left:auto;
-	margin-right:auto;
-	
+	background-color:#FFF;
+	position:relative;
+
 	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
 	min-height:75px;
 	height:auto !important;
@@ -15,6 +19,7 @@
 .questionText{
 	font-size: 1.2em;
 	margin-bottom:5px;
+	width:450px;
 }
 
 .questionChoices{
@@ -32,14 +37,11 @@
 	margin-bottom:10px;
 }
 
-.indicator
-{
-	width: 5px;
-	height: 16px;
-	background-color: #000;
-	position: absolute;
-	overflow: hidden;
-	border: none;
+.questionDelete{
+	position:absolute;
+	right:5px;
+	top:5px;
+	font-size:.9em;
 }
 
 .slider
@@ -51,4 +53,14 @@
 	border: 1px solid #000;
 	margin-bottom:5px;
 	clear:both;
+}
+
+.indicator
+{
+	width: 16px;
+	height: 16px;
+	background-color: #000;
+	position: absolute;
+	overflow: hidden;
+	border: none;
 }

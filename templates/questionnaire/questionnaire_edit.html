@@ -3,12 +3,10 @@
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.thickbox.js"></script>
-<link rel="stylesheet" href="/site_media/css/thickbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.inplace.source.js"></script>
+
 <link rel="stylesheet" href="/site_media/css/questionnaire.css" type="text/css" media="screen" />
 
-
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
 <script type="text/javascript">
 	$(document).ready(
 		function()
@@ -22,11 +20,55 @@
 						[0,0]
 					]
 				}
-			);			
+			);
+			$('div.questionSet').Sortable(
+				{
+					accept: 'questionContainer',
+					helperclass: 'sortHelper',
+					activeclass : 'sortableactive',
+					hoverclass : 'sortablehover',
+					handle: 'div.questionText',
+					tolerance: 'pointer'
+				}
+			);
+			$(".editComInput").editInPlace({
+				url: "/api/updateField/",
+				params: "ajax=yes",
+				error: function(request){
+					$("html").empty();
+					$("html").prepend(request.responseText || 'Unspecified Error');
+				}
+			});
+			$(".editComDescription").editInPlace({
+				url: "/api/updateField/",
+				params: "ajax=yes",
+				field_type: "textarea",
+			    textarea_rows: "5",
+			    textarea_cols: "35",
+				error: function(request){
+					$("html").empty();
+					$("html").prepend(request.responseText || 'Unspecified Error');
+				}
+			});
+			$(".editQuestionParam").editInPlace({
+				url: "/questionnaire/editParam/",
+				params: "ajax=yes",
+				error: function(request){
+					$("html").empty();
+					$("html").prepend(request.responseText || 'Unspecified Error');
+				}
+			});
+			$(".editRadioChoice").editInPlace({
+				url: "/questionnaire/editRadioChoice/",
+				params: "ajax=yes",
+				error: function(request){
+					$("html").empty();
+					$("html").prepend(request.responseText || 'Unspecified Error');
+				}
+			});
 		}
 	);
 </script>
-
 {% endblock %}
 
 {% block bodyid %}tab3{% endblock %}
@@ -38,56 +80,70 @@
 <a href="/components">Components</a> » {{ component.name }}
 </div>
 
-<h1>Editing {{ component.name }}</h1>
-<form action="/questionnaire/edit/" method="post" accept-charset="utf-8" id="componentForm">
-<table border="0" cellspacing="5" cellpadding="5">
-	<tr>
-		<th>Name: </th>
-		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"></td>
-	</tr>
-	<tr>
-		<th>Description: </th>
-		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
-	</tr>
-</table>
-	
-	{% for q in parameters.questions %}
+<h2>Editing {{ component.name }}</h2>
+<div class="floatForm">
+	<div class="floatRow">
+		<div class="floatLabel">Name</div>
+		<div class="floatContent editComInput" id="name___{{ component.id }}___Component">{{ component.name }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Description</div>
+		<div class="floatContent editComDescription" id="description___{{ component.id }}___Component">{{ component.description }}</div>
+	</div>
+</div>
+<br class="clearBoth" />
+<h2>Questions</h2>
+	<form action="/questionnaire/addQuestion/" method="post" accept-charset="utf-8"><p>
+		<select name="qType">
+			<option value="freeTextQ">Free Text</option>
+			<option value="radioButtonQ">Radio Button</option>
+			<option value="sliderQ">Slider</option>
+		</select>
+		<input type="hidden" name="comId" value="{{ component.id }}" />
+		<input class="buttonSmall" type="submit" value="Add Question" /></p>
+	</form>
+	<div id="questionSet">
+		{% for q in parameters.questions %}
 		<div id="question___{{forloop.counter}}" class="questionContainer">
-			<div id="questionText___{{forloop.counter}}" class="questionText">
+			<div class="questionDelete">
+				<a href="/questionnaire/deleteQuestion/?qid={{forloop.counter}}&amp;comId={{ component.id }}">Delete</a>
+			</div>
+			<div id="questionText___{{forloop.counter}}___{{ component.id }}" class="questionText editQuestionParam">
 				{{q.questionText}}
 			</div>
-			
+		
 			{% ifequal q.questionType "Free Text" %}
-				<textarea name="Name" rows="{{q.textAreaRows}}" cols="{{q.textAreaCols}}" disabled></textarea>
+				<textarea name="Name" rows="{{q.textAreaRows}}" cols="{{q.textAreaCols}}" disabled="disabled" ></textarea>
 			{% endifequal %}
-			
+		
 			{% ifequal q.questionType "Radio Button" %}
 				<ul class="questionChoices">
 					{% for qc in q.questionChoices %}
-						<li id="questionChoice___{{forloop.counter}}">
-							<input type="radio" name="buttons{{forloop.parentloop.counter}}" disabled/>
-							{{qc}} (<a href="#">x</a>)
+						<li>
+							<input type="radio" name="buttons{{forloop.parentloop.counter}}" disabled="disabled" />
+							<span id="{{forloop.counter}}___{{forloop.parentloop.counter}}___{{ component.id }}" class="editRadioChoice">{{qc}}</span> 
+							(<a href="/questionnaire/deleteRadioChoice/?qid={{forloop.parentloop.counter}}&amp;comId={{ component.id }}&amp;qc={{forloop.counter}}">x</a>)
 						</li>
 					{% endfor %}
 				</ul>
+				<a href="/questionnaire/addRadioChoice/?qid={{forloop.counter}}&amp;comId={{ component.id }}">Add option</a>
 			{% endifequal %}
-			
+		
 			{% ifequal q.questionType "Slider" %}
 			<div id="name">
 				<div class="slider">
 					<div class="indicator">&nbsp;</div>
 				</div>
-				<div class="leftScale">{{q.leftScale}}</div><div class="rightScale">{{q.rightScale}}</div>				
+				<div id="leftScale___{{forloop.counter}}___{{ component.id }}" class="leftScale editQuestionParam">{{q.leftScale}}</div><div id="rightScale___{{forloop.counter}}___{{ component.id }}" class="rightScale editQuestionParam">{{q.rightScale}}</div>				
 			</div>
 			{% endifequal %}
-			
+		
 		</div>
-	{% endfor %}
-
-	<input type="hidden" name="comIM" value="{{ component.id }}">
-	<p><input type="submit" value="Save Changes" class="buttonSmall"></p>
+		{% endfor %}
+	</div>
+	<p><input type="hidden" name="comIM" value="{{ component.id }}" /></p>
+	<p><input type="submit" value="Save Changes" class="buttonSmall" /></p>
 	<div id="message">
 
 	</div>
-</form>
 {% endblock %}

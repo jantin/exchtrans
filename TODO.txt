@@ -1,20 +1,31 @@
-Questionnaire with slider scale questions
-	instructions for set
-	question text
-	page break
+To do between 4/16 and 5/15
+- Finish Text Page component type
+	-with back button
+- Finish Questionnaire component type
+	-Allow for slider, radio button, and free text questions
+- Reexamine identity
+	-Clean up participant representation
+	-T D K M F G R
+	-Giving to more than one person
+- Data logging
+
+
+To do between 5/16 and 6/30
+- Participant monitoring
+- Data export
+- History widget
+- Network widget
+- Recip: What happens to the excess points
+- Recip: What happens to points given (doubled?)
+- Negotiated exchange component
+- Ability for participants to choose the form of exchange
+- Migrate from my laptop to iSchool server (Harbinger)
+	-Document install procedure
+- Review and document code
+	-Document how to write components
+
 Session vars
 	-min/max players
 Monitor window
 
-
-Confirm offers.
-
-
-
-* Enable components to have custom names
-
 * Make experiment title and description text into form fields on experiment edit page.
-
-* Distinguish between generic and custom (preexisting) component in Add component dropdown.
-
-
