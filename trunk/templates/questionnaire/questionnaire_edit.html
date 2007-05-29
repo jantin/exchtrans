@@ -66,6 +66,15 @@
 					$("html").prepend(request.responseText || 'Unspecified Error');
 				}
 			});
+			$(".backCheckBox").click( function() {
+				var checked = $(".backCheckBox").attr("checked");
+				var elementId = $(".backCheckBox").attr("id");
+				$.ajax({
+					type: "POST",
+					url: "/questionnaire/backCheckbox/",
+					data: "checked=" + checked + "&elementId=" + elementId
+				});
+			}); 
 		}
 	);
 </script>
@@ -89,6 +98,16 @@
 	<div class="floatRow">
 		<div class="floatLabel">Description</div>
 		<div class="floatContent editComDescription" id="description___{{ component.id }}___Component">{{ component.description }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Enable Back button</div>
+		<div class="floatContent">
+			{% if parameters.back %}
+				<input type="checkbox" name="back" class="backCheckBox" id="backCheckBox___{{ component.id }}" checked="checked" />
+			{% else %}
+				<input type="checkbox" name="back" class="backCheckBox" id="backCheckBox___{{ component.id }}" />
+			{% endif %}
+		</div>
 	</div>
 </div>
 <br class="clearBoth" />
@@ -142,7 +161,9 @@
 		{% endfor %}
 	</div>
 	<p><input type="hidden" name="comIM" value="{{ component.id }}" /></p>
-	<p><input type="submit" value="Save Changes" class="buttonSmall" /></p>
+	{% if parameters.questions %}
+		<p><input type="submit" value="Save Changes" class="buttonSmall" /></p>
+	{% endif %}
 	<div id="message">
 
 	</div>

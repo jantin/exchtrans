@@ -58,9 +58,11 @@ class sliderQ(object):
 class questionSet(object):
 	"""A Data structure for questionnaire question sets"""
 	def __init__(	self, 	
-					questions = [ freeTextQ(), radioButtonQ(), sliderQ() ]
+					questions = [],
+					back = False
 					):
 		self.questions = questions
+		self.back = back
 
 
 @login_required
@@ -74,13 +76,14 @@ def questionnaireDisplay(request):
 	sesVars = loadSessionVars(sid)
 	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
 	
-	return render_to_response(template, 
+	return render_to_response("questionnaire/questionnaire_display.html", 
 							{	'sid': sid, 
 								'pname': pname,
 								'parameters': parameters,
 								'cumulativePoints': cumulativePoints
 							}, 
 						  	context_instance=RequestContext(request))
+
 
 
 @login_required
@@ -197,4 +200,29 @@ def questionnaireEditParam(request):
 
 	return render_to_response('api.html', 
 						  {'response': newValue}, 
+						  context_instance=RequestContext(request))
+
+
+@login_required
+def handleBackCheckbox(request):
+	"""When users toggle back button checkbox, this updates the commonent"""
+	# element_id should be in the form of "<choice num>___<question num>___<Component ID>"
+	elementList = request.POST.get('elementId').split("___")
+	comId = elementList[1]
+	checked = request.POST.get('checked')
+	
+	# Load the component from the DB
+	component = Component.objects.get(id=comId)
+	
+	# Unpickle, update, and repickle the question set
+	qSet = pickle.loads(component.parameters)
+	if(checked == "true"):
+		qSet.back = True
+	else:
+		qSet.back = False
+	component.parameters = pickle.dumps(qSet)
+	component.save()
+	
+	return render_to_response('api.html', 
+						  {'response': checked}, 
 						  context_instance=RequestContext(request))
