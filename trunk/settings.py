@@ -10,11 +10,14 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+##
+## FILL ME IN!!!!!
+##
 DATABASE_ENGINE = 'mysql'           # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
-DATABASE_NAME = 'exchtrandb'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'exchtrandbuser'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'exchtranpass1'         # Not used with sqlite3.
-DATABASE_HOST = '/opt/local/var/run/mysql5/mysqld.sock'             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_NAME = ''             # Or path to database file if using sqlite3.
+DATABASE_USER = ''             # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. All choices can be found here:
@@ -47,8 +50,11 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
+##
+## FILL ME IN!!!!!
+##
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = ')!+sw(a5o9-yyl-k^0+%u)ixj7+zu*_gtx_nj0r4kic$obv1rr'
+SECRET_KEY = ''
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -66,8 +72,11 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'exchtran.urls'
 
+##
+## FILL ME IN!!!!!
+##
 TEMPLATE_DIRS = (
-    '/opt/local/lib/python2.4/site-packages/exchtran/templates',
+    '',
 )
 
 INSTALLED_APPS = (
