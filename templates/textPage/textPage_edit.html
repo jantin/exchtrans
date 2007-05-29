@@ -58,9 +58,15 @@
 		<th>Button Label (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
 		<td><input type="text" name="buttonLabel" value="{{ parameters.buttonLabel }}" size="40" maxlength="255"></td>
 	</tr>
-	<tr> {% if ActionAreaChecked %}	checked	{% endif %}
-		<th>Display Type (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
-		<td>Full screen: <input name="template" type="radio" value="Full" {% ifequal parameters.template "Full" %} checked {% endifequal %}/> Action Area: <input name="template" type="radio" value="ActionArea" {% ifequal parameters.template "ActionArea" %} checked {% endifequal %} /></td>
+	<tr>
+		<th>Enable Back Button (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<td>
+			{% if parameters.enableBack %}
+				<input type="checkbox" name="enableBack" checked="checked" />
+			{% else %}
+				<input type="checkbox" name="enableBack" />
+			{% endif %}
+		</td>
 	</tr>
 </table>
 	<input type="hidden" name="comIM" value="{{ component.id }}">

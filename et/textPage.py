@@ -14,13 +14,14 @@ class textPageObj(object):
 	def __init__(	self, 
 					heading = "Enter heading here", 
 					body = "Enter text here", 
-					buttonLabel = "Submit", 
-					template = ""):
+					buttonLabel = "Submit",
+					enableBack = False					
+				):
 		self.heading = heading
 		self.body = body
 		self.buttonLabel = buttonLabel
-		self.template = template
 		self.timestamp = time()
+		self.enableBack = enableBack
 
 
 @login_required
@@ -53,10 +54,15 @@ def textPageEdit(request):
 		
 	comID = request.POST.get("comIM")
 	
+	if(request.POST.get("enableBack") == "on"):
+		enableBack = True
+	else:
+		enableBack = False
+	
 	componentParams = textPageObj(	request.POST.get("heading"),
 									request.POST.get("body"),
 									request.POST.get("buttonLabel"),
-									request.POST.get("template")
+									enableBack
 								)
 
 	c = Component.objects.get(id=comID)

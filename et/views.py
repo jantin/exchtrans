@@ -402,11 +402,10 @@ def driveSession(request):
 	p.save()
 	
 	# Determine the kick off function for the next component
-	componentFunctionName = sesVars.componentsList[int(p.currentComponent)].component_id.componentType.kickoffFunction
+	kickOffFunction = sesVars.componentsList[int(p.currentComponent)].component_id.componentType.kickoffFunction
 	
-	# TODO Make this render kickoff template
 	# redirect to the kickoff function of the next component
-	return HttpResponseRedirect('/' + componentFunctionName + '/?pname=' + pname + '&sid=' + sid)
+	return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid)
 
 	
 class sessionVariables:

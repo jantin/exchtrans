@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="/site_media/css/questionnaire.css" type="text/css" media="screen" />
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(
+		function()
+		{
+			$('.slider').Slider(
+				{
+					accept : '.indicator',
+					restricted: true,
+					fractions : 50,
+					values: [
+						[0,0]
+					]
+				}
+			);
+		}
+	);
+</script>
+
+{% endblock %}
+
+
+{% block bodyid %}waiting{% endblock %}
+
+
+{% block bodycontent %}
+<div id="questionSet">
+	{% for q in parameters.questions %}
+	<div id="question___{{forloop.counter}}" class="questionContainer">
+		<div id="questionText___{{forloop.counter}}___{{ component.id }}" class="questionText">
+			{{q.questionText}}
+		</div>
+	
+		{% ifequal q.questionType "Free Text" %}
+			<textarea name="Name" rows="{{q.textAreaRows}}" cols="{{q.textAreaCols}}" ></textarea>
+		{% endifequal %}
+	
+		{% ifequal q.questionType "Radio Button" %}
+			<ul class="questionChoices">
+				{% for qc in q.questionChoices %}
+					<li>
+						<input type="radio" name="buttons{{forloop.parentloop.counter}}" />
+						<span id="{{forloop.counter}}___{{forloop.parentloop.counter}}___{{ component.id }}">{{qc}}</span> 
+					</li>
+				{% endfor %}
+			</ul>
+		{% endifequal %}
+	
+		{% ifequal q.questionType "Slider" %}
+		<div id="name">
+			<div class="slider">
+				<div class="indicator">&nbsp;</div>
+			</div>
+			<div id="leftScale___{{forloop.counter}}___{{ component.id }}" class="leftScale">{{q.leftScale}}</div><div id="rightScale___{{forloop.counter}}___{{ component.id }}" class="rightScale">{{q.rightScale}}</div>				
+		</div>
+		{% endifequal %}
+	
+	</div>
+	{% endfor %}
+</div>
+<div id="continueButton">
+	<form action="/session/drive/" method="get" accept-charset="utf-8">
+		<input type="hidden" name="sid" value="{{sid}}" id="sid">
+		<input type="hidden" name="pname" value="{{pname}}" id="pname">
+		<input type="submit" name="continueButton" value="Continue" class="buttonBig">
+	</form>
+</div>
+
+
+{% endblock %}

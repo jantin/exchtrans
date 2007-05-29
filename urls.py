@@ -60,7 +60,8 @@ urlpatterns = patterns('',
 	(r'^questionnaire/deleteQuestion/$', 'exchtran.et.questionnaire.questionnaireDeleteQ'),
 	(r'^questionnaire/addRadioChoice/$', 'exchtran.et.questionnaire.addRadioChoice'),
 	(r'^questionnaire/deleteRadioChoice/$', 'exchtran.et.questionnaire.deleteRadioChoice'),
-	(r'^questionnaire/editRadioChoice/$', 'exchtran.et.questionnaire.editRadioChoice'),	
+	(r'^questionnaire/editRadioChoice/$', 'exchtran.et.questionnaire.editRadioChoice'),
+	(r'^questionnaire/backCheckbox/$', 'exchtran.et.questionnaire.handleBackCheckbox'),	
 	
 	# Rex: Reciprocal Exchange
 	(r'^rexOffer/$', 'exchtran.et.rex.rexOffer'),

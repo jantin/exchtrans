@@ -2,7 +2,7 @@ To do between 4/16 and 5/15
 - Finish Text Page component type
 	-with back button
 - Finish Questionnaire component type
-	-Allow for slider, radio button, and free text questions
+	-Re-ordering of questions
 - Reexamine identity
 	-Clean up participant representation
 	-T D K M F G R
