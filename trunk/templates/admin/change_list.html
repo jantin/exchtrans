@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load adminmedia admin_list i18n %}
+{% block coltype %}flex{% endblock %}
+{% block stylesheet %}{% admin_media_prefix %}css/changelists.css{% endblock %}
+
+{% block content %}
+<div id="content-main">
+{% block object-tools %}
+{% if has_add_permission %}
+<ul><li><a href="add/">Add New User</a></li></ul>
+{% endif %}
+{% endblock %}
+<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+{% block result_list %}{% result_list cl %}{% endblock %}
+{% block pagination %}{% pagination cl %}{% endblock %}
+</div>
+</div>
+{% endblock %}
