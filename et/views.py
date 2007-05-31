@@ -373,13 +373,10 @@ def driveSession(request):
 	"""Moves participants along the session"""
 	pname = request.GET.get('pname')
 	sid = request.GET.get('sid')
+	goback = request.GET.get('goback')	
 	expSes = ExperimentSession.objects.get(id=sid)
 	sesVars = loadSessionVars(sid)
-	
-	# Quick check to make sure the session is still running.
-	if(expSes.status.statusText != "Running"):
-		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
-	
+
 	# Get the participant object
 	try:
 		p = Participant.objects.get(name=pname)
@@ -387,13 +384,22 @@ def driveSession(request):
 		# TODO kill the session here in this case
 		return HttpResponseRedirect("/session/booted/")
 	
+	# If goback is true, decrement the paticipants current component
+	if(goback == "true"):
+		p.currentComponent = p.currentComponent - 1
+		p.currentIteration = 0
+	
+	# Quick check to make sure the session is still running.
+	if(expSes.status.statusText != "Running"):
+		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
+		
 	# Check if the participant has done all iterations of the current component
 	if(sesVars.componentsList[int(p.currentComponent)].iterations == p.currentIteration):
 		# if so, increment the current component and restart the iteration count
 		p.currentComponent = p.currentComponent + 1
 		p.currentIteration = 0
 		
-		# If that was the l	ast component, redirect to the end screen
+		# If that was the last component, redirect to the end screen
 		if(len(sesVars.componentsList) == p.currentComponent):
 			return HttpResponseRedirect('/session/end/?sid=' + sid)
 	

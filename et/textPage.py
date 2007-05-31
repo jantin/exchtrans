@@ -34,13 +34,8 @@ def textPageDisplay(request):
 	cumulativePoints = p.cumulativePoints
 	sesVars = loadSessionVars(sid)
 	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
-	
-	if (parameters.template == "Full"):
-		template = "textPage/textPage_displayFull.html"
-	else:
-		template = "textPage/textPage_displayActionArea.html"
-	
-	return render_to_response(template, 
+		
+	return render_to_response("textPage/textPage_display.html", 
 							{	'sid': sid, 
 								'pname': pname,
 								'parameters': parameters,
