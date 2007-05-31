@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load svn_version %} 
 {% block bodycontent %}
 <div id="{% block sectionDivID %}gernericSectionDivID{% endblock %}">
 	
@@ -18,5 +18,9 @@
 			{% block adminContent %}<p>genericAdminContent</p>{% endblock %}
 		</div>
 	</div>
+	<div id="versionNumber">
+		Exchtran Version: {% svn_version %}
+	</div>
 </div>
+
 {% endblock %}

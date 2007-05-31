@@ -29,6 +29,12 @@ body {
 	height:500px;
 }
 
+#versionNumber{
+	margin-top:10px;
+	text-align: center;
+	font-size: .8em;
+}
+
 .logged_in_as{
 	text-align:right;
 	font-size:.9em;

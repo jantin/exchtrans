@@ -59,10 +59,10 @@ class questionSet(object):
 	"""A Data structure for questionnaire question sets"""
 	def __init__(	self, 	
 					questions = [],
-					back = False
+					enableBack = False
 					):
 		self.questions = questions
-		self.back = back
+		self.enableBack = enableBack
 
 
 @login_required
@@ -217,9 +217,9 @@ def handleBackCheckbox(request):
 	# Unpickle, update, and repickle the question set
 	qSet = pickle.loads(component.parameters)
 	if(checked == "true"):
-		qSet.back = True
+		qSet.enableBack = True
 	else:
-		qSet.back = False
+		qSet.enableBack = False
 	component.parameters = pickle.dumps(qSet)
 	component.save()
 	

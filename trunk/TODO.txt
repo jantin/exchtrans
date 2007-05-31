@@ -9,6 +9,9 @@ To do between 4/16 and 5/15
 	-Giving to more than one person
 - Data logging
 
+Disable right click.
+add version number
+
 
 To do between 5/16 and 6/30
 - Participant monitoring

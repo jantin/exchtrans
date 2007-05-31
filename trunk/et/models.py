@@ -124,9 +124,11 @@ class ExperimentComponents(models.Model):
 
 class SessionLog(models.Model):
 	participant = models.ForeignKey(Participant)
-	experimentComponent = models.ForeignKey(ExperimentComponents)
+	component = models.ForeignKey(Component)
+	session = models.ForeignKey(ExperimentSession)
 	timestamp = models.DateField(auto_now_add=True)
-	message = models.TextField()
+	messageType = models.TextField()
+	messageText = models.TextField()
 	
 	def __str__(self):
 		return self.message
