@@ -79,6 +79,10 @@ TEMPLATE_DIRS = (
     '',
 )
 
+# Custom setting for use with svn_version template tag
+# Set to the root directory of your checked out working copy
+SVN_DIR = '/opt/local/lib/python2.4/site-packages/exchtran'
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
