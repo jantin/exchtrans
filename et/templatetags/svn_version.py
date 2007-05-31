@@ -1,9 +1,11 @@
 from django import template
 register = template.Library()
 import os
+import settings
 
 @register.tag
 def svn_version(parser, token):
+	os.chdir(settings.SVN_DIR)
 	f = os.popen('svnversion')
 	version = f.read()[0:-1] # trim off the newline
 	f.close()
