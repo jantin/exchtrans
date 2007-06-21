@@ -392,7 +392,7 @@ def driveSession(request):
 	# Quick check to make sure the session is still running.
 	if(expSes.status.statusText != "Running"):
 		return HttpResponseRedirect('/session/wait/?pname=' + pname + '&sid=' + sid)
-		
+	
 	# Check if the participant has done all iterations of the current component
 	if(sesVars.componentsList[int(p.currentComponent)].iterations == p.currentIteration):
 		# if so, increment the current component and restart the iteration count
