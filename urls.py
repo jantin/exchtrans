@@ -52,6 +52,13 @@ urlpatterns = patterns('',
 	# Text Page
 	(r'^textPage/display/$', 'exchtran.et.textPage.textPageDisplay'),
 	(r'^textPage/submit/$', 'exchtran.et.textPage.textPageEdit'),
+
+	# Negotiated Exchange
+	(r'^nex/submit/$', 'exchtran.et.nex.nexEdit'),
+
+	# Matcher
+	(r'^matcher/display/$', 'exchtran.et.matcher.matcherDisplay'),
+	(r'^matcher/submit/$', 'exchtran.et.matcher.matcherEdit'),
 	
 	# Questionnaire
 	(r'^questionnaire/display/$', 'exchtran.et.questionnaire.questionnaireDisplay'),
