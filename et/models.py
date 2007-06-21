@@ -111,7 +111,6 @@ class ExperimentComponents(models.Model):
 	order = models.IntegerField()
 	iterations = models.IntegerField()
 	
-	# add parameters here, remove from Component
 	def __str__(self):
 		return str(self.experiment_id) + "_" + str(self.component_id) + " " + str(self.order)
 	
@@ -126,16 +125,22 @@ class SessionLog(models.Model):
 	participant = models.ForeignKey(Participant)
 	component = models.ForeignKey(Component)
 	session = models.ForeignKey(ExperimentSession)
-	timestamp = models.DateField(auto_now_add=True)
+	timestamp = models.DateTimeField(auto_now_add=True)
 	messageType = models.TextField()
 	messageText = models.TextField()
 	
 	def __str__(self):
-		return self.message
+		return self.messageText
 	
 	class Admin:
 		pass
 	
+	'''
+	TYPE 				DESCRIPTION
+	timestamp			Used at the start and end of components {start, end}
+	questionnaire		Hold questionnaire responses {questionnaireResponse object}
+	rexOffer			Holds an offer object {offer object}
+	'''
 
 class SessionVar(models.Model):
 	experimentSession = models.ForeignKey(ExperimentSession)

@@ -9,8 +9,7 @@ To do between 4/16 and 5/15
 	-Giving to more than one person
 - Data logging
 
-Disable right click.
-add version number
+- Disable right click.
 
 
 To do between 5/16 and 6/30
@@ -32,3 +31,37 @@ Session vars
 Monitor window
 
 * Make experiment title and description text into form fields on experiment edit page.
+
+
+
+
+Agenda:
+- Back button, Logging model, 
+- Serving from cowper.homeip.net. Where next?
+- Code hosted on Google Code. Open source OK?
+- Full screen options. (disabled right click)
+- QA person?
+
+-Email Judd about demo session
+
+
+
+
+
+
+
+
+
+
+
+Debug shell commands
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import login_required
+from django.template import Context, Template, RequestContext
+from django.core.exceptions import ObjectDoesNotExist
+from et.models import *
+from et.common import *
+from et.views import *
+import pickle
+from time import time

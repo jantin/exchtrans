@@ -76,6 +76,35 @@ def questionnaireDisplay(request):
 	sesVars = loadSessionVars(sid)
 	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
 	
+	# get the current session object
+	s = ExperimentSession.objects.get(id=sid)
+	# get the current component object
+	c = sesVars.componentsList[int(p.currentComponent)].component_id
+
+	# Log start time
+	logWrite(	participant = p, 
+				component = c, 
+				session = s,
+				messageType = "timestamp",
+				messageText = "start"
+				)
+	
+	# Log component Type
+	logWrite(	participant = p, 
+				component = c, 
+				session = s,
+				messageType = "componentType",
+				messageText = c.componentType
+				)
+
+	# Log component paramerters
+	logWrite(	participant = p, 
+				component = c, 
+				session = s,
+				messageType = "componentParams",
+				messageText = pickle.dumps(parameters)
+				)
+	
 	return render_to_response("questionnaire/questionnaire_display.html", 
 							{	'sid': sid, 
 								'pname': pname,
