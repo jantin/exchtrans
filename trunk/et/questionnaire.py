@@ -234,7 +234,7 @@ def questionnaireEditParam(request):
 
 @login_required
 def handleBackCheckbox(request):
-	"""When users toggle back button checkbox, this updates the commonent"""
+	"""When users toggle back button checkbox, this updates the component"""
 	# element_id should be in the form of "<choice num>___<question num>___<Component ID>"
 	elementList = request.POST.get('elementId').split("___")
 	comId = elementList[1]

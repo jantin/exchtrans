@@ -8,6 +8,8 @@ from common import *
 from textPage import *
 from questionnaire import *
 from rex import *
+from matcher import *
+from nex import *
 import pickle
 from time import time
 from time import sleep
@@ -105,6 +107,12 @@ def componentCreate(request):
 	if (componentType.componentType == "Text Page"):
 		componentParams = textPageObj()
 	
+	if (componentType.componentType == "Matcher"):
+		componentParams = matcherObj()
+
+	if (componentType.componentType == "Negotiated Exchange"):
+		componentParams = nexObj()	
+
 	# Add component to the database
 	c = Component(	name = componentName,
 					parameters = pickle.dumps(componentParams),
