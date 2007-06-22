@@ -55,6 +55,7 @@ urlpatterns = patterns('',
 
 	# Negotiated Exchange
 	(r'^nex/submit/$', 'exchtran.et.nex.nexEdit'),
+	(r'^nex/display/$', 'exchtran.et.nex.nexDisplay'),
 
 	# Matcher
 	(r'^matcher/display/$', 'exchtran.et.matcher.matcherDisplay'),

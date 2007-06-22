@@ -1,0 +1,116 @@
+{% extends "adminBase.html" %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+	    var options = { 
+	        target: '#message',   // target element to be updated with server response
+	    };		
+	    // bind to the form's submit event 
+	    $('#componentForm').submit(function() { 
+	        $(this).ajaxSubmit(options);
+			$("#message").html("Component Saved");
+			$('#message').fadeIn('3000');
+			setTimeout("$('#message').fadeOut('3000');", 2000)
+	        return false; 
+	    });
+		
+		// When page loads, make sure we're showing the right options
+		var checked = $("#randomPairingCheck").attr("checked");
+		if(checked == true){
+			$("#nonRandomPairing").toggleClass("displayNone");
+			$("#randomPairing").toggleClass("displayNone");
+		}
+		
+		// When the random checkbox is toggled, show the right options
+		$("#randomPairingCheck").click( function() {
+			$("#nonRandomPairing").toggleClass("displayNone");
+			$("#randomPairing").toggleClass("displayNone");
+		});
+	});
+</script>
+
+{% endblock %}
+
+{% block bodyid %}tab3{% endblock %}
+
+{% block sectionDivID %}components{% endblock %}
+
+{% block adminContent %}
+<div id="breadCrumbs">
+<a href="/components">Components</a> » {{ component.name }}
+</div>
+
+<h1>Editing {{ component.name }}</h1>
+<form action="/nex/submit/" method="post" accept-charset="utf-8" id="componentForm">
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr>
+		<th>Component Name: </th>
+		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"/></td>
+	</tr>
+	<tr>
+		<th>Component Description: </th>
+		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
+	</tr>
+</table>
+<h2>Points</h2>
+<table>
+	<tr>
+		<td></td>
+		<th>Initial X</th>
+		<th>Initial Y</th>
+		<th>Replenish X</th>
+		<th>Replenish Y</th>
+		<th>Clearing</th>
+	</tr>
+	<tr>
+		<th>Player 1</th>
+		<td><input type="text" name="p1x" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p1y" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p1x" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p1y" value="" id="p1x" size="3"/></td>
+		<td>
+			<select>
+				<option>End of round</option>
+				<option>End of module</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<th>Player 2</th>
+		<td><input type="text" name="p2x" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p2y" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p1x" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p1y" value="" id="p1x" size="3"/></td>
+		<td>
+			<select>
+				<option>End of round</option>
+				<option>End of module</option>
+			</select>
+		</td>
+	</tr>
+</table>
+<h2>Time</h2>
+<table>
+	<tr>
+		<th>Minutes</th>
+		<th>Seconds</th>
+	</tr>
+	<tr>
+		<td><input type="text" name="minutes" value="" size="2"/></td>
+		<td><input type="text" name="seconds" value="" size="2"/></td>
+	</tr>
+</table>
+<h2>Options</h2>
+<p><input type="checkbox" name="binding"/> Non-binding</p>
+<p><input type="checkbox" name="showPointValue"/> Show point value</p>
+	<p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>
+	<div id="message">
+
+	</div>
+</form>
+{% endblock %}

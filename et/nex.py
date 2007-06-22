@@ -10,18 +10,37 @@ import pickle
 from time import time
 
 class nexObj(object):
-	"""A Data structure holding a  negotiated exchange object"""
+	"""A Data structure holding a negotiated exchange object"""
 	def __init__(	self, 
-					heading = "Enter heading here", 
-					body = "Enter text here", 
-					buttonLabel = "Submit",
-					enableBack = False					
+					p1x = 20, 
+					p1y = 10, 
+					p1xReplenish = 20,
+					p1yReplenish = 10,
+					p1Clearing = "End of round",
+					p2x = 20, 
+					p2y = 10,
+					p2xReplenish = 20,
+					p2yReplenish = 10,					
+					p2Clearing = "End of round",
+					mins = 2,
+					secs = 30,
+					nonBinding = False,
+					showPoints = False					
 				):
-		self.heading = heading
-		self.body = body
-		self.buttonLabel = buttonLabel
-		self.timestamp = time()
-		self.enableBack = enableBack
+		self.p1x = p1x
+		self.p1y = p1y
+		self.p1xReplenish = p1xReplenish
+		self.p1yReplenish = p1yReplenish
+		self.p1Clearing = p1Clearing
+		self.p2x = p2x
+		self.p2y = p2y
+		self.p2xReplenish = p2xReplenish
+		self.p2yReplenish = p2yReplenish
+		self.p2Clearing = p2Clearing
+		self.mins = mins
+		self.secs = secs
+		self.nonBinding = nonBinding
+		self.showPoints = showPoints
 
 
 @login_required
@@ -65,7 +84,7 @@ def nexDisplay(request):
 				messageText = pickle.dumps(parameters)
 				)
 	
-	return render_to_response("textPage/textPage_display.html", 
+	return render_to_response("nex/nex_display.html", 
 							{	'sid': sid, 
 								'pname': pname,
 								'parameters': parameters,
