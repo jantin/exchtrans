@@ -38,6 +38,8 @@ class Experiment(models.Model):
 	dateModified = models.DateField(auto_now=True)
 	minPlayers = models.IntegerField()
 	maxPlayers = models.IntegerField()
+	xValue = models.IntegerField()
+	yValue = models.IntegerField()
 	
 	def __str__(self):
 		return self.name

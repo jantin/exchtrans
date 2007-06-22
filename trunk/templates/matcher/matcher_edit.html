@@ -9,8 +9,7 @@
 	$(document).ready(function() { 
 	    var options = { 
 	        target: '#message',   // target element to be updated with server response
-	    }; 
-
+	    };		
 	    // bind to the form's submit event 
 	    $('#componentForm').submit(function() { 
 	        $(this).ajaxSubmit(options);
@@ -19,6 +18,19 @@
 			setTimeout("$('#message').fadeOut('3000');", 2000)
 	        return false; 
 	    });
+		
+		// When page loads, make sure we're showing the right options
+		var checked = $("#randomPairingCheck").attr("checked");
+		if(checked == true){
+			$("#nonRandomPairing").toggleClass("displayNone");
+			$("#randomPairing").toggleClass("displayNone");
+		}
+		
+		// When the random checkbox is toggled, show the right options
+		$("#randomPairingCheck").click( function() {
+			$("#nonRandomPairing").toggleClass("displayNone");
+			$("#randomPairing").toggleClass("displayNone");
+		});
 	});
 </script>
 
@@ -38,15 +50,128 @@
 <table border="0" cellspacing="5" cellpadding="5">
 	<tr>
 		<th>Component Name: </th>
-		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"></td>
+		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"/></td>
 	</tr>
 	<tr>
 		<th>Component Description: </th>
 		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
 	</tr>
 </table>
-	<input type="hidden" name="comIM" value="{{ component.id }}">
-	<p><input type="submit" value="Save Changes" class="buttonSmall"></p>
+
+<h2>Pairings</h2>
+<p><input type="checkbox" name="randomPairingCheck" id="randomPairingCheck" checked="checked"/> Randomize Pairing (Every player will play every other player and have a turn as decider against each player.)</p>
+<div id="nonRandomPairing">
+	<table border="0" cellspacing="5" cellpadding="5">
+		<tr>
+			<th>Player 1</th>
+			<th>Player 2</th>
+			<th>Decider</th>
+			<th>Decider Choices</th>
+			<th>Rounds</th>
+		</tr>
+		<tr>
+			<td>
+				<select>
+					<option>A</option>
+					<option>B</option>
+					<option>C</option>
+					<option>D</option>								
+				</select>
+			</td>
+			<td>
+				<select>
+					<option>A</option>
+					<option>B</option>
+					<option>C</option>
+					<option>D</option>								
+				</select>
+			</td>
+			<td>
+				<input type="radio" name="decider" value="p1"/>P1<br/>
+				<input type="radio" name="decider" value="p2"/>P2<br/>
+				<input type="radio" name="decider" value="none"/>None
+			</td>
+			<td>
+				<select multiple="multiple" size="4" name="componentChoices">
+					<option>This is a long name with some text</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+				</select>
+			</td>
+			<td><input type="text" name="rounds" value="" id="rounds" size="2" maxlength="2"/></td>
+		</tr>
+		<tr>
+			<td>
+				<select>
+					<option>A</option>
+					<option>B</option>
+					<option>C</option>
+					<option>D</option>								
+				</select>
+			</td>
+			<td>
+				<select>
+					<option>A</option>
+					<option>B</option>
+					<option>C</option>
+					<option>D</option>								
+				</select>
+			</td>
+			<td>
+				<input type="radio" name="decider" value="p1"/>P1<br/>
+				<input type="radio" name="decider" value="p2"/>P2<br/>
+				<input type="radio" name="decider" value="none"/>None
+			</td>
+			<td>
+				<select multiple="multiple" size="4" name="componentChoices">
+					<option>This is a long name with some text</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+				</select>
+			</td>
+			<td><input type="text" name="rounds" value="" id="rounds" size="2" maxlength="2"/></td>
+		</tr>
+	</table>
+</div>
+<div id="randomPairing" class="displayNone">
+	<table border="0" cellspacing="5" cellpadding="5">
+		<tr>
+			<th>Decider Choices</th>
+			<th>Rounds</th>
+		</tr>
+		<tr>
+			<td>
+				<select multiple="multiple" size="4" name="componentChoices">
+					<option>This is a long name with some text</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+					<option>foo</option>
+				</select>
+			</td>
+			<td><input type="text" name="rounds" value="" id="rounds" size="2" maxlength="2"/></td>
+		</tr>
+	</table>
+</div>
+
+	
+	<p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>
 	<div id="message">
 
 	</div>
