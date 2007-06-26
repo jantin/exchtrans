@@ -2,7 +2,6 @@
 
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
-
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
@@ -18,19 +17,6 @@
 			setTimeout("$('#message').fadeOut('3000');", 2000)
 	        return false; 
 	    });
-		
-		// When page loads, make sure we're showing the right options
-		var checked = $("#randomPairingCheck").attr("checked");
-		if(checked == true){
-			$("#nonRandomPairing").toggleClass("displayNone");
-			$("#randomPairing").toggleClass("displayNone");
-		}
-		
-		// When the random checkbox is toggled, show the right options
-		$("#randomPairingCheck").click( function() {
-			$("#nonRandomPairing").toggleClass("displayNone");
-			$("#randomPairing").toggleClass("displayNone");
-		});
 	});
 </script>
 
@@ -69,27 +55,27 @@
 	</tr>
 	<tr>
 		<th>Player 1</th>
-		<td><input type="text" name="p1x" value="" id="p1x" size="3"/></td>
-		<td><input type="text" name="p1y" value="" id="p1x" size="3"/></td>
-		<td><input type="text" name="p1x" value="" id="p1x" size="3"/></td>
-		<td><input type="text" name="p1y" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p1x" value="{{parameters.p1x}}" size="3"/></td>
+		<td><input type="text" name="p1y" value="{{parameters.p1y}}" size="3"/></td>
+		<td><input type="text" name="p1xReplenish" value="{{parameters.p1xReplenish}}" size="3"/></td>
+		<td><input type="text" name="p1yReplenish" value="{{parameters.p1yReplenish}}" size="3"/></td>
 		<td>
-			<select>
-				<option>End of round</option>
-				<option>End of module</option>
+			<select name="p1Clearing">
+				<option {% ifequal parameters.p1Clearing "End of round" %}selected="selected"{% endifequal %} >End of round</option>
+				<option {% ifequal parameters.p1Clearing "End of module" %}selected="selected"{% endifequal %}>End of module</option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<th>Player 2</th>
-		<td><input type="text" name="p2x" value="" id="p1x" size="3"/></td>
-		<td><input type="text" name="p2y" value="" id="p1x" size="3"/></td>
-		<td><input type="text" name="p1x" value="" id="p1x" size="3"/></td>
-		<td><input type="text" name="p1y" value="" id="p1x" size="3"/></td>
+		<td><input type="text" name="p2x" value="{{parameters.p2x}}" size="3"/></td>
+		<td><input type="text" name="p2y" value="{{parameters.p2y}}" size="3"/></td>
+		<td><input type="text" name="p2xReplenish" value="{{parameters.p2xReplenish}}" size="3"/></td>
+		<td><input type="text" name="p2yReplenish" value="{{parameters.p2yReplenish}}" size="3"/></td>
 		<td>
-			<select>
-				<option>End of round</option>
-				<option>End of module</option>
+			<select name="p2Clearing">
+				<option {% ifequal parameters.p2Clearing "End of round" %}selected="selected"{% endifequal %} >End of round</option>
+				<option {% ifequal parameters.p2Clearing "End of module" %}selected="selected"{% endifequal %}>End of module</option>
 			</select>
 		</td>
 	</tr>
@@ -101,13 +87,13 @@
 		<th>Seconds</th>
 	</tr>
 	<tr>
-		<td><input type="text" name="minutes" value="" size="2"/></td>
-		<td><input type="text" name="seconds" value="" size="2"/></td>
+		<td><input type="text" name="mins" value="{{parameters.mins}}" size="2"/></td>
+		<td><input type="text" name="secs" value="{{parameters.secs}}" size="2"/></td>
 	</tr>
 </table>
 <h2>Options</h2>
-<p><input type="checkbox" name="binding"/> Non-binding</p>
-<p><input type="checkbox" name="showPointValue"/> Show point value</p>
+<p><input type="checkbox" name="nonBinding" {% if parameters.nonBinding %}checked="checked"{% endif %} /> Non-binding</p>
+<p><input type="checkbox" name="showPoints" {% if parameters.showPoints %}checked="checked"{% endif %}/> Show point value</p>
 	<p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>
 	<div id="message">
 

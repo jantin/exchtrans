@@ -9,7 +9,7 @@
 	background:#FFF;
 	border-bottom:1px dotted #CCC;
 	padding:10px;
-	
+	text-align:center;
 	
 	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
 	min-height:370px;
