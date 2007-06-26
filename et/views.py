@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from models import *
 from common import *
 from textPage import *
@@ -76,9 +77,14 @@ def componentEdit(request):
 	component = Component.objects.get(id=comID)
 	parameters = pickle.loads(component.parameters)
 	
+	# List of nex and rex components used for matcher module
+	componentList = Component.objects.filter(Q(componentType__exact=8)|Q(componentType__exact=2))
+	
 	return render_to_response(	component.componentType.editTemplate, 
 								{'component': component,
-								 'parameters': parameters}, 
+								 'parameters': parameters,
+								 'componentList': componentList
+								}, 
 						  		context_instance=RequestContext(request))
 
 

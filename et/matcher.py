@@ -10,23 +10,42 @@ import pickle
 from time import time
 
 class matcherObj(object):
-	"""A Data structure holding a matcher"""
+	"""A Data structure holding a matcher."""
 	def __init__(	self, 
-					heading = "Enter heading here", 
-					body = "Enter text here", 
-					buttonLabel = "Submit",
-					enableBack = False					
+					pairings = [["0","1","0"],["2","3","0"]],
+					randomPairing = True,
+					randomComponentChoices = [],
+					pair1ComponentChoices = [],
+					pair2ComponentChoices = [], 
+					randomRounds = "1",
+					pair1rounds = "1",
+					pair2rounds = "1"
 				):
-		self.heading = heading
-		self.body = body
-		self.buttonLabel = buttonLabel
-		self.timestamp = time()
-		self.enableBack = enableBack
+		self.pairings = pairings
+		self.randomPairing = randomPairing
+		self.randomComponentChoices = randomComponentChoices
+		self.pair1ComponentChoices = pair1ComponentChoices
+		self.pair2ComponentChoices = pair2ComponentChoices
+		self.randomRounds = randomRounds
+		self.pair1rounds = pair1rounds
+		self.pair2rounds = pair2rounds
+		'''
+		If randomPairing is set to true, pairings, pair1rounds, and pair2rounds
+		are ignored at runtime.
+		
+		The pairing stucture works as such:
+		[[player 0, Player 1, Decider],...]
+		
+		Decider is one of the following
+		1, indicating player 1
+		2, indicating player 2
+		0, indicating no decider (first selected component will be used)
+		'''
 
 
 @login_required
 def matcherDisplay(request):
-	"""Displays the text page"""
+	"""Displays the matcher"""
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
 	
@@ -75,21 +94,37 @@ def matcherDisplay(request):
 
 @login_required
 def matcherEdit(request):
-	"""Saves the contents of the text page form"""
-		
+	"""Saves the contents of the matcher form"""
 	comID = request.POST.get("comIM")
 	
-	if(request.POST.get("enableBack") == "on"):
-		enableBack = True
+	# Slightly different form handling depending on the random pairing checkbox
+	if(request.POST.get("randomPairingCheck") == "on"):
+		componentParams = matcherObj(
+									randomPairing = True,
+									randomRounds = request.POST.get("randomRounds"),
+									randomComponentChoices = request.POST.getlist("randomComponentChoices")
+									)
 	else:
-		enableBack = False
-	
-	componentParams = textPageObj(	request.POST.get("heading"),
-									request.POST.get("body"),
-									request.POST.get("buttonLabel"),
-									enableBack
-								)
-
+		componentParams = matcherObj(
+									randomPairing = False,
+									pair1rounds = request.POST.get("pair1rounds"),
+									pair2rounds = request.POST.get("pair2rounds"),
+									pair1ComponentChoices = request.POST.getlist("pair1ComponentChoices"),
+									pair2ComponentChoices = request.POST.getlist("pair2ComponentChoices"),
+									pairings = [
+													[
+													request.POST.get("pair1p1"),
+													request.POST.get("pair1p2"),
+													request.POST.get("pair1decider")
+													],
+													[
+													request.POST.get("pair2p1"),
+													request.POST.get("pair2p1"),
+													request.POST.get("pair2decider")
+													]
+												]
+									)
+		
 	c = Component.objects.get(id=comID)
 	c.name = request.POST.get("componentName")
 	c.description = request.POST.get("componentDescription")
@@ -102,3 +137,20 @@ def matcherEdit(request):
 						  {'response': response}, 
 						  context_instance=RequestContext(request))
 
+
+def roundRobin(units, decider=0, sets=None):
+	""" Generates a schedule of "fair" pairings from a list of units """
+	# pulled from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65200
+	if len(units) % 2:
+		units.append(None)
+	count    = len(units)
+	sets     = sets or (count - 1)
+	half     = count / 2
+	schedule = []
+	for turn in range(sets):
+		pairings = []
+		for i in range(half):
+			pairings.append([units[i], units[count-i-1], decider])
+		units.insert(1, units.pop())
+		schedule.append(pairings)
+	return schedule

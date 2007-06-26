@@ -98,15 +98,32 @@ def nexEdit(request):
 		
 	comID = request.POST.get("comIM")
 	
-	if(request.POST.get("enableBack") == "on"):
-		enableBack = True
+	if(request.POST.get("nonBinding") == "on"):
+		nonBinding = True
 	else:
-		enableBack = False
+		nonBinding = False
+
+	if(request.POST.get("showPoints") == "on"):
+		showPoints = True
+	else:
+		showPoints = False
 	
-	componentParams = textPageObj(	request.POST.get("heading"),
-									request.POST.get("body"),
-									request.POST.get("buttonLabel"),
-									enableBack
+	
+	componentParams = nexObj(
+								p1x = request.POST.get("p1x"),
+								p1y = request.POST.get("p1y"),
+								p1xReplenish = request.POST.get("p1xReplenish"),
+								p1yReplenish = request.POST.get("p1yReplenish"),
+								p1Clearing = request.POST.get("p1Clearing"),
+								p2x = request.POST.get("p2x"),
+								p2y = request.POST.get("p2y"),
+								p2xReplenish = request.POST.get("p2xReplenish"),
+								p2yReplenish = request.POST.get("p2yReplenish"),
+								p2Clearing = request.POST.get("p2Clearing"),
+								mins = request.POST.get("mins"),
+								secs = request.POST.get("secs"),
+								nonBinding = nonBinding,
+								showPoints = showPoints
 								)
 
 	c = Component.objects.get(id=comID)
@@ -117,6 +134,95 @@ def nexEdit(request):
 	c.save()
 	
 	response = "Component Saved"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+	
+
+def makeOfferButton(request):
+	"""Handles the makeOfferButton form screen"""
+	
+	response = "offerFormulation"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+def offerFormulation(request):
+	"""Handles the offerForumationScreen screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def counterOfferFormulation(request):
+	"""Handles the counterOfferFormulation screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def waitingScreen(request):
+	"""Handles the waitingScreen screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def confirmCancel(request):
+	"""Handles the confirmCancel screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def incomingOffer(request):
+	"""Handles the incomingOffer screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def confirmEndRound(request):
+	"""Handles the confirmEndRound screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def nonBindingConfirmation(request):
+	"""Handles the nonBindingConfirmation screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def transactionSummary(request):
+	"""Handles the transactionSummary screen"""
+	
+	response = "Something"
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
+
+def nextRoundCountdown(request):
+	"""Handles the nextRoundCountdown screen"""
+	
+	response = "Something"
 	return render_to_response('api.html', 
 						  {'response': response}, 
 						  context_instance=RequestContext(request))

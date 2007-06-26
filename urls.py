@@ -56,7 +56,17 @@ urlpatterns = patterns('',
 	# Negotiated Exchange
 	(r'^nex/submit/$', 'exchtran.et.nex.nexEdit'),
 	(r'^nex/display/$', 'exchtran.et.nex.nexDisplay'),
-
+	(r'^nex/makeOfferButton/$', 'exchtran.et.nex.makeOfferButton'),
+	(r'^nex/offerFormulation/$', 'exchtran.et.nex.offerFormulation'),
+	(r'^nex/counterOfferFormulation/$', 'exchtran.et.nex.counterOfferFormulation'),
+	(r'^nex/waitingScreen/$', 'exchtran.et.nex.waitingScreen'),
+	(r'^nex/confirmCancel/$', 'exchtran.et.nex.confirmCancel'),
+	(r'^nex/incomingOffer/$', 'exchtran.et.nex.incomingOffer'),
+	(r'^nex/confirmEndRound/$', 'exchtran.et.nex.confirmEndRound'),
+	(r'^nex/nonBindingConfirmation/$', 'exchtran.et.nex.nonBindingConfirmation'),
+	(r'^nex/transactionSummary/$', 'exchtran.et.nex.transactionSummary'),
+	(r'^nex/nextRoundCountdown/$', 'exchtran.et.nex.nextRoundCountdown'),
+			
 	# Matcher
 	(r'^matcher/display/$', 'exchtran.et.matcher.matcherDisplay'),
 	(r'^matcher/submit/$', 'exchtran.et.matcher.matcherEdit'),

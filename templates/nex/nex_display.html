@@ -1,0 +1,171 @@
+{% extends "expBase.html" %}
+
+{% block extrahead %}
+<script src="/site_media/scripts/jquery/jquery.pack.js" type="text/javascript" charset="utf-8"></script>
+<script src="/site_media/scripts/jquery/jquery.form.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+	    var options = { 
+			success: nextScreen
+	    }; 
+
+	    // bind to the form's submit event 
+	    $('form').submit(function() { 
+	        $(this).ajaxSubmit(options);
+	        return false; 
+	    });
+	});
+	function nextScreen(responseText, statusText){
+		$(".exchangeScreen").css("display", "none");
+		$("#" + responseText).css("display", "block");
+	}
+</script>
+
+{% endblock %}
+
+{% block actionArea %}
+<div id="makeOfferButton" class="exchangeScreen">
+	<br/><br/><br/><br/>
+	<h1>Exchanging with Player M</h1>
+	<br/><br/><br/><br/><br/>
+	<form action="/nex/makeOfferButton/" method="post" accept-charset="utf-8">
+		<input type="submit" name="makeOfferButton" value="Make Offer" class="buttonBig"/>
+	</form>
+</div>
+<div id="offerFormulation" style="display:none;" class="exchangeScreen">
+	<h1>Exchanging with Player M</h1>
+	<form action="/nex/offerFormulation/" method="post" accept-charset="utf-8">
+		<p>What will you give?</p>
+		<p>
+			<input type="text" name="offer" value="" size="4" maxlength="4"/>
+			<select name="offerCurrency">
+				<option>x</option>
+				<option>y</option>
+			</select>
+		</p>
+		<p>What do you want in return?</p>
+		<p>
+			<input type="text" name="request" value="" size="4" maxlength="4"/>
+			<select name="requestCurrency">
+				<option>x</option>
+				<option>y</option>
+			</select>
+		</p>
+		<br/>
+		<h3>This deal would get you 50 points</h3>
+		<input type="submit" name="makeOfferButton" value="Offer" id="some_name" class="buttonBig"/>
+	</form>
+</div>
+<div id="counterOfferFormulation" style="display:none;" class="exchangeScreen">
+	<h1>Exchanging with Player M</h1>
+	<form action="/nex/offerFormulationSubmit/" method="post" accept-charset="utf-8">
+		<p>Player M offered you <strong>20 X</strong> for <strong>10 Y</strong>. This deal would get you 50 points.</p>
+		<p>Enter your counter offer below.</p>
+		<p>What will you give?</p>
+		<p>
+			<input type="text" name="offer" value="" size="4" maxlength="4"/>
+			<select name="offerCurrency">
+				<option>x</option>
+				<option>y</option>
+			</select>
+		</p>
+		<p>What do you want in return?</p>
+		<p>
+			<input type="text" name="request" value="" size="4" maxlength="4"/>
+			<select name="requestCurrency">
+				<option>x</option>
+				<option>y</option>
+			</select>
+		</p>
+		<h3>This counter offer deal would get you 75 points</h3>
+		<input type="submit" name="makeOfferButton" value="Cancel" id="some_name" class="buttonBig"/>
+		<input type="submit" name="makeOfferButton" value="Counter Offer" id="some_name" class="buttonBig"/>
+	</form>
+</div>
+<div id="waitingScreen" style="display:none;" class="exchangeScreen">
+	<br/><br/><br/>
+	<h1>Exchanging with Player M</h1>
+	<br/>
+	<h3>Please wait for the other player</h3>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
+	<p>
+		<input type="button" name="makeOfferButton" value="Cancel" id="some_name" class="buttonBig"/>
+	</p>
+</div>
+<div id="confirmCancel" style="display:none;" class="exchangeScreen">
+	<br/><br/><br/>
+	<h1>Exchanging with Player M</h1>
+	<br/><br/>
+	<p>Are you sure you want to cancel your offer?</p>
+	<p>
+		<input type="button" name="makeOfferButton" value="No" id="some_name" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Yes" id="some_name" class="buttonBig"/>
+	</p>
+</div>
+<div id="incomingOffer" style="display:none;" class="exchangeScreen">
+	<h1>Exchanging with Player M</h1>
+	<br/><br/><br/>
+	<p>Player M offered you <strong>20 X</strong> for <strong>10 Y</strong></p>
+	<p>
+		<input type="button" name="makeOfferButton" value="Accept" id="some_name" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Counter Offer" id="some_name" class="buttonBig"/>
+		<input type="button" name="makeOfferButton" value="End Round" id="some_name" class="buttonBig"/>
+	</p>
+</div>
+<div id="1" style="display:none;" class="exchangeScreen">
+	<br/><br/><br/>
+	<h1>Exchanging with Player M</h1>
+	<br/><br/>
+	<p>Are you sure you want to end this round of exchange?</p>
+	<p>
+		<input type="button" name="makeOfferButton" value="No" id="some_name" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Yes" id="some_name" class="buttonBig"/>
+	</p>
+</div>
+<div id="nonBindingConfirmation" style="display:none;" class="exchangeScreen">
+		<br/><br/><br/>
+	<h1>Exchanging with Player M</h1>
+	<br/>
+	<p>You accepted player M's offer of <strong>12 X</strong> for <strong>10 Y</strong>.<br/>You will get 100 points for this deal.</p>
+	<p>Do you want to follow through on your part of the deal<br/> and give 10 Y to player M?</p>
+	<br/>
+	<p>
+		<input type="button" name="makeOfferButton" value="No" id="some_name" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Yes" id="some_name" class="buttonBig"/>
+	</p>
+</div>
+<div id="transactionSummary" style="display:none;" class="exchangeScreen">
+	<br/><br/>
+	<h1>Exchanging with Player M</h1>
+	<br/><br/>
+	<p>You accepted player M's offer of <strong>12 X</strong> for <strong>10 Y</strong>.</p>
+	<p>You received 100 points for this deal.</p>
+	<p>
+		<input type="button" name="makeOfferButton" value="Continue" id="some_name" class="buttonBig"/> 
+	</p>
+</div>
+<div id="nextRoundCountdown" style="display:none;" class="exchangeScreen">
+	<h1>Starting next round shortly</h1>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
+</div>
+{% endblock %}
+
+{% block rightCol %}{% endblock %}
+
+{% block bottomBar %}
+
+<div id="currentPointsBox">
+	<p>Total X</p>
+	<div class="largePoints">
+		20
+	</div>
+</div>
+<div id="cumulativePointsBox">
+	<p>Total Y</p>
+	<div class="largePoints">
+		5
+	</div>
+</div>
+
+{% endblock %}
