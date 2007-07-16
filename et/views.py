@@ -78,7 +78,9 @@ def componentEdit(request):
 	parameters = pickle.loads(component.parameters)
 	
 	# List of nex and rex components used for matcher module
-	componentList = Component.objects.filter(Q(componentType__exact=8)|Q(componentType__exact=2))
+	rexID = ComponentTypes.objects.get(componentType__exact="Reciprocal Exchange")
+	nexID = ComponentTypes.objects.get(componentType__exact="Negotiated Exchange")
+	componentList = Component.objects.filter(Q(componentType__exact=nexID.id)|Q(componentType__exact=rexID.id))
 	
 	return render_to_response(	component.componentType.editTemplate, 
 								{'component': component,
@@ -230,7 +232,9 @@ def newExperiment(request):
 					   		description = request.POST.get('experimentDescription'),
 							status = experimentStatus.objects.get(statusText='Waiting for participants'),
 							minPlayers = 4,
-							maxPlayers = 4
+							maxPlayers = 4,
+							xValue = 10,
+							yValue = 10
 						)
 		e.save()
 		
@@ -280,10 +284,20 @@ def joinSession(request):
 	partiStatus = participantStatus.objects.get(statusText="Ready")
 	expSes = ExperimentSession.objects.get(id=sid)
 	p = Participant(status=partiStatus, experimentSession=expSes, currentIteration=0, currentComponent=0)
+	
+	# Set the participant's player number
+	participantsList = Participant.objects.filter(experimentSession__exact=sid)
+	p.number = len(participantsList)
+	
+	# Set the participant's identity letter
+	possibleIdentityLetters = ["T","D","K","M","F","G","R","L","S","W","H","Z"]
+	p.identityLetter = possibleIdentityLetters[p.number]
+
 	p.save()
 	
-	# Set participant's name
+	# Set participant's unique name
 	p.name = p.dateCreated.strftime("%Y-%m-%d") + "_" + str(p.id).rjust(6,"0")
+	
 	p.save()
 	
 	if(expSes.status.statusText == "Not Ready"):
@@ -316,7 +330,7 @@ def startSession(request):
 
 	# Get a list of the participants
 	participantsList = Participant.objects.filter(experimentSession__exact=sid)
-	
+
 	# Clean out the SessionVar table rows
 	SessionVar.objects.filter(experimentSession=sessionObj).delete()
 	

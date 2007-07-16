@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="/site_media/css/matcher.css" type="text/css" media="screen" />
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/heartbeat.js"></script>
+
+
+{% endblock %}
+
+
+{% block bodyid %}waiting{% endblock %}
+
+
+{% block bodycontent %}
+
+<div id="verticalCenter">
+	<h2>You are about to exchange with player {{opponentIdentity}}</h2>
+	<p>You get to choose the form of exchange</p>
+	<div id="deciderForm">
+		<form action="/matcher/deciderSubmit/" method="POST" accept-charset="utf-8">
+			{% for c in choices %}
+				<input type="radio" name="deciderChoice" value="{{c.id}}" />{{c.displayName}}<br/>
+			{% endfor %}
+			<br/>
+			<input type="hidden" name="pname" value="{{pname}}">
+			<input type="hidden" name="sid" value="{{sid}}">
+			<input type="submit" value="Select" class="buttonSmall"/>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

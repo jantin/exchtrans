@@ -75,24 +75,40 @@
 		<tr>
 			<td>
 				<select name="pair1p1" id="pair1p1">
-					<option value="0" {% ifequal parameters.pairings.0.0 "0" %}selected="selected"{% endifequal %}>A</option>
-					<option value="1" {% ifequal parameters.pairings.0.0 "1" %}selected="selected"{% endifequal %}>B</option>
-					<option value="2" {% ifequal parameters.pairings.0.0 "2" %}selected="selected"{% endifequal %}>C</option>
-					<option value="3" {% ifequal parameters.pairings.0.0 "3" %}selected="selected"{% endifequal %}>D</option>								
+					<option value="0" {% ifequal parameters.pairing.0.0 "0" %}selected="selected"{% endifequal %}>1</option>
+					<option value="1" {% ifequal parameters.pairing.0.0 "1" %}selected="selected"{% endifequal %}>2</option>
+					<option value="2" {% ifequal parameters.pairing.0.0 "2" %}selected="selected"{% endifequal %}>3</option>
+					<option value="3" {% ifequal parameters.pairing.0.0 "3" %}selected="selected"{% endifequal %}>4</option>								
+					<option value="4" {% ifequal parameters.pairing.0.0 "4" %}selected="selected"{% endifequal %}>5</option>								
+					<option value="5" {% ifequal parameters.pairing.0.0 "5" %}selected="selected"{% endifequal %}>6</option>								
+					<option value="6" {% ifequal parameters.pairing.0.0 "6" %}selected="selected"{% endifequal %}>7</option>								
+					<option value="7" {% ifequal parameters.pairing.0.0 "7" %}selected="selected"{% endifequal %}>8</option>								
+					<option value="8" {% ifequal parameters.pairing.0.0 "8" %}selected="selected"{% endifequal %}>9</option>								
+					<option value="9" {% ifequal parameters.pairing.0.0 "9" %}selected="selected"{% endifequal %}>10</option>								
+					<option value="10" {% ifequal parameters.pairing.0.0 "10" %}selected="selected"{% endifequal %}>11</option>								
+					<option value="11" {% ifequal parameters.pairing.0.0 "11" %}selected="selected"{% endifequal %}>12</option>								
 				</select>
 			</td>
 			<td>
 				<select name="pair1p2" id="pair1p2">
-					<option value="0" {% ifequal parameters.pairings.0.1 "0" %}selected="selected"{% endifequal %}>A</option>
-					<option value="1" {% ifequal parameters.pairings.0.1 "1" %}selected="selected"{% endifequal %}>B</option>
-					<option value="2" {% ifequal parameters.pairings.0.1 "2" %}selected="selected"{% endifequal %}>C</option>
-					<option value="3" {% ifequal parameters.pairings.0.1 "3" %}selected="selected"{% endifequal %}>D</option>								
+					<option value="0" {% ifequal parameters.pairing.0.1 "0" %}selected="selected"{% endifequal %}>1</option>
+					<option value="1" {% ifequal parameters.pairing.0.1 "1" %}selected="selected"{% endifequal %}>2</option>
+					<option value="2" {% ifequal parameters.pairing.0.1 "2" %}selected="selected"{% endifequal %}>3</option>
+					<option value="3" {% ifequal parameters.pairing.0.1 "3" %}selected="selected"{% endifequal %}>4</option>								
+					<option value="4" {% ifequal parameters.pairing.0.1 "4" %}selected="selected"{% endifequal %}>5</option>								
+					<option value="5" {% ifequal parameters.pairing.0.1 "5" %}selected="selected"{% endifequal %}>6</option>								
+					<option value="6" {% ifequal parameters.pairing.0.1 "6" %}selected="selected"{% endifequal %}>7</option>								
+					<option value="7" {% ifequal parameters.pairing.0.1 "7" %}selected="selected"{% endifequal %}>8</option>								
+					<option value="8" {% ifequal parameters.pairing.0.1 "8" %}selected="selected"{% endifequal %}>9</option>								
+					<option value="9" {% ifequal parameters.pairing.0.1 "9" %}selected="selected"{% endifequal %}>10</option>								
+					<option value="10" {% ifequal parameters.pairing.0.1 "10" %}selected="selected"{% endifequal %}>11</option>								
+					<option value="11" {% ifequal parameters.pairing.0.1 "11" %}selected="selected"{% endifequal %}>12</option>								
 				</select>
 			</td>
 			<td>
-				<input type="radio" {% ifequal parameters.pairings.0.2 "1" %} checked="checked"{% endifequal %} name="pair1decider" value="1"/>P1<br/>
-				<input type="radio" {% ifequal parameters.pairings.0.2 "2" %} checked="checked"{% endifequal %} name="pair1decider" value="2" />P2<br/>
-				<input type="radio" {% ifequal parameters.pairings.0.2 "0" %} checked="checked"{% endifequal %} name="pair1decider" value="0" />None
+				<input type="radio" {% ifequal parameters.pairing.0.2 "0" %} checked="checked"{% endifequal %} name="pair1decider" value="0" />None<br/>
+				<input type="radio" {% ifequal parameters.pairing.0.2 "1" %} checked="checked"{% endifequal %} name="pair1decider" value="1"/>P1<br/>
+				<input type="radio" {% ifequal parameters.pairing.0.2 "2" %} checked="checked"{% endifequal %} name="pair1decider" value="2" />P2
 			</td>
 			<td>
 				<select multiple="multiple" size="6" name="pair1ComponentChoices">
@@ -102,37 +118,6 @@
 				</select>
 			</td>
 			<td><input type="text" name="pair1rounds" value="{{parameters.pair1rounds}}" size="2" maxlength="2"/></td>
-		</tr>
-		<tr>
-			<td>
-				<select name="pair2p1" id="pair2p1">
-					<option value="0" {% ifequal parameters.pairings.1.0 "0" %}selected="selected"{% endifequal %}>A</option>
-					<option value="1" {% ifequal parameters.pairings.1.0 "1" %}selected="selected"{% endifequal %}>B</option>
-					<option value="2" {% ifequal parameters.pairings.1.0 "2" %}selected="selected"{% endifequal %}>C</option>
-					<option value="3" {% ifequal parameters.pairings.1.0 "3" %}selected="selected"{% endifequal %}>D</option>								
-				</select>
-			</td>
-			<td>
-				<select name="pair2p2" id="pair2p2">
-					<option value="0" {% ifequal parameters.pairings.1.1 "0" %}selected="selected"{% endifequal %}>A</option>
-					<option value="1" {% ifequal parameters.pairings.1.1 "1" %}selected="selected"{% endifequal %}>B</option>
-					<option value="2" {% ifequal parameters.pairings.1.1 "2" %}selected="selected"{% endifequal %}>C</option>
-					<option value="3" {% ifequal parameters.pairings.1.1 "3" %}selected="selected"{% endifequal %}>D</option>								
-				</select>
-			</td>
-			<td>
-				<input type="radio" {% ifequal parameters.pairings.1.2 "1" %} checked="checked"{% endifequal %} name="pair2decider" value="1"/>P1<br/>
-				<input type="radio" {% ifequal parameters.pairings.1.2 "2" %} checked="checked"{% endifequal %} name="pair2decider" value="2" />P2<br/>
-				<input type="radio" {% ifequal parameters.pairings.1.2 "0" %} checked="checked"{% endifequal %} name="pair2decider" value="0" />None
-			</td>
-			<td>
-				<select multiple="multiple" size="6" name="pair2ComponentChoices">
-					{% for c in componentList %}
-						<option value="{{c.id}}" {% multipleSelectSelector parameters.pair2ComponentChoices c.id %}>{{c.name}} ({{c.componentType}})</option>
-					{% endfor %}
-				</select>
-			</td>
-			<td><input type="text" name="pair2rounds" value="{{parameters.pair2rounds}}" size="2" maxlength="2"/></td>
 		</tr>
 	</table>
 </div>
