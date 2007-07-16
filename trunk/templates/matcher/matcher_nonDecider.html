@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="/site_media/css/matcher.css" type="text/css" media="screen" />
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/heartbeat.js"></script>
+
+
+{% endblock %}
+
+
+{% block bodyid %}waiting{% endblock %}
+
+
+{% block bodycontent %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$.jheartbeat.set({
+			url: "/matcher/checkDecision/?sid={{ sid }}&pname={{ pname }}&opponentIdentity={{opponentIdentity}}",
+			delay: 3000
+		}, function () {
+			var statusText = document.getElementById('HeartBeatDIV').innerHTML;
+			if(statusText != ""){
+				location.href = "/matcher/followDecider/?sid={{ sid }}&pname={{ pname }}&choiceID=" + statusText;
+			}
+		});
+	});
+</script>
+
+<div id="verticalCenter">
+	<h2>You are about to exchange with player {{opponentIdentity}}</h2>
+	<p>Player {{opponentIdentity}} is choosing the form of exchange. Please wait.</p>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed"/>
+</div>
+
+{% endblock %}

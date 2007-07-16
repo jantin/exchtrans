@@ -25,7 +25,7 @@ class nexObj(object):
 					mins = 2,
 					secs = 30,
 					nonBinding = False,
-					showPoints = False					
+					showPoints = False
 				):
 		self.p1x = p1x
 		self.p1y = p1y
@@ -129,6 +129,7 @@ def nexEdit(request):
 	c = Component.objects.get(id=comID)
 	c.name = request.POST.get("componentName")
 	c.description = request.POST.get("componentDescription")
+	c.displayName = request.POST.get("displayName")
 	c.parameters = pickle.dumps(componentParams)
 	
 	c.save()

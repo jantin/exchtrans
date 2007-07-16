@@ -69,6 +69,8 @@ class Participant(models.Model):
 	currentComponent = models.IntegerField(null=True)
 	currentIteration = models.IntegerField(null=True)
 	cumulativePoints = models.IntegerField(null=True,default=0)
+	number = models.IntegerField()
+	identityLetter = models.CharField(maxlength=1)
 	
 	def __str__(self):
 		return self.name
@@ -98,6 +100,7 @@ class Component(models.Model):
 	dateCreated = models.DateField(auto_now_add=True)
 	dateModified = models.DateField(auto_now=True)
 	componentType = models.ForeignKey(ComponentTypes)
+	displayName = models.CharField(maxlength=255, null=True)
 	
 	
 	def __str__(self):

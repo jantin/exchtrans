@@ -70,6 +70,9 @@ urlpatterns = patterns('',
 	# Matcher
 	(r'^matcher/display/$', 'exchtran.et.matcher.matcherDisplay'),
 	(r'^matcher/submit/$', 'exchtran.et.matcher.matcherEdit'),
+	(r'^matcher/deciderSubmit/$', 'exchtran.et.matcher.deciderSubmit'),
+	(r'^matcher/checkDecision/$', 'exchtran.et.matcher.checkDeciderChoice'),
+	(r'^matcher/followDecider/$', 'exchtran.et.matcher.followDecider'),
 	
 	# Questionnaire
 	(r'^questionnaire/display/$', 'exchtran.et.questionnaire.questionnaireDisplay'),
