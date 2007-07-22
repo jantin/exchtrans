@@ -2,8 +2,9 @@
 {% load multipleSelectSelector %} 
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
-
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.copyEvents.pack.js"></script>
+
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
 	$(document).ready(function() { 
@@ -22,15 +23,48 @@
 		// When page loads, make sure we're showing the right options
 		var checked = $("#randomPairingCheck").attr("checked");
 		if(checked == true){
-			$("#nonRandomPairing").toggleClass("displayNone");
+			$("#pairings").toggleClass("displayNone");
+		} else {
 			$("#randomPairing").toggleClass("displayNone");
 		}
 		
 		// When the random checkbox is toggled, show the right options
 		$("#randomPairingCheck").click( function() {
-			$("#nonRandomPairing").toggleClass("displayNone");
+			$("#pairings").toggleClass("displayNone");
 			$("#randomPairing").toggleClass("displayNone");
 		});
+		
+		
+		$(".addPairingLink").click( function() {
+			pairingClone = $(this).parents(".pairing").cloneWithEvents();
+			$(this).parents(".pairing").after(pairingClone);
+			updateFormNames();
+			return false;
+		});
+		$(".subtractPairingLink").click( function() {
+			if( $(".pairing").size() <= 1 ){
+				return false;
+			} else {
+				$(this).parents(".pairing").remove();
+				updateFormNames();
+				return false;
+			}
+		});
+		
+		function updateFormNames(){
+			counter = 0;
+			$(".pairing").each(function(i){
+				$(this).find(".p1FormElement").attr("name","p1_" + i);
+				$(this).find(".p2FormElement").attr("name","p2_" + i);
+				$(this).find(".deciderFormElement").attr("name","decider_" + i);
+				$(this).find(".componentChoicesFormElement").attr("name","componentChoices_" + i);
+				$(this).find(".roundsFormElement").attr("name","rounds_" + i);
+				counter++;
+			});
+			
+			$("#pairingCount").attr("value", counter)
+			return;
+		}
 	});
 </script>
 
@@ -63,87 +97,96 @@
 	<input type="checkbox" name="randomPairingCheck" id="randomPairingCheck" {% if parameters.randomPairing %}checked="checked"{% endif %}/> 
 	Randomize Pairing (Every player will play every other player and have a turn as decider against each player.)
 </p>
-<div id="nonRandomPairing">
-	<table border="0" cellspacing="5" cellpadding="5">
-		<tr>
-			<th>Player 1</th>
-			<th>Player 2</th>
-			<th>Decider</th>
-			<th>Decider Choices</th>
-			<th>Rounds</th>
-		</tr>
-		<tr>
-			<td>
-				<select name="pair1p1" id="pair1p1">
-					<option value="0" {% ifequal parameters.pairing.0.0 "0" %}selected="selected"{% endifequal %}>1</option>
-					<option value="1" {% ifequal parameters.pairing.0.0 "1" %}selected="selected"{% endifequal %}>2</option>
-					<option value="2" {% ifequal parameters.pairing.0.0 "2" %}selected="selected"{% endifequal %}>3</option>
-					<option value="3" {% ifequal parameters.pairing.0.0 "3" %}selected="selected"{% endifequal %}>4</option>								
-					<option value="4" {% ifequal parameters.pairing.0.0 "4" %}selected="selected"{% endifequal %}>5</option>								
-					<option value="5" {% ifequal parameters.pairing.0.0 "5" %}selected="selected"{% endifequal %}>6</option>								
-					<option value="6" {% ifequal parameters.pairing.0.0 "6" %}selected="selected"{% endifequal %}>7</option>								
-					<option value="7" {% ifequal parameters.pairing.0.0 "7" %}selected="selected"{% endifequal %}>8</option>								
-					<option value="8" {% ifequal parameters.pairing.0.0 "8" %}selected="selected"{% endifequal %}>9</option>								
-					<option value="9" {% ifequal parameters.pairing.0.0 "9" %}selected="selected"{% endifequal %}>10</option>								
-					<option value="10" {% ifequal parameters.pairing.0.0 "10" %}selected="selected"{% endifequal %}>11</option>								
-					<option value="11" {% ifequal parameters.pairing.0.0 "11" %}selected="selected"{% endifequal %}>12</option>								
-				</select>
-			</td>
-			<td>
-				<select name="pair1p2" id="pair1p2">
-					<option value="0" {% ifequal parameters.pairing.0.1 "0" %}selected="selected"{% endifequal %}>1</option>
-					<option value="1" {% ifequal parameters.pairing.0.1 "1" %}selected="selected"{% endifequal %}>2</option>
-					<option value="2" {% ifequal parameters.pairing.0.1 "2" %}selected="selected"{% endifequal %}>3</option>
-					<option value="3" {% ifequal parameters.pairing.0.1 "3" %}selected="selected"{% endifequal %}>4</option>								
-					<option value="4" {% ifequal parameters.pairing.0.1 "4" %}selected="selected"{% endifequal %}>5</option>								
-					<option value="5" {% ifequal parameters.pairing.0.1 "5" %}selected="selected"{% endifequal %}>6</option>								
-					<option value="6" {% ifequal parameters.pairing.0.1 "6" %}selected="selected"{% endifequal %}>7</option>								
-					<option value="7" {% ifequal parameters.pairing.0.1 "7" %}selected="selected"{% endifequal %}>8</option>								
-					<option value="8" {% ifequal parameters.pairing.0.1 "8" %}selected="selected"{% endifequal %}>9</option>								
-					<option value="9" {% ifequal parameters.pairing.0.1 "9" %}selected="selected"{% endifequal %}>10</option>								
-					<option value="10" {% ifequal parameters.pairing.0.1 "10" %}selected="selected"{% endifequal %}>11</option>								
-					<option value="11" {% ifequal parameters.pairing.0.1 "11" %}selected="selected"{% endifequal %}>12</option>								
-				</select>
-			</td>
-			<td>
-				<input type="radio" {% ifequal parameters.pairing.0.2 "0" %} checked="checked"{% endifequal %} name="pair1decider" value="0" />None<br/>
-				<input type="radio" {% ifequal parameters.pairing.0.2 "1" %} checked="checked"{% endifequal %} name="pair1decider" value="1"/>P1<br/>
-				<input type="radio" {% ifequal parameters.pairing.0.2 "2" %} checked="checked"{% endifequal %} name="pair1decider" value="2" />P2
-			</td>
-			<td>
-				<select multiple="multiple" size="6" name="pair1ComponentChoices">
-					{% for c in componentList %}
-						<option value="{{c.id}}" {% multipleSelectSelector parameters.pair1ComponentChoices c.id %}>{{c.name}} ({{c.componentType}})</option>
-					{% endfor %}
-				</select>
-			</td>
-			<td><input type="text" name="pair1rounds" value="{{parameters.pair1rounds}}" size="2" maxlength="2"/></td>
-		</tr>
-	</table>
-</div>
-<div id="randomPairing" class="displayNone">
-	<table border="0" cellspacing="5" cellpadding="5">
-		<tr>
-			<th>Decider Choices</th>
-			<th>Rounds</th>
-		</tr>
-		<tr>
-			<td>
-				<select multiple="multiple" size="6" name="randomComponentChoices">
-					{% for c in componentList %}
-						<option value="{{c.id}}" {% multipleSelectSelector parameters.randomComponentChoices c.id %}>{{c.name}} ({{c.componentType}})</option>
-					{% endfor %}
-				</select>
-			</td>
-			<td><input type="text" name="randomRounds" value="{{parameters.randomRounds}}" size="2" maxlength="2"/></td>
-		</tr>
-	</table>
-</div>
-
-	
-	<p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>
+	<div id="pairings">
+		{% for pairing in parameters.pairings %}
+			<div class="pairing">
+				<table border="0" cellspacing="5" cellpadding="5">
+					<tr>
+						<th>Player 1</th>
+						<th>Player 2</th>
+						<th>Decider</th>
+						<th>Decider Choices</th>
+						<th>Rounds</th>
+						<th></th>
+					</tr>
+					<tr>
+						<td>
+							<select name="p1_{{forloop.counter0}}" class="p1FormElement">
+								<option value="0" {% ifequal pairing.p1 "0" %}selected="selected"{% endifequal %}>1</option>
+								<option value="1" {% ifequal pairing.p1 "1" %}selected="selected"{% endifequal %}>2</option>
+								<option value="2" {% ifequal pairing.p1 "2" %}selected="selected"{% endifequal %}>3</option>
+								<option value="3" {% ifequal pairing.p1 "3" %}selected="selected"{% endifequal %}>4</option>								
+								<option value="4" {% ifequal pairing.p1 "4" %}selected="selected"{% endifequal %}>5</option>								
+								<option value="5" {% ifequal pairing.p1 "5" %}selected="selected"{% endifequal %}>6</option>								
+								<option value="6" {% ifequal pairing.p1 "6" %}selected="selected"{% endifequal %}>7</option>								
+								<option value="7" {% ifequal pairing.p1 "7" %}selected="selected"{% endifequal %}>8</option>								
+								<option value="8" {% ifequal pairing.p1 "8" %}selected="selected"{% endifequal %}>9</option>								
+								<option value="9" {% ifequal pairing.p1 "9" %}selected="selected"{% endifequal %}>10</option>								
+								<option value="10" {% ifequal pairing.p1 "10" %}selected="selected"{% endifequal %}>11</option>								
+								<option value="11" {% ifequal pairing.p1 "11" %}selected="selected"{% endifequal %}>12</option>								
+							</select>
+						</td>
+						<td>
+							<select name="p2_{{forloop.counter0}}" class="p2FormElement">
+								<option value="0" {% ifequal pairing.p2 "0" %}selected="selected"{% endifequal %}>1</option>
+								<option value="1" {% ifequal pairing.p2 "1" %}selected="selected"{% endifequal %}>2</option>
+								<option value="2" {% ifequal pairing.p2 "2" %}selected="selected"{% endifequal %}>3</option>
+								<option value="3" {% ifequal pairing.p2 "3" %}selected="selected"{% endifequal %}>4</option>								
+								<option value="4" {% ifequal pairing.p2 "4" %}selected="selected"{% endifequal %}>5</option>								
+								<option value="5" {% ifequal pairing.p2 "5" %}selected="selected"{% endifequal %}>6</option>								
+								<option value="6" {% ifequal pairing.p2 "6" %}selected="selected"{% endifequal %}>7</option>								
+								<option value="7" {% ifequal pairing.p2 "7" %}selected="selected"{% endifequal %}>8</option>								
+								<option value="8" {% ifequal pairing.p2 "8" %}selected="selected"{% endifequal %}>9</option>								
+								<option value="9" {% ifequal pairing.p2 "9" %}selected="selected"{% endifequal %}>10</option>								
+								<option value="10" {% ifequal pairing.p2 "10" %}selected="selected"{% endifequal %}>11</option>								
+								<option value="11" {% ifequal pairing.p2 "11" %}selected="selected"{% endifequal %}>12</option>								
+							</select>
+						</td>
+						<td>
+							<select name="decider_{{forloop.counter0}}" class="deciderFormElement">
+								<option value="0" {% ifequal pairing.decider "0" %} selected="selected"{% endifequal %} />None</option>
+								<option value="1" {% ifequal pairing.decider "1" %} selected="selected"{% endifequal %} />P1</option>
+								<option value="2" {% ifequal pairing.decider "2" %} selected="selected"{% endifequal %} />P2</option>
+							</select>
+						</td>
+						<td>
+							<select multiple="multiple" size="6" name="componentChoices_{{forloop.counter0}}" class="componentChoicesFormElement">
+								{% for c in componentList %}
+									<option value="{{c.id}}" {% multipleSelectSelector pairing.choices c.id %}>{{c.name}} ({{c.componentType}})</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td><input type="text" name="rounds_{{forloop.counter0}}" class="roundsFormElement" value="{{pairing.rounds}}" size="2" maxlength="2"/></td>
+						<td><a href="#" class="subtractPairingLink">-</a> <a href="#" class="addPairingLink">+</a></td>
+					</tr>
+				</table>
+			</div>
+		{% endfor %}
+	</div>
+	<div id="randomPairing">
+		<table border="0" cellspacing="5" cellpadding="5">
+			<tr>
+				<th>Decider Choices</th>
+				<th>Rounds</th>
+			</tr>
+			<tr>
+				<td>
+					<select multiple="multiple" size="6" name="randomChoices">
+						{% for c in componentList %}
+							<option value="{{c.id}}" {% multipleSelectSelector parameters.randomChoices c.id %}>{{c.name}} ({{c.componentType}})</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td><input type="text" name="randomRounds" value="{{parameters.randomRounds}}" size="2" maxlength="2"/></td>
+			</tr>
+		</table>
+	</div>
+	<p><input type="hidden" name="comIM" value="{{ component.id }}"/>
+		<input type="hidden" name="pairingCount" value="{{ parameters.pairings|length }}" id="pairingCount">
+		<input type="submit" value="Save Changes" class="buttonSmall"/></p>
 	<div id="message">
 
 	</div>
 </form>
+
 {% endblock %}

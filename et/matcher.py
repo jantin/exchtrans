@@ -13,25 +13,21 @@ from random import shuffle
 class matcherObj(object):
 	"""A Data structure holding a matcher."""
 	def __init__(	self, 
-					pairing = [["0","1","0"]],
+					pairings = [{'p1': "0", 'p2': "1", 'decider': "0", 'rounds': "1", 'choices':[]}],
 					randomPairing = True,
-					randomComponentChoices = [],
-					pair1ComponentChoices = [],
-					randomRounds = "1",
-					pair1rounds = "1"
+					randomChoices = [],
+					randomRounds = "1"
 				):
-		self.pairing = pairing
+		self.pairings = pairings
 		self.randomPairing = randomPairing
-		self.randomComponentChoices = randomComponentChoices
-		self.pair1ComponentChoices = pair1ComponentChoices
+		self.randomChoices = randomChoices
 		self.randomRounds = randomRounds
-		self.pair1rounds = pair1rounds
 		'''
 		If randomPairing is set to true, pairing and pair1rounds
 		are ignored at runtime.
 		
 		The pairing stucture works as such:
-		[[player 0, Player 1, Decider],...]
+		[{player 1, Player 2, Decider, rounds},...]
 		
 		Decider is one of the following
 		1, indicating player 1
@@ -82,15 +78,19 @@ def matcherDisplay(request):
 				messageText = pickle.dumps(parameters)
 				)
 	
+	
+	
 	# check to see if participant is involved in pairing and if not, send ahead
-	if( (parameters.randomPairing == False) and not checkPairsForPlayer(parameters.pairing, p.number) ):
-		return HttpResponseRedirect('/session/drive/?pname=' + p.name + '&sid=' + sid)
+	#if( (parameters.randomPairing == False) and not checkPairsForPlayer(parameters.pairing, p.number) ):
+	#	return HttpResponseRedirect('/session/drive/?pname=' + p.name + '&sid=' + sid)
 	
 	# if random, create pairings (first player to get here only)
 	# first, check if the pairings have been created already
 	if( parameters.randomPairing ):
 		# check if the pairings have been created already by checking for
 		# a session variable in the SessionVar table.
+		
+		# This key may be problematic if the experiment contains the same component multiple times
 		key = "matcher" + str(c.id) + "RandomPairs"
 		try:
 			pairsCheck = SessionVar.objects.get(experimentSession=s,key=key)
@@ -107,6 +107,7 @@ def matcherDisplay(request):
 			pairs += roundRobin( shuffledPlayers, decider = 1 )
 			sv = SessionVar(experimentSession=s, key=key, value=pickle.dumps(pairs))
 			sv.save()
+	'''
 	else:
 		# Get the identity of the other player in the pair
 		opponentIdentity = getOpponentIdentity(parameters.pairing, p.number, sid)
@@ -140,10 +141,25 @@ def matcherDisplay(request):
 										}, 
 									  	context_instance=RequestContext(request))
 		else:
-			pass
-		# TODO: if no decider, pass player on to exchange form
-		
-		
+			# There is no decider, therefore direct the player to the first of the selected
+			# decider choices. If there is no decider specified, there should be only one selected.
+			
+			choiceID = parameters.pair1ComponentChoices[0]
+			
+			# get the component object
+			chosenComponent = Component.objects.get(id=choiceID)
+
+			# Determine the kick off function for the component
+			kickOffFunction = chosenComponent.componentType.kickoffFunction
+
+			# redirect to the kickoff function of the component
+			return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid)		
+	'''
+	# Send off to first random pairing
+	# iterate throught the pairs list looking for a pairing the current player is involved with
+	# Check if that player is a decider or not, if so pass to matcher_decider, otherwise: matcher_nonDecider
+	# Write a session var indicating the current pairing index and the player's id
+	# Write a new function that exchange forms direct to after the exchange is complete that checks what pairing the player is currently on moves them to the next OR passes to driveSession
 	return render_to_response("textPage/textPage_display.html", 
 							{	'sid': sid, 
 								'pname': pname,
@@ -234,26 +250,28 @@ def followDecider(request):
 def matcherEdit(request):
 	"""Saves the contents of the matcher form"""
 	comID = request.POST.get("comIM")
-	
 	# Slightly different form handling depending on the random pairing checkbox
 	if(request.POST.get("randomPairingCheck") == "on"):
 		componentParams = matcherObj(
 									randomPairing = True,
 									randomRounds = request.POST.get("randomRounds"),
-									randomComponentChoices = request.POST.getlist("randomComponentChoices")
+									randomChoices = request.POST.getlist("randomChoices")
 									)
 	else:
+		pairingCount = request.POST.get("pairingCount")
+		pairings = []
+		for i in range(int(pairingCount)):
+			pairings.append	(
+								{ 	'p1': request.POST.get("p1_" + str(i)),
+									'p2': request.POST.get("p2_" + str(i)),
+									'decider': request.POST.get("decider_" + str(i)),
+									'rounds': request.POST.get("rounds_" + str(i)),
+									'choices': request.POST.getlist("componentChoices_" + str(i))
+								}
+							)
 		componentParams = matcherObj(
-									randomPairing = False,
-									pair1rounds = request.POST.get("pair1rounds"),
-									pair1ComponentChoices = request.POST.getlist("pair1ComponentChoices"),
-									pairing = 	[
-													[
-													request.POST.get("pair1p1"),
-													request.POST.get("pair1p2"),
-													request.POST.get("pair1decider")
-													]
-												]
+										randomPairing = False,
+										pairings = pairings
 									)
 	
 	c = Component.objects.get(id=comID)
@@ -274,14 +292,15 @@ def roundRobin(units, decider=0, sets=None):
 	# pulled from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65200
 	if len(units) % 2:
 		units.append(None)
-	count    = len(units)
-	sets     = sets or (count - 1)
-	half     = count / 2
+	count	 = len(units)
+	sets	 = sets or (count - 1)
+	half	 = count / 2
 	schedule = []
 	for turn in range(sets):
 		pairings = []
 		for i in range(half):
-			pairings.append([units[i], units[count-i-1], decider])
+			pairings.append({'p1': units[i], 'p2': units[count-i-1], 'decider':decide})
+			# pairings.append([units[i], units[count-i-1], decide])
 		units.insert(1, units.pop())
 		schedule.append(pairings)
 	return schedule
@@ -295,8 +314,10 @@ def checkPairsForPlayer(pairing, playerNumber):
 	return False
 
 def checkForDecider(pair):
-	"""Checks if the given pairing has a decider"""
-	if( pair[0][2] > 0 ):
+	"""Checks if the given pairing has a decider. Returns True if there is a decider
+		False if there is not a decider"""
+	print "DECIDER VALUE:" + str(pair[0][2])
+	if( int(pair[0][2]) > 0 ):
 		return True
 	else:
 		return False
