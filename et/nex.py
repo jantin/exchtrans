@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import simplejson
 from models import *
 from common import *
 from views import *
@@ -138,14 +139,29 @@ def nexEdit(request):
 	return render_to_response('api.html', 
 						  {'response': response}, 
 						  context_instance=RequestContext(request))
+
+
+def checkForOpponent(request):
+	"""Handles the checkForOpponent screen."""
 	
+	# Register current player as being ready
+	
+	# Check if opponent is ready. If so, response = "offerFormulation"
+	
+	return render_to_response('api.html', 
+						  {'response': response}, 
+						  context_instance=RequestContext(request))
+
 
 def makeOfferButton(request):
 	"""Handles the makeOfferButton form screen"""
+	response = {}
+	response['nextScreen'] = "offerFormulation"
 	
-	response = "offerFormulation"
+	
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 def offerFormulation(request):
