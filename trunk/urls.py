@@ -27,6 +27,7 @@ urlpatterns = patterns('',
 	(r'^users/$', 'exchtran.et.views.users'),
 	
 	(r'^scratch/$', 'exchtran.et.views.scratch'),
+	(r'^httpRPS/$', 'exchtran.et.views.httpRPS'),
 
 	#Deprecated
 	(r'^editor/$', 'exchtran.et.views.editor'),	

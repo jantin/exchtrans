@@ -454,6 +454,27 @@ class sessionVariables:
 @login_required
 def scratch(request):
 	"""outputs scratch template for UI dev"""
-	return render_to_response('scratch.html', 
+	return render_to_response('nex/nex_display.html', 
 						  {'name': "value"}, 
 						  context_instance=RequestContext(request))
+
+@login_required
+def httpRPS(request):
+	"""Make a DB query and return a result. Used for benchmarking"""
+	startTime = time()
+	sid = request.GET.get('sid')
+	pname = request.GET.get('pname')
+	
+	# get the current Participant object
+	p = Participant.objects.get(name=pname)
+	cumulativePoints = p.cumulativePoints
+	sesVars = loadSessionVars(sid)
+	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
+	totalTime = time() - startTime
+	response = {}
+	response['time'] = totalTime
+	jsonString = simplejson.dumps(response)
+	return render_to_response('api.html', 
+						  {'response': jsonString}, 
+						  context_instance=RequestContext(request))
+

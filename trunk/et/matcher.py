@@ -27,12 +27,12 @@ class matcherObj(object):
 		are ignored at runtime.
 		
 		The pairing stucture works as such:
-		[{player 1, Player 2, Decider, rounds},...]
+		[{player 1, Player 2, Decider, rounds, choices},...]
 		
 		Decider is one of the following
 		1, indicating player 1
 		2, indicating player 2
-		0, indicating no decider (first selected component will be used)
+		0, indicating no decider (first selected component in choices list will be used)
 		'''
 
 
@@ -109,6 +109,8 @@ def matcherDisplay(request):
 		playerPairMap = SessionVar.objects.get(experimentSession=s,key=playerPairMapKey)
 		playerPairMap = pickle.loads(playerPairMap.value)
 	except:
+		# PlayerPairMap use the player number as a key to the current pairing index. The pairing index indicates
+		# where we are in the pairings list of the matcherObj.
 		playerPairMap = {}
 		players = range(len(sesVars.participantsList))
 		for i in players:
