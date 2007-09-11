@@ -12,7 +12,7 @@
 
 	    // bind the form's submit event 
 	    $('form').submit(function() { 
-	        $(this).ajaxSubmit({success: processResponse});
+	        $(this).ajaxSubmit({success: processFormResponse});
 	        return false; 
 	    });
 		
@@ -26,36 +26,61 @@
 		});
 		
 		// Start polling server to check for opponents
-		//pollServer("/httpRPS/?sid=56&pname=2007-07-30_000388", 250);
+		pollServer("/nex/checkForOpponentPollProcess/?sid=56&pname=2007-07-30_000388", 2000);
 	});
-	function processResponse(responseText){
+	function processFormResponse(responseText){
 		// responseText is JSON text returned by the server
 		// parseJSON is not jQuery, rather it's in json.js from json.org
 		responseJSON = responseText.parseJSON();
 		
-		// Turn off all the screens
-		$(".exchangeScreen").css("display", "none");
-		// turn on the screen recevied from the server
-		$("#" + responseJSON['nextScreen']).css("display", "block");
+		switch( responseJSON['processor'] ){
+			case "":
+				showScreen(responseJSON['showScreen']);
+				break;
+		}
 		
 		if(responseJSON['poll'] == true){
 			pollServer(responseJSON['url'],responseJSON['interval']);
 		}
+		return;
 	}
+	
+	// This function polls the server
 	function pollServer(url, interval){		
 		$.getJSON(url, function(responseJSON){
 			processPoll(url, interval, responseJSON);
 			}
 		)
+		return;
 	}
 	
+	// This function handles the response after each pole.
 	function processPoll(url, interval, responseJSON){
 		pollURL = url;
 		pollInterval = interval;
 		
-		$("#makeOfferButton").append("<p>Hello: " + responseJSON['time'] + "</p>")
+		//$("#makeOfferButton").append("<p>Hello: " + responseJSON['time'] + "</p>")
+		switch( responseJSON['processor'] ){
+			case "checkForOpponentPollProcess":
+				showScreen(responseJSON['showScreen']);
+				break;
+		}
 		
-		setTimeout("pollServer(pollURL, pollInterval)", interval);
+		if(responseJSON['continuePolling']){
+			setTimeout("pollServer(pollURL, pollInterval)", interval);			
+		}
+		
+		return;
+	}
+	
+	// This function displays only the specified screen. screenName should be the the div ID
+	// of the desired screen.
+	function showScreen(screenName){
+		// Turn off all the screens
+		$(".exchangeScreen").css("display", "none");
+		// turn on the specified screen
+		$("#" + screenName).css("display", "block");
+		return;
 	}
 
 </script>
@@ -63,12 +88,14 @@
 {% endblock %}
 
 {% block actionArea %}
-<div id="checkForOpponent" style="display:none;" class="exchangeScreen">
+<div id="checkForOpponent" style="" class="exchangeScreen">
 	<br/><br/><br/><br/>
-	<h1>Exchanging with Player M</h1>
-	<br/><br/><br/><br/><br/>
+	<h1>You are about to exchange with Player M</h1>
+	<br/><br/><br/><br/>
+	<h3>Please wait...</h3>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
 </div>
-<div id="makeOfferButton" style="" class="exchangeScreen">
+<div id="makeOfferButton" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/><br/>
 	<h1>Exchanging with Player M</h1>
 	<br/><br/><br/><br/><br/>
