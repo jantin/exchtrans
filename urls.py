@@ -57,6 +57,7 @@ urlpatterns = patterns('',
 	# Negotiated Exchange
 	(r'^nex/submit/$', 'exchtran.et.nex.nexEdit'),
 	(r'^nex/display/$', 'exchtran.et.nex.nexDisplay'),
+	(r'^nex/checkForOpponentPollProcess/$', 'exchtran.et.nex.checkForOpponentPollProcess'),
 	(r'^nex/makeOfferButton/$', 'exchtran.et.nex.makeOfferButton'),
 	(r'^nex/offerFormulation/$', 'exchtran.et.nex.offerFormulation'),
 	(r'^nex/counterOfferFormulation/$', 'exchtran.et.nex.counterOfferFormulation'),

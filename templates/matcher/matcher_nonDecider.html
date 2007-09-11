@@ -18,12 +18,12 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$.jheartbeat.set({
-			url: "/matcher/checkDecision/?sid={{ sid }}&pname={{ pname }}&opponentIdentity={{opponentIdentity}}",
+			url: "/matcher/checkDecision/?sid={{ sid }}&pname={{ pname }}&opponentIdentity={{ opponentIdentity }}&opponentName={{ opponentName }}",
 			delay: 3000
 		}, function () {
 			var statusText = document.getElementById('HeartBeatDIV').innerHTML;
 			if(statusText != ""){
-				location.href = "/matcher/followDecider/?sid={{ sid }}&pname={{ pname }}&choiceID=" + statusText;
+				location.href = "/matcher/followDecider/?sid={{ sid }}&pname={{ pname }}&opponentName={{ opponentName }}&choiceID=" + statusText;
 			}
 		});
 	});

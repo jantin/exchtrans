@@ -109,7 +109,7 @@ def matcherDisplay(request):
 		playerPairMap = SessionVar.objects.get(experimentSession=s,key=playerPairMapKey)
 		playerPairMap = pickle.loads(playerPairMap.value)
 	except:
-		# PlayerPairMap use the player number as a key to the current pairing index. The pairing index indicates
+		# PlayerPairMap uses the player number as a key to the current pairing index. The pairing index indicates
 		# where we are in the pairings list of the matcherObj.
 		playerPairMap = {}
 		players = range(len(sesVars.participantsList))
@@ -133,8 +133,9 @@ def matcherDisplay(request):
 			playerPairMapSessionVar.value = pickle.dumps(playerPairMap)
 			playerPairMapSessionVar.save()
 			
-			# Get the identity of the other player in the pair
+			# Get the name and identity of the other player in the pair
 			opponentIdentity = getOpponentIdentity(pair, p.number, sid)
+			opponentName = getOpponentName(pair, p.number, sid)
 		
 			# check if there is a decider involved
 			if( checkForDecider(pair) ):
@@ -152,7 +153,8 @@ def matcherDisplay(request):
 												'pname': pname,
 												'parameters': parameters,
 												'choices': choices,
-												'opponentIdentity': opponentIdentity
+												'opponentIdentity': opponentIdentity,
+												'opponentName': opponentName
 											}, 
 										  	context_instance=RequestContext(request))
 				else:
@@ -161,12 +163,13 @@ def matcherDisplay(request):
 											{	'sid': sid, 
 												'pname': pname,
 												'parameters': parameters,
-												'opponentIdentity': opponentIdentity											
+												'opponentIdentity': opponentIdentity,
+												'opponentName': opponentName											
 											}, 
 										  	context_instance=RequestContext(request))
 			else:
 				# There is no decider, therefore direct the player to the first of the selected
-				# decider choices. If there is no decider specified, there should be only one selected.
+				# decider choices. In theory, if there is no decider specified, there should be only one selected anyways.
 			
 				choiceID = pair["choices"][0]
 			
@@ -177,7 +180,7 @@ def matcherDisplay(request):
 				kickOffFunction = chosenComponent.componentType.kickoffFunction
 
 				# redirect to the kickoff function of the component
-				return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid)		
+				return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid+ '&opponentName=' + opponentName + '&exchangeComponentID=' + choiceID)		
 	
 	# After there are no more pairs to go through, go to the next component
 	return HttpResponseRedirect('/session/drive/?pname=' + pname + '&sid=' + sid)
@@ -190,6 +193,7 @@ def deciderSubmit(request):
 	choiceID = request.POST.get("deciderChoice")
 	sid = request.POST.get('sid')
 	pname = request.POST.get('pname')
+	opponentName = request.POST.get('opponentName')
 	
 	# get the current Participant object
 	p = Participant.objects.get(name=pname)
@@ -211,7 +215,7 @@ def deciderSubmit(request):
 	kickOffFunction = chosenComponent.componentType.kickoffFunction
 	
 	# redirect to the kickoff function of the chosen component
-	return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid)
+	return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid + '&opponentName=' + opponentName + '&exchangeComponentID=' + choiceID)		
 	
 
 def checkDeciderChoice(request):
@@ -250,6 +254,7 @@ def followDecider(request):
 	choiceID = request.GET.get("choiceID")
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
+	opponentName = request.GET.get('opponentName')
 	
 	# get the choice component object
 	chosenComponent = Component.objects.get(id=choiceID)
@@ -258,7 +263,7 @@ def followDecider(request):
 	kickOffFunction = chosenComponent.componentType.kickoffFunction
 	
 	# redirect to the kickoff function of the chosen component
-	return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid)
+	return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid + '&opponentName=' + opponentName + '&exchangeComponentID=' + choiceID)		
 	
 
 @login_required
@@ -356,6 +361,21 @@ def getOpponentIdentity(pair, playerNumber, sid):
 	else:
 		return False
 	
+def getOpponentName(pair, playerNumber, sid):
+	"""Accepts a pair and a player number. Returns the name of the 
+		other player in the pairing (e.g. 2007-07-30_000388 )"""
+	p1 = str(pair["p1"])
+	p2 = str(pair["p2"])
+	playerNumber = str(playerNumber)
+	
+	if(playerNumber == p1):
+		opponent = Participant.objects.get(experimentSession=sid, number=p2)
+		return opponent.name
+	elif(playerNumber == p2):
+		opponent = Participant.objects.get(experimentSession=sid, number=p1)
+		return opponent.name
+	else:
+		return False
 	
 	
 	
