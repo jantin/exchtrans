@@ -52,17 +52,24 @@ def nexDisplay(request):
 	opponentName = request.GET.get('opponentName')
 	exchangeComponentID = request.GET.get('exchangeComponentID')
 	
-	# get the current Participant object
+	# get the current Participant object, session vars, and matcher params
 	p = Participant.objects.get(name=pname)
+	s = ExperimentSession.objects.get(id=sid)
 	cumulativePoints = p.cumulativePoints
 	sesVars = loadSessionVars(sid)
+	# Note: these parameters are for the matcher component that is calling the current exchange component
 	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
-	
-	# get the current session object
-	s = ExperimentSession.objects.get(id=sid)
-	# get the current component object
+	# Note: This component object is for the matcher component that is calling the current exchange component
 	c = sesVars.componentsList[int(p.currentComponent)].component_id
-	
+
+	# get the current exchange component parameters
+	exchangeParameters = pickle.loads(Component.objects.get(id=51).parameters)
+	# Serialize the nex object into a dictionary that can be passed as JSON
+	exchangeParametersJSON = {}
+	for key,value in exchangeParameters.__dict__.items():
+		exchangeParametersJSON[key] = value
+	exchangeParametersJSON = simplejson.dumps(exchangeParametersJSON)
+
 	# Get the current pairing
 	playerPairMapKey = "matcher" + str(c.id) + "playerPairMap"
 	playerPairMap = SessionVar.objects.get(key=playerPairMapKey).value
@@ -70,35 +77,14 @@ def nexDisplay(request):
 	currentPairingIndex = playerPairMap[p.number]
 	currentPairing = parameters.pairings[currentPairingIndex]
 	
+	# get the identity of the other player
+	opponentIdentity = Participant.objects.get(name=opponentName).identityLetter
+	
 	# Register current player as being ready
-	# key form is playerReady_<currentComponentID>_<exchangeComponentID>_<pairingIndex>
-	key = "playerReady_" + str(c.id) + "_" + exchangeComponentID + "_" + str(currentPairingIndex)
+	# key form is playerReady_<currentComponentID>_<exchangeComponentID>_<pairingIndex>_<pname>
+	key = "playerReady_" + str(c.id) + "_" + exchangeComponentID + "_" + str(currentPairingIndex) + "_" + pname
 	sv = SessionVar(key=key, value="True", experimentSession=s)
 	sv.save()
-	
-	# Log start time
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "timestamp",
-				messageText = "start"
-				)
-	
-	# Log component Type
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "componentType",
-				messageText = c.componentType
-				)
-
-	# Log component paramerters
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "componentParams",
-				messageText = pickle.dumps(parameters)
-				)
 	
 	return render_to_response("nex/nex_display.html", 
 							{	'sid': sid, 
@@ -106,7 +92,11 @@ def nexDisplay(request):
 								'parameters': parameters,
 								'cumulativePoints': cumulativePoints,
 								'opponentName': opponentName,
-								'exchangeComponentID': exchangeComponentID								
+								'exchangeComponentID': exchangeComponentID,
+								'opponentIdentity': opponentIdentity,
+								'exchangeParameters': exchangeParameters,
+								'exchangeParametersJSON': exchangeParametersJSON
+								
 							}, 
 						  	context_instance=RequestContext(request))
 
@@ -163,6 +153,7 @@ def checkForOpponentPollProcess(request):
 	opponentName = request.GET.get('opponentName')
 	exchangeComponentID = request.GET.get('exchangeComponentID')
 	
+	
 	# Initialize response dictionary
 	response = {}
 	response['processor'] = "checkForOpponentPollProcess"
@@ -183,10 +174,11 @@ def checkForOpponentPollProcess(request):
 	currentPairingIndex = playerPairMap[p.number]
 	
 	# Check if opponent is ready.
-	# key form is playerReady_<currentComponentID>_<exchangeComponentID>_<pairingIndex>
-	playerReadyKey = "playerReady_" + str(c.id) + "_" + str(exchangeComponentID) + "_" + str(currentPairingIndex)
+	# key form is playerReady_<currentComponentID>_<exchangeComponentID>_<pairingIndex>_<pname>
+	playerReadyKey = "playerReady_" + str(c.id) + "_" + exchangeComponentID + "_" + str(currentPairingIndex) + "_" + opponentName
 	try:
 		playerReady = SessionVar.objects.get(key=playerReadyKey).value
+		print "playerReady: " + playerReady
 		if(playerReady == "True"):
 			response['continuePolling'] = False
 			response['showScreen'] = "makeOfferButton"
@@ -200,8 +192,19 @@ def checkForOpponentPollProcess(request):
 
 def makeOfferButton(request):
 	"""Handles the makeOfferButton form screen"""
+	sid = request.POST.get('sid')
+	pname = request.POST.get('pname')
+	opponentName = request.POST.get('opponentName')
+	exchangeComponentID = request.POST.get('exchangeComponentID')
+	
+	# Initialize response dictionary
 	response = {}
-	response['nextScreen'] = "offerFormulation"
+	response['processor'] = "makeOfferButton"
+	response['sid'] = sid
+	response['pname'] = pname
+	response['opponentName'] = opponentName
+	response['exchangeComponentID'] = exchangeComponentID
+	response['showScreen'] = "offerFormulation"
 	
 	
 	jsonString = simplejson.dumps(response)

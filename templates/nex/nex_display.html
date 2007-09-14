@@ -8,9 +8,11 @@
 
 
 <script type="text/javascript" charset="utf-8">
+	// Code to run after the page is completely loaded.
 	$(document).ready(function() { 
 
-	    // bind the form's submit event 
+	    // bind the submit event of all forms on the page. The server response will be
+		// delivered to the processFormResponse() function.
 	    $('form').submit(function() { 
 	        $(this).ajaxSubmit({success: processFormResponse});
 	        return false; 
@@ -26,20 +28,30 @@
 		});
 		
 		// Start polling server to check for opponents
-		pollServer("/nex/checkForOpponentPollProcess/?sid=56&pname=2007-07-30_000388", 2000);
+		pollServer("/nex/checkForOpponentPollProcess/?sid={{sid}}&pname={{pname}}&opponentName={{opponentName}}&exchangeComponentID={{exchangeComponentID}}", 2000);
 	});
+	
+	// Each screen contains a form that submits the user's input to the server.
+	// This function processes the server's response and updates the page accordingly.
 	function processFormResponse(responseText){
-		// responseText is JSON text returned by the server
-		// parseJSON is not jQuery, rather it's in json.js from json.org
+		// responseText the response returned by the server. It is JSON formatted.
+		// Note: parseJSON() is not jQuery, rather it's in json.js from json.org
 		responseJSON = responseText.parseJSON();
 		
+		// exchangeParametersJSON contains the contents of the Nex component object
+		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
+
+		// Processor is a reference to the django view that processed the form.
+		// The switch excecute certain lines of javascript depending the processor.
 		switch( responseJSON['processor'] ){
-			case "":
+			case "makeOfferButton":
 				showScreen(responseJSON['showScreen']);
 				break;
+			// There will be more cases for each processor
 		}
 		
-		if(responseJSON['poll'] == true){
+		// If the server set poll to true, start polling on the given url and interval
+		if(responseJSON['poll']){
 			pollServer(responseJSON['url'],responseJSON['interval']);
 		}
 		return;
@@ -54,22 +66,24 @@
 		return;
 	}
 	
-	// This function handles the response after each pole.
+	// This function handles the response after each pole query.
 	function processPoll(url, interval, responseJSON){
 		pollURL = url;
 		pollInterval = interval;
-		
-		//$("#makeOfferButton").append("<p>Hello: " + responseJSON['time'] + "</p>")
-		switch( responseJSON['processor'] ){
-			case "checkForOpponentPollProcess":
-				showScreen(responseJSON['showScreen']);
-				break;
-		}
-		
+				
+		// If continuePolling is true, poll the server again after waiting
 		if(responseJSON['continuePolling']){
 			setTimeout("pollServer(pollURL, pollInterval)", interval);			
+		} else {
+			// Processor is a reference to the django view that processed the poll request.
+			// The switch excecute certain lines of javascript depending the processor.
+			switch( responseJSON['processor'] ){
+				case "checkForOpponentPollProcess":
+					showScreen(responseJSON['showScreen']);
+					break;
+				// There will be more cases for each processor
+			}
 		}
-		
 		return;
 	}
 	
@@ -88,23 +102,27 @@
 {% endblock %}
 
 {% block actionArea %}
-<div id="checkForOpponent" style="" class="exchangeScreen">
+<div id="checkForOpponent" class="exchangeScreen">
 	<br/><br/><br/><br/>
-	<h1>You are about to exchange with Player M</h1>
+	<h1>You are about to exchange with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/><br/>
 	<h3>Please wait...</h3>
 	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
 </div>
 <div id="makeOfferButton" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/><br/>
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/><br/><br/>
 	<form action="/nex/makeOfferButton/" method="post" accept-charset="utf-8">
+		<input type="hidden" name="sid" value="{{sid}}"/>
+		<input type="hidden" name="pname" value="{{pname}}"/>
+		<input type="hidden" name="opponentName" value="{{opponentName}}"/>
+		<input type="hidden" name="exchangeComponentID" value="{{exchangeComponentID}}"/>
 		<input type="submit" name="makeOfferButton" value="Make Offer" class="buttonBig"/>
 	</form>
 </div>
 <div id="offerFormulation" style="display:none;" class="exchangeScreen">
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<form action="/nex/offerFormulation/" method="post" accept-charset="utf-8">
 		<p>What will you give?</p>
 		<p>
@@ -124,16 +142,16 @@
 		</p>
 		<br/>
 		<h3>This deal would get you <span id="offerFormulationPoints">0</span> points</h3>
-		<input type="submit" name="makeOfferButton" value="Offer" id="some_name" class="buttonBig"/>
+		<input type="submit" name="makeOfferButton" value="Offer" class="buttonBig"/>
 	</form>
 	<div id="httpLoadText">
 		
 	</div>
 </div>
 <div id="counterOfferFormulation" style="display:none;" class="exchangeScreen">
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<form action="/nex/offerFormulationSubmit/" method="post" accept-charset="utf-8">
-		<p>Player M offered you <strong>20 X</strong> for <strong>10 Y</strong>. This deal would get you 50 points.</p>
+		<p>Player {{opponentIdentity}} offered you <strong>20 X</strong> for <strong>10 Y</strong>. This deal would get you 50 points.</p>
 		<p>Enter your counter offer below.</p>
 		<p>What will you give?</p>
 		<p>
@@ -152,70 +170,70 @@
 			</select>
 		</p>
 		<h3>This counter offer deal would get you 75 points</h3>
-		<input type="submit" name="makeOfferButton" value="Cancel" id="some_name" class="buttonBig"/>
-		<input type="submit" name="makeOfferButton" value="Counter Offer" id="some_name" class="buttonBig"/>
+		<input type="submit" name="makeOfferButton" value="Cancel" class="buttonBig"/>
+		<input type="submit" name="makeOfferButton" value="Counter Offer" class="buttonBig"/>
 	</form>
 </div>
 <div id="waitingScreen" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/>
-	<h3>Please wait for the other player</h3>
+	<h3>Please wait for player {{opponentIdentity}}</h3>
 	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
 	<p>
-		<input type="button" name="makeOfferButton" value="Cancel" id="some_name" class="buttonBig"/>
+		<input type="button" name="makeOfferButton" value="Cancel" class="buttonBig"/>
 	</p>
 </div>
 <div id="confirmCancel" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/>
 	<p>Are you sure you want to cancel your offer?</p>
 	<p>
-		<input type="button" name="makeOfferButton" value="No" id="some_name" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Yes" id="some_name" class="buttonBig"/>
+		<input type="button" name="makeOfferButton" value="No" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Yes" class="buttonBig"/>
 	</p>
 </div>
 <div id="incomingOffer" style="display:none;" class="exchangeScreen">
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/>
-	<p>Player M offered you <strong>20 X</strong> for <strong>10 Y</strong></p>
+	<p>Player {{opponentIdentity}} offered you <strong>20 X</strong> for <strong>10 Y</strong></p>
 	<p>
-		<input type="button" name="makeOfferButton" value="Accept" id="some_name" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Counter Offer" id="some_name" class="buttonBig"/>
-		<input type="button" name="makeOfferButton" value="End Round" id="some_name" class="buttonBig"/>
+		<input type="button" name="makeOfferButton" value="Accept" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Counter Offer" class="buttonBig"/>
+		<input type="button" name="makeOfferButton" value="End Round" class="buttonBig"/>
 	</p>
 </div>
 <div id="1" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/>
 	<p>Are you sure you want to end this round of exchange?</p>
 	<p>
-		<input type="button" name="makeOfferButton" value="No" id="some_name" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Yes" id="some_name" class="buttonBig"/>
+		<input type="button" name="makeOfferButton" value="No" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Yes" class="buttonBig"/>
 	</p>
 </div>
 <div id="nonBindingConfirmation" style="display:none;" class="exchangeScreen">
 		<br/><br/><br/>
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/>
-	<p>You accepted player M's offer of <strong>12 X</strong> for <strong>10 Y</strong>.<br/>You will get 100 points for this deal.</p>
-	<p>Do you want to follow through on your part of the deal<br/> and give 10 Y to player M?</p>
+	<p>You accepted player {{opponentIdentity}}'s offer of <strong>12 X</strong> for <strong>10 Y</strong>.<br/>You will get 100 points for this deal.</p>
+	<p>Do you want to follow through on your part of the deal<br/> and give 10 Y to player {{opponentIdentity}}?</p>
 	<br/>
 	<p>
-		<input type="button" name="makeOfferButton" value="No" id="some_name" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Yes" id="some_name" class="buttonBig"/>
+		<input type="button" name="makeOfferButton" value="No" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Yes" class="buttonBig"/>
 	</p>
 </div>
 <div id="transactionSummary" style="display:none;" class="exchangeScreen">
 	<br/><br/>
-	<h1>Exchanging with Player M</h1>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/>
-	<p>You accepted player M's offer of <strong>12 X</strong> for <strong>10 Y</strong>.</p>
+	<p>You accepted player {{opponentIdentity}}'s offer of <strong>12 X</strong> for <strong>10 Y</strong>.</p>
 	<p>You received 100 points for this deal.</p>
 	<p>
-		<input type="button" name="makeOfferButton" value="Continue" id="some_name" class="buttonBig"/> 
+		<input type="button" name="makeOfferButton" value="Continue" class="buttonBig"/> 
 	</p>
 </div>
 <div id="nextRoundCountdown" style="display:none;" class="exchangeScreen">

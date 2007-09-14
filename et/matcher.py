@@ -106,15 +106,15 @@ def matcherDisplay(request):
 
 	playerPairMapKey = "matcher" + str(c.id) + "playerPairMap"
 	try:
-		playerPairMap = SessionVar.objects.get(experimentSession=s,key=playerPairMapKey)
-		playerPairMap = pickle.loads(playerPairMap.value)
+		playerPairMapSessionVar = SessionVar.objects.get(experimentSession=s,key=playerPairMapKey)
+		playerPairMap = pickle.loads(playerPairMapSessionVar.value)
 	except:
 		# PlayerPairMap uses the player number as a key to the current pairing index. The pairing index indicates
 		# where we are in the pairings list of the matcherObj.
 		playerPairMap = {}
 		players = range(len(sesVars.participantsList))
 		for i in players:
-			playerPairMap[i] = 0
+			playerPairMap[i] = -1
 		playerPairMapSessionVar = SessionVar(experimentSession=s, key=playerPairMapKey, value=pickle.dumps(playerPairMap))
 		playerPairMapSessionVar.save()
 	
@@ -122,13 +122,10 @@ def matcherDisplay(request):
 	for pairIndex in range(playerPairMap[p.number], len(pairings)):
 		
 		pair = pairings[pairIndex]
-		print pair
 		# check to see if participant is involved in pairing
 		if ( checkPairForPlayer(pair, p.number) ):
 			
 			# Save pair index to the playerPairMap session var
-			playerPairMapSessionVar = SessionVar.objects.get(experimentSession=s,key=playerPairMapKey)
-			playerPairMap = pickle.loads(playerPairMapSessionVar.value)
 			playerPairMap[p.number] = pairIndex + 1
 			playerPairMapSessionVar.value = pickle.dumps(playerPairMap)
 			playerPairMapSessionVar.save()
