@@ -18,14 +18,24 @@
 	        return false; 
 	    });
 		
+		// pNum is either 1 or 2 indicating if, within the current pairing, the player is the 1st or 2nd player
+		// It's used when building keys to access nex parameters. e.g. exchangeParametersJSON['p' + pNum + 'x']
+		pNum = "{{playerNumber}}";
+
+		
 		// Bind the input fields of the offerFormulation screen
 		// Updates the "This deal would get you" number on the offerFormulation screen
 		$('.offerFormulationInputs').numeric();
 		$(".offerFormulationInputs").keyup(function(){
-			offer = $("#offerFormulationOffer").val();
-			request = $("#offerFormulationRequest").val();
-			$("#offerFormulationPoints").html(offer * request);
+			offerFormulationProcessInput();
 		});
+		$("#offerFormulationOfferUnit").change(function(){
+			offerFormulationProcessInput();
+		});
+		$("#offerFormulationRequestUnit").change(function(){
+			offerFormulationProcessInput();
+		});
+		
 		
 		// Start polling server to check for opponents
 		pollServer("/nex/checkForOpponentPollProcess/?sid={{sid}}&pname={{pname}}&opponentName={{opponentName}}&exchangeComponentID={{exchangeComponentID}}", 2000);
@@ -73,10 +83,10 @@
 				
 		// If continuePolling is true, poll the server again after waiting
 		if(responseJSON['continuePolling']){
-			setTimeout("pollServer(pollURL, pollInterval)", interval);			
+			setTimeout("pollServer(pollURL, pollInterval)", pollInterval);			
 		} else {
 			// Processor is a reference to the django view that processed the poll request.
-			// The switch excecute certain lines of javascript depending the processor.
+			// The switch excecutes certain lines of javascript depending the processor.
 			switch( responseJSON['processor'] ){
 				case "checkForOpponentPollProcess":
 					showScreen(responseJSON['showScreen']);
@@ -95,6 +105,64 @@
 		// turn on the specified screen
 		$("#" + screenName).css("display", "block");
 		return;
+	}
+	
+	// Updates the "This deal would get you" number on the offerFormulation screen
+	// Called on keyup of the input fields of the offerFormulation screen
+	function offerFormulationProcessInput(){
+			
+			pNum = "{{playerNumber}}";
+			
+			// Clear the error if present
+			$("#offerFormulationOfferError").html("");
+			
+			// exchangeParametersJSON contains the contents of the Nex component object
+			exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
+			
+			// Set up all our working variables
+			offer = $("#offerFormulationOffer").val();
+			request = $("#offerFormulationRequest").val();
+			offerUnit = $("#offerFormulationOfferUnit").val();
+			requestUnit = $("#offerFormulationRequestUnit").val();
+			availableX = $("#availableX").text();
+			availableY = $("#availableY").text();
+			xValue = exchangeParametersJSON['p' + pNum + 'xValue'];
+			yValue = exchangeParametersJSON['p' + pNum + 'yValue'];
+					
+			// Calculate the current number of points held by the player this round
+			initialPoints = (availableX * xValue) + (availableY * yValue);
+			
+			// Calculate the loss from offering
+			if(offerUnit == "x"){
+				// Check that the input value is not beyond the available amount
+				if(parseInt(offer) > parseInt(availableX)) {
+					offer = availableX;
+					$("#offerFormulationOffer").val(offer);
+					$("#offerFormulationOfferError").html("You only have " + availableX + " " + offerUnit);
+				}
+				loss = offer * xValue;
+			} else {
+				// Check that the input value is not beyond the available amount
+				if(parseInt(offer) > parseInt(availableY)) {
+					offer = availableY;
+					$("#offerFormulationOffer").val(offer);
+					$("#offerFormulationOfferError").html("You only have " + availableY + " " + offerUnit);
+				}
+				loss = offer * yValue;
+			}
+			
+			// Calculate the potential gain from the request
+			if(requestUnit == "x"){
+				gain = request * xValue;
+			} else {
+				gain = request * yValue;
+			}
+			
+			// calculate the potential points
+			pointsPreview = initialPoints + (gain - loss);		
+			
+			// Display the preview points
+			$("#offerFormulationPoints").html(pointsPreview);
 	}
 
 </script>
@@ -127,26 +195,24 @@
 		<p>What will you give?</p>
 		<p>
 			<input type="text" name="offerFormulationOffer" id="offerFormulationOffer" class="offerFormulationInputs" value="" size="4" maxlength="4"/>
-			<select name="offerCurrency">
+			<select name="offerCurrency" id="offerFormulationOfferUnit">
 				<option>x</option>
 				<option>y</option>
 			</select>
+			<span id="offerFormulationOfferError" class="offerFormulationError"></span>
 		</p>
 		<p>What do you want in return?</p>
 		<p>
 			<input type="text" name="offerFormulationRequest" id="offerFormulationRequest" class="offerFormulationInputs" value="" size="4" maxlength="4"/>
-			<select name="requestCurrency">
-				<option>x</option>
+			<select name="requestCurrency" id="offerFormulationRequestUnit">
 				<option>y</option>
+				<option>x</option>
 			</select>
 		</p>
 		<br/>
-		<h3>This deal would get you <span id="offerFormulationPoints">0</span> points</h3>
+		<p>This deal would get you: <b><span id="offerFormulationPoints">0</span></b> points</p>
 		<input type="submit" name="makeOfferButton" value="Offer" class="buttonBig"/>
 	</form>
-	<div id="httpLoadText">
-		
-	</div>
 </div>
 <div id="counterOfferFormulation" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -248,15 +314,11 @@
 
 <div id="currentPointsBox">
 	<p>Total X</p>
-	<div class="largePoints">
-		20
-	</div>
+	<div id="availableX" class="largePoints">20</div>
 </div>
 <div id="cumulativePointsBox">
 	<p>Total Y</p>
-	<div class="largePoints">
-		5
-	</div>
+	<div id="availableY" class="largePoints">5</div>
 </div>
 
 {% endblock %}

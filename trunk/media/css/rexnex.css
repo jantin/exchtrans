@@ -120,8 +120,11 @@
 	
 }
 
-
-
+.offerFormulationError{
+	color: #F00;
+	position:absolute;
+	margin:.6em;
+}
 
 
 

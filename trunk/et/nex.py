@@ -14,12 +14,16 @@ class nexObj(object):
 	"""A Data structure holding a negotiated exchange object"""
 	def __init__(	self, 
 					p1x = 20, 
-					p1y = 10, 
+					p1y = 10,
+					p1xValue = 5, 
+					p1yValue = 1,
 					p1xReplenish = 20,
 					p1yReplenish = 10,
 					p1Clearing = "End of round",
 					p2x = 20, 
 					p2y = 10,
+					p2xValue = 5, 
+					p2yValue = 1,
 					p2xReplenish = 20,
 					p2yReplenish = 10,					
 					p2Clearing = "End of round",
@@ -30,11 +34,15 @@ class nexObj(object):
 				):
 		self.p1x = p1x
 		self.p1y = p1y
+		self.p1xValue = p1xValue
+		self.p1yValue = p1yValue
 		self.p1xReplenish = p1xReplenish
 		self.p1yReplenish = p1yReplenish
 		self.p1Clearing = p1Clearing
 		self.p2x = p2x
 		self.p2y = p2y
+		self.p2xValue = p2xValue
+		self.p2yValue = p2yValue
 		self.p2xReplenish = p2xReplenish
 		self.p2yReplenish = p2yReplenish
 		self.p2Clearing = p2Clearing
@@ -86,6 +94,16 @@ def nexDisplay(request):
 	sv = SessionVar(key=key, value="True", experimentSession=s)
 	sv.save()
 	
+	# Determine if the current player is player 1 or player 2 of the pairing
+	if (int(currentPairing["p1"]) == int(p.number)):
+		playerNumber = 1
+	elif (int(currentPairing["p2"]) == int(p.number)):
+		playerNumber = 2
+	else:
+		playerNumber = None
+	
+	print exchangeParameters.p2xValue
+	
 	return render_to_response("nex/nex_display.html", 
 							{	'sid': sid, 
 								'pname': pname,
@@ -95,7 +113,8 @@ def nexDisplay(request):
 								'exchangeComponentID': exchangeComponentID,
 								'opponentIdentity': opponentIdentity,
 								'exchangeParameters': exchangeParameters,
-								'exchangeParametersJSON': exchangeParametersJSON
+								'exchangeParametersJSON': exchangeParametersJSON,
+								'playerNumber': playerNumber
 								
 							}, 
 						  	context_instance=RequestContext(request))
@@ -119,11 +138,15 @@ def nexEdit(request):
 	componentParams = nexObj(
 								p1x = request.POST.get("p1x"),
 								p1y = request.POST.get("p1y"),
+								p1xValue = request.POST.get("p1xValue"),
+								p1yValue = request.POST.get("p1yValue"),
 								p1xReplenish = request.POST.get("p1xReplenish"),
 								p1yReplenish = request.POST.get("p1yReplenish"),
 								p1Clearing = request.POST.get("p1Clearing"),
 								p2x = request.POST.get("p2x"),
 								p2y = request.POST.get("p2y"),
+								p2xValue = request.POST.get("p2xValue"),
+								p2yValue = request.POST.get("p2yValue"),
 								p2xReplenish = request.POST.get("p2xReplenish"),
 								p2yReplenish = request.POST.get("p2yReplenish"),
 								p2Clearing = request.POST.get("p2Clearing"),
@@ -177,8 +200,7 @@ def checkForOpponentPollProcess(request):
 	# key form is playerReady_<currentComponentID>_<exchangeComponentID>_<pairingIndex>_<pname>
 	playerReadyKey = "playerReady_" + str(c.id) + "_" + exchangeComponentID + "_" + str(currentPairingIndex) + "_" + opponentName
 	try:
-		playerReady = SessionVar.objects.get(key=playerReadyKey).value
-		print "playerReady: " + playerReady
+		playerReady = SessionVar.objects.filter(key=playerReadyKey)[0].value
 		if(playerReady == "True"):
 			response['continuePolling'] = False
 			response['showScreen'] = "makeOfferButton"
