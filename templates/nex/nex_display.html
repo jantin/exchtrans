@@ -13,16 +13,13 @@
 
 	    // bind the submit event of all forms on the page. The server response will be
 		// delivered to the processFormResponse() function.
-	    $('form').submit(function() { 
-	        $(this).ajaxSubmit({success: processFormResponse});
-	        return false; 
-	    });
+	    
+		$('form').ajaxForm({success: processFormResponse}); 
 		
 		// pNum is either 1 or 2 indicating if, within the current pairing, the player is the 1st or 2nd player
 		// It's used when building keys to access nex parameters. e.g. exchangeParametersJSON['p' + pNum + 'x']
 		pNum = "{{playerNumber}}";
 
-		
 		// Bind the input fields of the offerFormulation screen
 		// Updates the "This deal would get you" number on the offerFormulation screen
 		$('.offerFormulationInputs').numeric();
@@ -36,11 +33,10 @@
 			offerFormulationProcessInput();
 		});
 		
-		
 		// Start polling server to check for opponents
-		pollServer("/nex/checkForOpponentPollProcess/?sid={{sid}}&pname={{pname}}&opponentName={{opponentName}}&exchangeComponentID={{exchangeComponentID}}", 2000);
+		pollServer("/nex/checkForOpponentPollProcess/", 2000);
 	});
-	
+
 	// Each screen contains a form that submits the user's input to the server.
 	// This function processes the server's response and updates the page accordingly.
 	function processFormResponse(responseText){
@@ -55,9 +51,14 @@
 		// The switch excecute certain lines of javascript depending the processor.
 		switch( responseJSON['processor'] ){
 			case "makeOfferButton":
-				showScreen(responseJSON['showScreen']);
+				// Initialize points preview
+				offerFormulationProcessInput();
 				break;
-			// There will be more cases for each processor
+		}
+		
+		
+		if(responseJSON['showScreen']){
+			showScreen(responseJSON['showScreen']);
 		}
 		
 		// If the server set poll to true, start polling on the given url and interval
@@ -69,30 +70,24 @@
 	
 	// This function polls the server
 	function pollServer(url, interval){		
-		$.getJSON(url, function(responseJSON){
-			processPoll(url, interval, responseJSON);
+		$.getJSON(url, function(pollResponseJSON){
+			processPoll(url, interval, pollResponseJSON);
 			}
-		)
+		);
 		return;
 	}
 	
 	// This function handles the response after each pole query.
-	function processPoll(url, interval, responseJSON){
+	function processPoll(url, interval, pollResponseJSON){
 		pollURL = url;
 		pollInterval = interval;
 				
 		// If continuePolling is true, poll the server again after waiting
-		if(responseJSON['continuePolling']){
+		if(pollResponseJSON['continuePolling']){
 			setTimeout("pollServer(pollURL, pollInterval)", pollInterval);			
-		} else {
-			// Processor is a reference to the django view that processed the poll request.
-			// The switch excecutes certain lines of javascript depending the processor.
-			switch( responseJSON['processor'] ){
-				case "checkForOpponentPollProcess":
-					showScreen(responseJSON['showScreen']);
-					break;
-				// There will be more cases for each processor
-			}
+		} else if(pollResponseJSON['showScreen']){
+			showScreen(pollResponseJSON['showScreen'])
+
 		}
 		return;
 	}
@@ -182,11 +177,7 @@
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/><br/><br/>
 	<form action="/nex/makeOfferButton/" method="post" accept-charset="utf-8">
-		<input type="hidden" name="sid" value="{{sid}}"/>
-		<input type="hidden" name="pname" value="{{pname}}"/>
-		<input type="hidden" name="opponentName" value="{{opponentName}}"/>
-		<input type="hidden" name="exchangeComponentID" value="{{exchangeComponentID}}"/>
-		<input type="submit" name="makeOfferButton" value="Make Offer" class="buttonBig"/>
+		<input type="submit" name="makeOfferSubmit" value="Make Offer" class="buttonBig"/>
 	</form>
 </div>
 <div id="offerFormulation" style="display:none;" class="exchangeScreen">
@@ -194,8 +185,8 @@
 	<form action="/nex/offerFormulation/" method="post" accept-charset="utf-8">
 		<p>What will you give?</p>
 		<p>
-			<input type="text" name="offerFormulationOffer" id="offerFormulationOffer" class="offerFormulationInputs" value="" size="4" maxlength="4"/>
-			<select name="offerCurrency" id="offerFormulationOfferUnit">
+			<input type="text" name="offerFormulationOffer" id="offerFormulationOffer" class="offerFormulationInputs" value="0" size="4" maxlength="4"/>
+			<select name="offerFormulationOfferUnit" id="offerFormulationOfferUnit">
 				<option>x</option>
 				<option>y</option>
 			</select>
@@ -203,41 +194,43 @@
 		</p>
 		<p>What do you want in return?</p>
 		<p>
-			<input type="text" name="offerFormulationRequest" id="offerFormulationRequest" class="offerFormulationInputs" value="" size="4" maxlength="4"/>
-			<select name="requestCurrency" id="offerFormulationRequestUnit">
+			<input type="text" name="offerFormulationRequest" id="offerFormulationRequest" class="offerFormulationInputs" value="0" size="4" maxlength="4"/>
+			<select name="offerFormulationRequestUnit" id="offerFormulationRequestUnit">
 				<option>y</option>
 				<option>x</option>
 			</select>
 		</p>
 		<br/>
 		<p>This deal would get you: <b><span id="offerFormulationPoints">0</span></b> points</p>
-		<input type="submit" name="makeOfferButton" value="Offer" class="buttonBig"/>
+		<input type="submit" name="offerFormulationOffer" value="Offer" class="buttonBig"/>
 	</form>
 </div>
 <div id="counterOfferFormulation" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
-	<form action="/nex/offerFormulationSubmit/" method="post" accept-charset="utf-8">
+	<form action="/nex/counterOfferFormulation/" method="post" accept-charset="utf-8">
 		<p>Player {{opponentIdentity}} offered you <strong>20 X</strong> for <strong>10 Y</strong>. This deal would get you 50 points.</p>
 		<p>Enter your counter offer below.</p>
 		<p>What will you give?</p>
 		<p>
-			<input type="text" name="offer" value="" size="4" maxlength="4"/>
-			<select name="offerCurrency">
+			<input type="text" name="offerFormulationOffer" id="offerFormulationOffer" class="offerFormulationInputs" value="0" size="4" maxlength="4"/>
+			<select name="offerFormulationOfferUnit" id="offerFormulationOfferUnit">
 				<option>x</option>
 				<option>y</option>
 			</select>
+			<span id="offerFormulationOfferError" class="offerFormulationError"></span>
 		</p>
 		<p>What do you want in return?</p>
 		<p>
-			<input type="text" name="request" value="" size="4" maxlength="4"/>
-			<select name="requestCurrency">
-				<option>x</option>
+			<input type="text" name="offerFormulationRequest" id="offerFormulationRequest" class="offerFormulationInputs" value="0" size="4" maxlength="4"/>
+			<select name="offerFormulationRequestUnit" id="offerFormulationRequestUnit">
 				<option>y</option>
+				<option>x</option>
 			</select>
 		</p>
-		<h3>This counter offer deal would get you 75 points</h3>
-		<input type="submit" name="makeOfferButton" value="Cancel" class="buttonBig"/>
-		<input type="submit" name="makeOfferButton" value="Counter Offer" class="buttonBig"/>
+		<br/>
+		<p>This deal would get you: <b><span id="offerFormulationPoints">0</span></b> points</p>
+		<input type="submit" name="counterOfferFormulationSubmit" value="Cancel" class="buttonBig"/>
+		<input type="submit" name="counterOfferFormulationSubmit" value="Counter Offer" class="buttonBig"/>
 	</form>
 </div>
 <div id="waitingScreen" style="display:none;" class="exchangeScreen">
@@ -247,7 +240,9 @@
 	<h3>Please wait for player {{opponentIdentity}}</h3>
 	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
 	<p>
-		<input type="button" name="makeOfferButton" value="Cancel" class="buttonBig"/>
+		<form action="/nex/waitingScreen/" method="post" accept-charset="utf-8">
+			<input type="submit" name="waitingScreenCancel" value="Cancel" class="buttonBig"/>
+		</form>
 	</p>
 </div>
 <div id="confirmCancel" style="display:none;" class="exchangeScreen">
@@ -256,8 +251,10 @@
 	<br/><br/>
 	<p>Are you sure you want to cancel your offer?</p>
 	<p>
-		<input type="button" name="makeOfferButton" value="No" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Yes" class="buttonBig"/>
+		<form action="/nex/confirmCancel/" method="post" accept-charset="utf-8">
+			<input type="submit" name="confirmCancelSubmit" value="No" class="buttonBig"/> 
+			<input type="submit" name="confirmCancelSubmit" value="Yes" class="buttonBig"/>
+		</form>
 	</p>
 </div>
 <div id="incomingOffer" style="display:none;" class="exchangeScreen">
@@ -265,19 +262,23 @@
 	<br/><br/><br/>
 	<p>Player {{opponentIdentity}} offered you <strong>20 X</strong> for <strong>10 Y</strong></p>
 	<p>
-		<input type="button" name="makeOfferButton" value="Accept" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Counter Offer" class="buttonBig"/>
-		<input type="button" name="makeOfferButton" value="End Round" class="buttonBig"/>
+		<form action="/nex/incomingOffer/" method="post" accept-charset="utf-8">
+			<input type="submit" name="incomingOfferSubmit" value="Accept" class="buttonBig"/> 
+			<input type="submit" name="incomingOfferSubmit" value="Counter Offer" class="buttonBig"/>
+			<input type="submit" name="incomingOfferSubmit" value="End Round" class="buttonBig"/>
+		</form>	
 	</p>
 </div>
-<div id="1" style="display:none;" class="exchangeScreen">
+<div id="confirmEndRound" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/>
 	<p>Are you sure you want to end this round of exchange?</p>
 	<p>
-		<input type="button" name="makeOfferButton" value="No" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Yes" class="buttonBig"/>
+		<form action="/nex/confirmEndRound/" method="post" accept-charset="utf-8">
+			<input type="submit" name="confirmEndRoundSubmit" value="No" class="buttonBig"/> 
+			<input type="submit" name="confirmEndRoundSubmit" value="Yes" class="buttonBig"/>
+		</form>	
 	</p>
 </div>
 <div id="nonBindingConfirmation" style="display:none;" class="exchangeScreen">
@@ -288,8 +289,10 @@
 	<p>Do you want to follow through on your part of the deal<br/> and give 10 Y to player {{opponentIdentity}}?</p>
 	<br/>
 	<p>
-		<input type="button" name="makeOfferButton" value="No" class="buttonBig"/> 
-		<input type="button" name="makeOfferButton" value="Yes" class="buttonBig"/>
+		<form action="/nex/nonBindingConfirmation/" method="post" accept-charset="utf-8">
+			<input type="submit" name="nonBindingConfirmationSubmit" value="No" class="buttonBig"/> 
+			<input type="submit" name="nonBindingConfirmationSubmit" value="Yes" class="buttonBig"/>
+		</form>
 	</p>
 </div>
 <div id="transactionSummary" style="display:none;" class="exchangeScreen">
@@ -299,7 +302,9 @@
 	<p>You accepted player {{opponentIdentity}}'s offer of <strong>12 X</strong> for <strong>10 Y</strong>.</p>
 	<p>You received 100 points for this deal.</p>
 	<p>
-		<input type="button" name="makeOfferButton" value="Continue" class="buttonBig"/> 
+		<form action="/nex/transactionSummary/" method="post" accept-charset="utf-8">
+			<input type="submit" name="transactionSummarySubmit" value="Continue" class="buttonBig"/> 
+		</form>
 	</p>
 </div>
 <div id="nextRoundCountdown" style="display:none;" class="exchangeScreen">

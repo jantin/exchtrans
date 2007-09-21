@@ -45,8 +45,11 @@ Agenda:
 -Email Judd about demo session
 
 
-
-
+Loading multiple firefox instances
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test1"
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test2"
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test3"
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test4"
 
 
 
