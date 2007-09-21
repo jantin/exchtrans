@@ -24,7 +24,9 @@ CREATE TABLE `et_participant` (
     `dateCreated` date NOT NULL,
     `currentComponent` integer NULL,
     `currentIteration` integer NULL,
-    `cumulativePoints` integer NULL
+    `cumulativePoints` integer NULL,
+    `number` integer NOT NULL,
+    `identityLetter` varchar(1) NOT NULL
 );
 CREATE TABLE `et_sessionvar` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -46,14 +48,15 @@ CREATE TABLE `et_component` (
     `parameters` longtext NULL,
     `dateCreated` date NOT NULL,
     `dateModified` date NOT NULL,
-    `componentType_id` integer NOT NULL REFERENCES `et_componenttypes` (`id`)
+    `componentType_id` integer NOT NULL REFERENCES `et_componenttypes` (`id`),
+    `displayName` varchar(255) NULL
 );
 CREATE TABLE `et_sessionlog` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `participant_id` integer NOT NULL REFERENCES `et_participant` (`id`),
     `component_id` integer NOT NULL REFERENCES `et_component` (`id`),
     `session_id` integer NOT NULL,
-    `timestamp` date NOT NULL,
+    `timestamp` datetime NOT NULL,
     `messageType` longtext NOT NULL,
     `messageText` longtext NOT NULL
 );
@@ -76,7 +79,9 @@ CREATE TABLE `et_experiment` (
     `dateCreated` date NOT NULL,
     `dateModified` date NOT NULL,
     `minPlayers` integer NOT NULL,
-    `maxPlayers` integer NOT NULL
+    `maxPlayers` integer NOT NULL,
+    `xValue` integer NOT NULL,
+    `yValue` integer NOT NULL
 );
 ALTER TABLE `et_experimentcomponents` ADD CONSTRAINT experiment_id_id_refs_id_ddebe0f FOREIGN KEY (`experiment_id_id`) REFERENCES `et_experiment` (`id`);
 CREATE TABLE `et_experimentsession` (
