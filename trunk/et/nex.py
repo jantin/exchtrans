@@ -52,6 +52,21 @@ class nexObj(object):
 		self.showPoints = showPoints
 
 
+class nexOfferObj(object):
+	"""A Data structure holding a negotiated exchange offer"""
+	def __init__(	self, 
+					offer, 
+					offerUnit,
+					request, 
+					requestUnit,
+					offeredBy
+				):
+		self.offer = offer
+		self.offerUnit = offerUnit
+		self.request = request
+		self.requestUnit = requestUnit
+		self.offeredBy = offeredBy
+
 @login_required
 def nexDisplay(request):
 	"""Displays the negotiated exchange"""
@@ -61,61 +76,59 @@ def nexDisplay(request):
 	exchangeComponentID = request.GET.get('exchangeComponentID')
 	
 	# get the current Participant object, session vars, and matcher params
-	p = Participant.objects.get(name=pname)
-	s = ExperimentSession.objects.get(id=sid)
-	cumulativePoints = p.cumulativePoints
+	request.session['p'] = Participant.objects.get(name=pname)
+	request.session['s'] = ExperimentSession.objects.get(id=sid)
+
 	sesVars = loadSessionVars(sid)
 	# Note: these parameters are for the matcher component that is calling the current exchange component
-	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
+	request.session['parameters'] = pickle.loads(sesVars.componentsList[int(request.session['p'].currentComponent)].component_id.parameters)
+	
 	# Note: This component object is for the matcher component that is calling the current exchange component
-	c = sesVars.componentsList[int(p.currentComponent)].component_id
+	request.session['c'] = sesVars.componentsList[int(request.session['p'].currentComponent)].component_id
 
 	# get the current exchange component parameters
-	exchangeParameters = pickle.loads(Component.objects.get(id=51).parameters)
+	# TODO WHY is 51 hard coded?????
+	request.session['exchangeParameters'] = pickle.loads(Component.objects.get(id=51).parameters)
+	
 	# Serialize the nex object into a dictionary that can be passed as JSON
 	exchangeParametersJSON = {}
-	for key,value in exchangeParameters.__dict__.items():
+	for key,value in request.session['exchangeParameters'].__dict__.items():
 		exchangeParametersJSON[key] = value
 	exchangeParametersJSON = simplejson.dumps(exchangeParametersJSON)
 
 	# Get the current pairing
-	playerPairMapKey = "matcher" + str(c.id) + "playerPairMap"
+	playerPairMapKey = "matcher" + str(request.session['c'].id) + "playerPairMap"
 	playerPairMap = SessionVar.objects.get(key=playerPairMapKey).value
-	playerPairMap = pickle.loads(playerPairMap)
-	currentPairingIndex = playerPairMap[p.number]
-	currentPairing = parameters.pairings[currentPairingIndex]
+	request.session['playerPairMap'] = pickle.loads(playerPairMap)
+	request.session['currentPairingIndex'] = request.session['playerPairMap'][request.session['p'].number]
+	request.session['currentPairing'] = request.session['parameters'].pairings[int(request.session['currentPairingIndex'])]
+
 	
 	# get the identity of the other player
-	opponentIdentity = Participant.objects.get(name=opponentName).identityLetter
-	
+	request.session['opponent'] = Participant.objects.get(name=opponentName)
+
+	# Set up a key prefix for reading and writing to the sessionvar table
+	# The form is <currentComponentID>_<keyPrefix>_<pairingIndex>_<currentRound>
+	request.session['keyPrefix'] = str(request.session['c'].id) + "_" + exchangeComponentID + "_" + str(request.session['currentPairingIndex']) + "_0" 
+
 	# Register current player as being ready
-	# key form is playerReady_<currentComponentID>_<exchangeComponentID>_<pairingIndex>_<pname>
-	key = "playerReady_" + str(c.id) + "_" + exchangeComponentID + "_" + str(currentPairingIndex) + "_" + pname
-	sv = SessionVar(key=key, value="True", experimentSession=s)
+	key = request.session['keyPrefix'] + "_playerReady_" + pname
+	sv = SessionVar(key=key, value="True", experimentSession=request.session['s'])
 	sv.save()
 	
+	
 	# Determine if the current player is player 1 or player 2 of the pairing
-	if (int(currentPairing["p1"]) == int(p.number)):
-		playerNumber = 1
-	elif (int(currentPairing["p2"]) == int(p.number)):
-		playerNumber = 2
+	if (int(request.session['currentPairing']["p1"]) == int(request.session['p'].number)):
+		request.session['playerNumber'] = 1
+	elif (int(request.session['currentPairing']["p2"]) == int(request.session['p'].number)):
+		request.session['playerNumber'] = 2
 	else:
-		playerNumber = None
-	
-	print exchangeParameters.p2xValue
-	
+		request.session['playerNumber'] = None
+		
 	return render_to_response("nex/nex_display.html", 
-							{	'sid': sid, 
-								'pname': pname,
-								'parameters': parameters,
-								'cumulativePoints': cumulativePoints,
-								'opponentName': opponentName,
-								'exchangeComponentID': exchangeComponentID,
-								'opponentIdentity': opponentIdentity,
-								'exchangeParameters': exchangeParameters,
+							{	'opponentIdentity': request.session['opponent'].identityLetter,
 								'exchangeParametersJSON': exchangeParametersJSON,
-								'playerNumber': playerNumber
-								
+								'playerNumber': request.session['playerNumber']
 							}, 
 						  	context_instance=RequestContext(request))
 
@@ -171,42 +184,20 @@ def nexEdit(request):
 
 def checkForOpponentPollProcess(request):
 	"""Handles the checkForOpponent screen."""
-	sid = request.GET.get('sid')
-	pname = request.GET.get('pname')
-	opponentName = request.GET.get('opponentName')
-	exchangeComponentID = request.GET.get('exchangeComponentID')
-	
-	
-	# Initialize response dictionary
 	response = {}
+	
 	response['processor'] = "checkForOpponentPollProcess"
-	response['sid'] = sid
-	response['pname'] = pname
-	response['opponentName'] = opponentName
-	response['exchangeComponentID'] = exchangeComponentID
-	
-	# get the current participant, component, and sesVars objects
-	p = Participant.objects.get(name=pname)
-	sesVars = loadSessionVars(sid)
-	c = sesVars.componentsList[int(p.currentComponent)].component_id
-	
-	# Get the current pairing
-	playerPairMapKey = "matcher" + str(c.id) + "playerPairMap"
-	playerPairMap = SessionVar.objects.get(key=playerPairMapKey).value
-	playerPairMap = pickle.loads(playerPairMap)
-	currentPairingIndex = playerPairMap[p.number]
-	
+
 	# Check if opponent is ready.
-	# key form is playerReady_<currentComponentID>_<exchangeComponentID>_<pairingIndex>_<pname>
-	playerReadyKey = "playerReady_" + str(c.id) + "_" + exchangeComponentID + "_" + str(currentPairingIndex) + "_" + opponentName
+	playerReadyKey = request.session['keyPrefix'] + "_playerReady_" + request.session['opponent'].name
 	try:
 		playerReady = SessionVar.objects.filter(key=playerReadyKey)[0].value
-		if(playerReady == "True"):
-			response['continuePolling'] = False
-			response['showScreen'] = "makeOfferButton"
 	except:
 		response['continuePolling'] = True
-		
+	else:
+		response['continuePolling'] = False
+		response['showScreen'] = "makeOfferButton"
+	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
 						  {'response': jsonString}, 
@@ -214,20 +205,41 @@ def checkForOpponentPollProcess(request):
 
 def makeOfferButton(request):
 	"""Handles the makeOfferButton form screen"""
-	sid = request.POST.get('sid')
-	pname = request.POST.get('pname')
-	opponentName = request.POST.get('opponentName')
-	exchangeComponentID = request.POST.get('exchangeComponentID')
-	
-	# Initialize response dictionary
 	response = {}
 	response['processor'] = "makeOfferButton"
-	response['sid'] = sid
-	response['pname'] = pname
-	response['opponentName'] = opponentName
-	response['exchangeComponentID'] = exchangeComponentID
 	response['showScreen'] = "offerFormulation"
+	response['poll'] = True
+	response['url'] = "/nex/checkForOfferPollProcess/"
+						
+	response['interval'] = 3000
 	
+	jsonString = simplejson.dumps(response)
+	return render_to_response('api.html', 
+						  {'response': jsonString}, 
+						  context_instance=RequestContext(request))
+
+def checkForOfferPollProcess(request):
+	"""Check to see if the other player has made an offer. If so, interupt 
+	the current player's offer forumlation and move to the incoming offer screen"""
+	response = {}
+	response['processor'] = "checkForOfferPollProcess"
+
+	# Check if opponent has made an offer.
+	offerByOpponentKey = request.session['keyPrefix'] + "_offerMade_" + request.session['opponent'].name	
+	try:
+		existingOffers = SessionVar.objects.filter(key=offerByOpponentKey)[0]
+	except:
+		offerBySelfKey = request.session['keyPrefix'] + "_offerMade_" + request.session['p'].name
+		try:
+			existingOffers = SessionVar.objects.filter(key=offerBySelfKey)[0]
+		except:
+			response['continuePolling'] = True
+		else:
+			response['continuePolling'] = False
+			response['showScreen'] = "waitingScreen"
+	else:
+		response['continuePolling'] = False
+		response['showScreen'] = "incomingOffer"
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
@@ -235,82 +247,208 @@ def makeOfferButton(request):
 						  context_instance=RequestContext(request))
 
 def offerFormulation(request):
-	"""Handles the offerForumationScreen screen"""
+	"""Handles the offerForumationScreen screen in the following way. First, check
+	that an offer has not already been made. Then, insert the offer into the DB.
+	Finally, if the current player is player 1, check that player 2 didn't sneak 
+	an offer into the DB while player 1 was writing."""
 	
-	response = "Something"
+	response = {}
+	response['processor'] = "offerFormulation"	
+	
+	offerCheckKey = request.session['keyPrefix'] + "_offerMade_" + request.session['opponent'].name
+	try:
+		existingOffers = SessionVar.objects.filter(key=offerCheckKey)[0]
+	except:
+		offerObj = nexOfferObj(	offer=request.POST.get('offerFormulationOffer'), 
+								offerUnit=request.POST.get('offerFormulationOfferUnit'), 
+								request=request.POST.get('offerFormulationRequest'), 
+								requestUnit=request.POST.get('offerFormulationRequestUnit'),
+								offeredBy=request.session['p'].name
+							   )
+		offerInsertKey = request.session['keyPrefix'] + "_offerMade_" + request.session['p'].name
+		offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
+		response['continuePolling'] = False
+		response['showScreen'] = "waitingScreen"
+		response['poll'] = True
+		response['url'] = "/nex/waitingScreenPollProcess/"
+		response['interval'] = 500
+	else:
+		response['showScreen'] = "incomingOffer"
+		response['continuePolling'] = False
+	
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def counterOfferFormulation(request):
 	"""Handles the counterOfferFormulation screen"""
+	response = {}
+	response['processor'] = "counterOfferFormulation"	
 	
-	response = "Something"
+	submit = request.POST.get('counterOfferFormulationSubmit')
+	
+	if(submit == "Cancel"):
+		response['showScreen'] = "incommingOffer"
+	elif(submit == "Counter Offer"):	
+		offerObj = nexOfferObj(	offer=request.POST.get('offerFormulationOffer'), 
+								offerUnit=request.POST.get('offerFormulationOfferUnit'), 
+								request=request.POST.get('offerFormulationRequest'), 
+								requestUnit=request.POST.get('offerFormulationRequestUnit'),
+								offeredBy=request.session['p'].name
+							   )
+		offerInsertKey = request.session['keyPrefix'] + "_offerMade_" + request.session['p'].name
+		offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
+		response['showScreen'] = "waitingScreen"
+		response['poll'] = True
+		response['url'] = "/nex/waitingScreenPollProcess/"
+		response['interval'] = 500
+	
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def waitingScreen(request):
 	"""Handles the waitingScreen screen"""
+	response = {}
+	response['processor'] = "waitingScreen"	
+	response['showScreen'] = "confirmCancel"
 	
-	response = "Something"
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
+						  context_instance=RequestContext(request))
+
+def waitingScreenPollProcess(request):
+	"""Polls to see if the other player has accepted the offer, counter offered, 
+	or ended the round"""
+	response = {}	
+	response['processor'] = "waitingScreenPollProcess"
+	key = request.session['keyPrefix'] + "_messageToWaitingPlayer"
+	try:
+		opponentStatus = SessionVar.objects.get(key=key).value
+	except:
+		response['continuePolling'] = True
+	else:
+		response['continuePolling'] = False
+		if(opponentStatus == "acceptNonBinding"):
+			response['showScreen'] = "nonBindingConfirmation"
+		elif(opponentStatus == "acceptBinding"):
+			response['showScreen'] = "transactionSummary"
+		elif(opponentStatus == "counterOffered"):
+			response['showScreen'] = "incommingOffer"
+			SessionVar.objects.get(key=key).delete()
+		elif(opponentStatus == "endRound"):
+			response['showScreen'] = "transactionSummary"
+	
+	jsonString = simplejson.dumps(response)
+	return render_to_response('api.html', 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def confirmCancel(request):
 	"""Handles the confirmCancel screen"""
+	confirmed = request.POST.get('confirmCancelSubmit')
+	response = {}
+	response['processor'] = "confirmCancel"
 	
-	response = "Something"
+	if(confirmed == 'Yes'):
+		response['showScreen'] = "transactionSummary"
+	elif(confirmed == 'No'):
+		response['showScreen'] = "waitingScreen"
+		
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def incomingOffer(request):
 	"""Handles the incomingOffer screen"""
+	selection = request.POST.get('incomingOfferSubmit')
+	response = {}
+	response['processor'] = "incomingOffer"
 	
-	response = "Something"
+	if(selection == "Accept"):
+		key = request.session['keyPrefix'] + "_messageToWaitingPlayer"
+		if(request.session['exchangeParameters'].nonBinding):
+			SessionVar(key=key, experimentSession=request.session['s'], value="acceptNonBinding").save()
+			response['showScreen'] = "nonBindingConfirmation"
+		else:
+			SessionVar(key=key, experimentSession=request.session['s'], value="acceptBinding").save()
+			response['showScreen'] = "transactionSummary"
+	elif(selection == "Counter Offer"):
+		response['showScreen'] = "counterOfferFormulation"
+	elif(selection == "End Round"):
+		response['showScreen'] = "confirmEndRound"
+	
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def confirmEndRound(request):
 	"""Handles the confirmEndRound screen"""
+	confirmed = request.POST.get('confirmEndRoundSubmit')
+	response = {}
+	response['processor'] = "confirmEndRound"
 	
-	response = "Something"
+	if(confirmed == 'Yes'):
+		key = request.session['keyPrefix'] + "_messageToWaitingPlayer"
+		SessionVar(key=key, experimentSession=request.session['s'], value="endRound").save()
+		response['showScreen'] = "transactionSummary"
+	elif(confirmed == 'No'):
+		response['showScreen'] = "incomingOffer"
+		
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def nonBindingConfirmation(request):
 	"""Handles the nonBindingConfirmation screen"""
+	response = {}
+	response['processor'] = "nonBindingConfirmation"
 	
-	response = "Something"
+	
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def transactionSummary(request):
 	"""Handles the transactionSummary screen"""
+	response = {}
+	response['processor'] = "transactionSummary"
 	
-	response = "Something"
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
 
 def nextRoundCountdown(request):
 	"""Handles the nextRoundCountdown screen"""
+	response = {}
+	response['processor'] = "nextRoundCountdown"
 	
-	response = "Something"
+	
+	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': response}, 
+						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
 
+		
+	
+	
+	
+	
+	
+	
