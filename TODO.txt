@@ -57,6 +57,7 @@ Loading multiple firefox instances
 
 
 
+
 Debug shell commands
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
