@@ -9,6 +9,7 @@ from common import *
 from views import *
 import pickle
 from time import time
+from etErrors import *
 
 class nexObj(object):
 	"""A Data structure holding a negotiated exchange object"""
@@ -210,8 +211,7 @@ def makeOfferButton(request):
 	response['showScreen'] = "offerFormulation"
 	response['poll'] = True
 	response['url'] = "/nex/checkForOfferPollProcess/"
-						
-	response['interval'] = 3000
+	response['interval'] = 2000
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
@@ -224,27 +224,50 @@ def checkForOfferPollProcess(request):
 	response = {}
 	response['processor'] = "checkForOfferPollProcess"
 
-	# Check if opponent has made an offer.
-	offerByOpponentKey = request.session['keyPrefix'] + "_offerMade_" + request.session['opponent'].name	
+	# Check for unread messages with the value offerMade
+	messageKey = request.session['keyPrefix'] + "_messageTo_" + request.session['p'].name	
 	try:
-		existingOffers = SessionVar.objects.filter(key=offerByOpponentKey)[0]
+		message = SessionVar.objects.get(key=messageKey, value="offerMade") #, unread=True
 	except:
-		offerBySelfKey = request.session['keyPrefix'] + "_offerMade_" + request.session['p'].name
-		try:
-			existingOffers = SessionVar.objects.filter(key=offerBySelfKey)[0]
-		except:
-			response['continuePolling'] = True
-		else:
-			response['continuePolling'] = False
-			response['showScreen'] = "waitingScreen"
+		response['continuePolling'] = True
 	else:
+		# Change the status of the message to read
+		message.unread = False
+		message.save()
 		response['continuePolling'] = False
+		response['poll'] = True
+		response['url'] = "/nex/checkForCancelWhileWaitingPollProcess/"
+		response['interval'] = 2000
 		response['showScreen'] = "incomingOffer"
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
 						  {'response': jsonString}, 
 						  context_instance=RequestContext(request))
+
+def checkForCancelWhileWaitingPollProcess(request):
+	"""Check to see if the other player has made an offer. If so, interupt 
+	the current player's offer forumlation and move to the incoming offer screen"""
+	response = {}
+	response['processor'] = "checkForCancelWhileWaitingPollProcess"
+
+	# Check for unread messages with the value offerMade
+	messageKey = request.session['keyPrefix'] + "_messageTo_" + request.session['p'].name	
+	try:
+		message = SessionVar.objects.get(key=messageKey, unread=True, value="canceledWhileWaiting")
+	except:
+		response['continuePolling'] = True
+	else:
+		# Change the status of the message to read
+		message.unread = False
+		message.save()
+		response['showScreen'] = "transactionSummary"
+	
+	jsonString = simplejson.dumps(response)
+	return render_to_response('api.html', 
+						  {'response': jsonString}, 
+						  context_instance=RequestContext(request))
+
 
 def offerFormulation(request):
 	"""Handles the offerForumationScreen screen in the following way. First, check
@@ -255,7 +278,7 @@ def offerFormulation(request):
 	response = {}
 	response['processor'] = "offerFormulation"	
 	
-	offerCheckKey = request.session['keyPrefix'] + "_offerMade_" + request.session['opponent'].name
+	offerCheckKey = request.session['keyPrefix'] + "_messageTo_" + request.session['p'].name
 	try:
 		existingOffers = SessionVar.objects.filter(key=offerCheckKey)[0]
 	except:
@@ -265,13 +288,17 @@ def offerFormulation(request):
 								requestUnit=request.POST.get('offerFormulationRequestUnit'),
 								offeredBy=request.session['p'].name
 							   )
-		offerInsertKey = request.session['keyPrefix'] + "_offerMade_" + request.session['p'].name
+		offerInsertKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['p'].name
 		offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
+		
+		messageToKey = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
+		messageTo = SessionVar(experimentSession=request.session['s'], key=messageToKey, value="offerMade").save()
+		
 		response['continuePolling'] = False
 		response['showScreen'] = "waitingScreen"
 		response['poll'] = True
 		response['url'] = "/nex/waitingScreenPollProcess/"
-		response['interval'] = 500
+		response['interval'] = 2000
 	else:
 		response['showScreen'] = "incomingOffer"
 		response['continuePolling'] = False
@@ -290,7 +317,7 @@ def counterOfferFormulation(request):
 	submit = request.POST.get('counterOfferFormulationSubmit')
 	
 	if(submit == "Cancel"):
-		response['showScreen'] = "incommingOffer"
+		response['showScreen'] = "incomingOffer"
 	elif(submit == "Counter Offer"):	
 		offerObj = nexOfferObj(	offer=request.POST.get('offerFormulationOffer'), 
 								offerUnit=request.POST.get('offerFormulationOfferUnit'), 
@@ -300,10 +327,14 @@ def counterOfferFormulation(request):
 							   )
 		offerInsertKey = request.session['keyPrefix'] + "_offerMade_" + request.session['p'].name
 		offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
+		
+		messageKey = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
+		message = SessionVar(experimentSession=request.session['s'], key=messageKey, value="counterOffered").save()
+		
 		response['showScreen'] = "waitingScreen"
 		response['poll'] = True
 		response['url'] = "/nex/waitingScreenPollProcess/"
-		response['interval'] = 500
+		response['interval'] = 2000
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
@@ -327,22 +358,29 @@ def waitingScreenPollProcess(request):
 	or ended the round"""
 	response = {}	
 	response['processor'] = "waitingScreenPollProcess"
-	key = request.session['keyPrefix'] + "_messageToWaitingPlayer"
+	key = request.session['keyPrefix'] + "_messageTo_" + request.session['p'].name
+	messageValues = ["acceptNonBinding", "acceptBinding", "counterOffered", "endRound"]
 	try:
-		opponentStatus = SessionVar.objects.get(key=key).value
+		message = SessionVar.objects.get(key=key, unread=True, value__in=messageValues)
 	except:
 		response['continuePolling'] = True
 	else:
-		response['continuePolling'] = False
-		if(opponentStatus == "acceptNonBinding"):
+		if(message.value == "acceptNonBinding"):
 			response['showScreen'] = "nonBindingConfirmation"
-		elif(opponentStatus == "acceptBinding"):
+		elif(message.value == "acceptBinding"):
 			response['showScreen'] = "transactionSummary"
-		elif(opponentStatus == "counterOffered"):
-			response['showScreen'] = "incommingOffer"
-			SessionVar.objects.get(key=key).delete()
-		elif(opponentStatus == "endRound"):
+		elif(message.value == "counterOffered"):
+			response['continuePolling'] = False
+			response['poll'] = True
+			response['url'] = "/nex/checkForCancelWhileWaitingPollProcess/"
+			response['interval'] = 2000
+			response['showScreen'] = "incomingOffer"
+		elif(message.value == "endRound"):
 			response['showScreen'] = "transactionSummary"
+			
+		response['continuePolling'] = False
+		message.unread = False
+		message.save()
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
@@ -357,7 +395,10 @@ def confirmCancel(request):
 	response['processor'] = "confirmCancel"
 	
 	if(confirmed == 'Yes'):
+		key = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
+		SessionVar(key=key, experimentSession=request.session['s'], value="canceledWhileWaiting").save()
 		response['showScreen'] = "transactionSummary"
+		response['continuePolling'] = False
 	elif(confirmed == 'No'):
 		response['showScreen'] = "waitingScreen"
 		
@@ -374,7 +415,7 @@ def incomingOffer(request):
 	response['processor'] = "incomingOffer"
 	
 	if(selection == "Accept"):
-		key = request.session['keyPrefix'] + "_messageToWaitingPlayer"
+		key = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
 		if(request.session['exchangeParameters'].nonBinding):
 			SessionVar(key=key, experimentSession=request.session['s'], value="acceptNonBinding").save()
 			response['showScreen'] = "nonBindingConfirmation"
@@ -399,7 +440,7 @@ def confirmEndRound(request):
 	response['processor'] = "confirmEndRound"
 	
 	if(confirmed == 'Yes'):
-		key = request.session['keyPrefix'] + "_messageToWaitingPlayer"
+		key = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
 		SessionVar(key=key, experimentSession=request.session['s'], value="endRound").save()
 		response['showScreen'] = "transactionSummary"
 	elif(confirmed == 'No'):

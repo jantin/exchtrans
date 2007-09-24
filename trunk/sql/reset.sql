@@ -32,7 +32,8 @@ CREATE TABLE `et_sessionvar` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `experimentSession_id` integer NOT NULL,
     `key` longtext NOT NULL,
-    `value` longtext NOT NULL
+    `value` longtext NOT NULL,
+    `unread` bool NOT NULL
 );
 CREATE TABLE `et_componenttypes` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,

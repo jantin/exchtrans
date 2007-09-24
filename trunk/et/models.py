@@ -151,6 +151,7 @@ class SessionVar(models.Model):
 	experimentSession = models.ForeignKey(ExperimentSession)
 	key = models.TextField()
 	value = models.TextField()
+	unread = models.BooleanField(default=True)
 	
 	def __str__(self):
 		return self.key + " (" + str(self.experimentSession) + ")"

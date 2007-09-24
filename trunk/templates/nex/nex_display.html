@@ -8,6 +8,14 @@
 
 
 <script type="text/javascript" charset="utf-8">
+
+	// killPolling is defined as a global because polling can be stopped either by either 
+	// the poll process itself or a submitted form action
+	killPolling = false;
+
+	// timeout is used for polling
+	var timeout;
+
 	// Code to run after the page is completely loaded.
 	$(document).ready(function() { 
 
@@ -56,41 +64,93 @@
 				break;
 		}
 		
-		
 		if(responseJSON['showScreen']){
 			showScreen(responseJSON['showScreen']);
 		}
 		
+		if(responseJSON['continuePolling'] == false){
+			killPolling = true;
+			clearTimeout(timeout);
+		}
+		
 		// If the server set poll to true, start polling on the given url and interval
 		if(responseJSON['poll']){
+			killPolling = false;
 			pollServer(responseJSON['url'],responseJSON['interval']);
 		}
 		return;
 	}
 	
-	// This function polls the server
-	function pollServer(url, interval){		
-		$.getJSON(url, function(pollResponseJSON){
-			processPoll(url, interval, pollResponseJSON);
-			}
-		);
-		return;
-	}
-	
-	// This function handles the response after each pole query.
-	function processPoll(url, interval, pollResponseJSON){
-		pollURL = url;
-		pollInterval = interval;
-				
-		// If continuePolling is true, poll the server again after waiting
-		if(pollResponseJSON['continuePolling']){
-			setTimeout("pollServer(pollURL, pollInterval)", pollInterval);			
-		} else if(pollResponseJSON['showScreen']){
-			showScreen(pollResponseJSON['showScreen'])
+	var pollURL = "";
+	var pollInterval = "";
 
+	// This function polls the server
+	function pollServer(pollURL, interval){
+		//alert("pollServer Start \n" + "url: " + url['url'] + "\n" + "interval: " + interval + "\n" );
+		
+		clearTimeout(timeout);
+		if(!killPolling){
+			$.ajax({url: pollURL, dataType: "json", success: function(pollResponseJSON){
+					if(pollResponseJSON['continuePolling'] != true){
+						clearTimeout(timeout);
+						killPolling = true;
+						if(pollResponseJSON['showScreen']){
+							showScreen(pollResponseJSON['showScreen'])
+						}
+						if(pollResponseJSON['poll'] == true){
+							killPolling = false;
+							//alert("poll = true \n" + "pollResponseJSON['url']: " + pollResponseJSON['url'] + "\n" + "pollResponseJSON['interval']: " + pollResponseJSON['interval'] + "\n" );
+							pollServer(pollResponseJSON['url'], pollResponseJSON['interval']);
+						}
+					} else {
+						timeout = setTimeout("pollServer('" + pollURL + "', " + interval + ")", interval);
+					}
+				}
+			});
 		}
 		return;
 	}
+	
+	
+	
+	
+	// // This function polls the server
+	// function pollServer(url, interval){
+	// 	if(!killPolling){
+	// 		$.getJSON(url, function(pollResponseJSON){
+	// 			processPoll(url, interval, pollResponseJSON);
+	// 			}
+	// 		);
+	// 	}
+	// 	return;
+	// }
+	// 
+	// 
+	// // This function handles the response after each pole query.
+	// function processPoll(url, interval, pollResponseJSON){
+	// 	pollURL = url;
+	// 	pollInterval = interval;
+	// 			
+	// 	// If continuePolling is true, poll the server again after waiting
+	// 	if(pollResponseJSON['continuePolling'] == true){
+	// 		setTimeout("pollServer(pollURL, pollInterval)", pollInterval);			
+	// 	} else {
+	// 		killPolling = true;
+	// 	}
+	// 	
+	// 	// Change the screen if necessary
+	// 	if(pollResponseJSON['showScreen']){
+	// 		showScreen(pollResponseJSON['showScreen'])
+	// 	}
+	// 	
+	// 	// This allows one poll process to start another poll process
+	// 	if(pollResponseJSON['poll'] == true){
+	// 		killPolling = false;
+	// 		pollServer(pollResponseJSON['url'], pollResponseJSON['interval']);
+	// 	}
+	// 	
+	// 	return;
+	// }
 	
 	// This function displays only the specified screen. screenName should be the the div ID
 	// of the desired screen.
