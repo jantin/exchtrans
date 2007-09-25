@@ -89,6 +89,12 @@ urlpatterns = patterns('',
 	(r'^questionnaire/editRadioChoice/$', 'exchtran.et.questionnaire.editRadioChoice'),
 	(r'^questionnaire/backCheckbox/$', 'exchtran.et.questionnaire.handleBackCheckbox'),	
 	
+	# Widgets
+	(r'^widgets/timer/display/$', 'exchtran.et.widgets.timerDisplay'),
+	(r'^widgets/timer/editSubmit/$', 'exchtran.et.widgets.timerEdit'),
+	(r'^widgets/image/display/$', 'exchtran.et.widgets.imageDisplay'),
+	(r'^widgets/image/editSubmit/$', 'exchtran.et.widgets.imageEdit'),
+	
 	# Rex: Reciprocal Exchange
 	(r'^rexOffer/$', 'exchtran.et.rex.rexOffer'),
 	(r'^rexOffer/submit/$', 'exchtran.et.rex.rexOfferSubmit'),
