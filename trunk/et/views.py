@@ -11,6 +11,7 @@ from questionnaire import *
 from rex import *
 from matcher import *
 from nex import *
+from widgets import *
 import pickle
 from time import time
 from time import sleep
@@ -121,6 +122,13 @@ def componentCreate(request):
 	if (componentType.componentType == "Negotiated Exchange"):
 		componentParams = nexObj()	
 
+	if (componentType.componentType == "Widget: Timer"):
+		componentParams = widgetTimerObj()	
+		
+	if (componentType.componentType == "Widget: Image"):
+		componentParams = widgetImageObj()	
+	
+	
 	# Add component to the database
 	c = Component(	name = componentName,
 					parameters = pickle.dumps(componentParams),

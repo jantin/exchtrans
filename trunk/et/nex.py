@@ -9,7 +9,6 @@ from common import *
 from views import *
 import pickle
 from time import time
-from etErrors import *
 
 class nexObj(object):
 	"""A Data structure holding a negotiated exchange object"""

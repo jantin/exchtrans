@@ -8,17 +8,22 @@
 
 
 <script type="text/javascript" charset="utf-8">
+// killPolling is defined as a global because polling can be stopped either by either 
+// the poll process itself or a submitted form action
+killPolling = false;
 
-	// killPolling is defined as a global because polling can be stopped either by either 
-	// the poll process itself or a submitted form action
-	killPolling = false;
+// timeout is used for polling
+var timeout;
 
-	// timeout is used for polling
-	var timeout;
 
 	// Code to run after the page is completely loaded.
 	$(document).ready(function() { 
-
+		// Bind widget callbacks
+		$("html").bind("widget_timer_event_timeout", function (event) {
+			clearTimeout(timeout);
+			showScreen("transactionSummary");
+		});
+		
 	    // bind the submit event of all forms on the page. The server response will be
 		// delivered to the processFormResponse() function.
 	    
@@ -86,8 +91,6 @@
 
 	// This function polls the server
 	function pollServer(pollURL, interval){
-		//alert("pollServer Start \n" + "url: " + url['url'] + "\n" + "interval: " + interval + "\n" );
-		
 		clearTimeout(timeout);
 		if(!killPolling){
 			$.ajax({url: pollURL, dataType: "json", success: function(pollResponseJSON){
@@ -99,7 +102,6 @@
 						}
 						if(pollResponseJSON['poll'] == true){
 							killPolling = false;
-							//alert("poll = true \n" + "pollResponseJSON['url']: " + pollResponseJSON['url'] + "\n" + "pollResponseJSON['interval']: " + pollResponseJSON['interval'] + "\n" );
 							pollServer(pollResponseJSON['url'], pollResponseJSON['interval']);
 						}
 					} else {
@@ -373,7 +375,9 @@
 </div>
 {% endblock %}
 
-{% block rightCol %}{% endblock %}
+{% block rightCol %}
+	{% include "widgets/timer_display.html" %}
+{% endblock %}
 
 {% block bottomBar %}
 

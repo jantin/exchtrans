@@ -1,0 +1,65 @@
+<!-- Start Timer Widget -->
+
+<script type="text/javascript" charset="utf-8">
+
+var widget_timerTime = new Date();
+widget_timerTime.setMinutes(2);
+widget_timerTime.setSeconds(30);
+var widget_timerElapsed = widget_timerTime.getTime();
+
+widget_timerLoop();
+
+/**
+* Decrements timer. If the timer reaches zero, the "widget_timer_event_timeout"
+* event is triggered and the loop stops.
+* 
+*/
+function widget_timerLoop(){
+	
+	// Get the mins and secs and convert them to strings
+	widget_timerMins = widget_timerTime.getMinutes().toString();
+	widget_timerSecs = widget_timerTime.getSeconds().toString();
+
+	// Pad seconds with a 0 if neeeded
+	if(widget_timerSecs.length < 2){
+		widget_timerSecs = "0" + widget_timerSecs;
+	}	
+
+	$('#widget_timer_minutes').text( widget_timerMins );
+	$('#widget_timer_seconds').text( widget_timerSecs );
+
+	if(widget_timerMins == "0" && widget_timerSecs == "00"){
+		clearTimeout(widget_timerTimeout);
+		$("html").trigger("widget_timer_event_timeout");
+		return;
+	}
+
+	widget_timerElapsed -= 1000;
+	widget_timerTime.setTime(widget_timerElapsed);
+	widget_timerTimeout = setTimeout("widget_timerLoop()", 1000);
+	
+	return;
+}
+
+</script>
+
+
+<div id="widget_timer">
+	<div id="widget_timer_text">
+		Time remaining for this round
+	</div>
+	<div id="widget_timer_numbers">
+		<span id="widget_timer_minutes"></span>:<span id="widget_timer_seconds"></span>
+	</div>
+</div>
+
+<!-- End Timer Widget -->
+
+
+
+
+
+
+
+
+
