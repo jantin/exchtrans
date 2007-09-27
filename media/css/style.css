@@ -22,6 +22,7 @@ body {
 	padding-top:10px;
 	padding-left:20px;
 	padding-right:20px;
+	overflow: hidden;
 
 	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
 	min-height:500px;
@@ -30,7 +31,8 @@ body {
 }
 
 #versionNumber{
-	margin-top:10px;
+	clear:both;
+	margin-top:60px;
 	text-align: center;
 	font-size: .8em;
 }
@@ -143,6 +145,17 @@ textarea{
 	font-family: Helvetica, Arial, sans-serif;
 	height:2em;
 	font-size: .8em;
+}
+
+/* This class is applied to <p> tags be the JS validation */
+.error{
+	color:#F00;
+	font-size: .9em;
+}
+
+/* This class is applied to <input> tags be the JS validation */
+.fieldError{
+	background-color:#FBEC5D;
 }
 
 #breadCrumbs{

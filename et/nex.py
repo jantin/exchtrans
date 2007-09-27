@@ -20,6 +20,8 @@ class nexObj(object):
 					p1xReplenish = 20,
 					p1yReplenish = 10,
 					p1Clearing = "End of round",
+					p1xMaxRequest = 20,
+					p1yMaxRequest = 10,
 					p2x = 20, 
 					p2y = 10,
 					p2xValue = 5, 
@@ -27,6 +29,8 @@ class nexObj(object):
 					p2xReplenish = 20,
 					p2yReplenish = 10,					
 					p2Clearing = "End of round",
+					p2xMaxRequest = 20,
+					p2yMaxRequest = 10,
 					mins = 2,
 					secs = 30,
 					nonBinding = False,
@@ -39,6 +43,8 @@ class nexObj(object):
 		self.p1xReplenish = p1xReplenish
 		self.p1yReplenish = p1yReplenish
 		self.p1Clearing = p1Clearing
+		self.p1xMaxRequest = p1xMaxRequest
+		self.p1yMaxRequest = p1yMaxRequest
 		self.p2x = p2x
 		self.p2y = p2y
 		self.p2xValue = p2xValue
@@ -46,6 +52,8 @@ class nexObj(object):
 		self.p2xReplenish = p2xReplenish
 		self.p2yReplenish = p2yReplenish
 		self.p2Clearing = p2Clearing
+		self.p2xMaxRequest = p2xMaxRequest
+		self.p2yMaxRequest = p2yMaxRequest
 		self.mins = mins
 		self.secs = secs
 		self.nonBinding = nonBinding
@@ -156,6 +164,8 @@ def nexEdit(request):
 								p1xReplenish = request.POST.get("p1xReplenish"),
 								p1yReplenish = request.POST.get("p1yReplenish"),
 								p1Clearing = request.POST.get("p1Clearing"),
+								p1xMaxRequest = request.POST.get("p1xMaxRequest"),
+								p1yMaxRequest = request.POST.get("p1yMaxRequest"),
 								p2x = request.POST.get("p2x"),
 								p2y = request.POST.get("p2y"),
 								p2xValue = request.POST.get("p2xValue"),
@@ -163,6 +173,8 @@ def nexEdit(request):
 								p2xReplenish = request.POST.get("p2xReplenish"),
 								p2yReplenish = request.POST.get("p2yReplenish"),
 								p2Clearing = request.POST.get("p2Clearing"),
+								p2xMaxRequest = request.POST.get("p2xMaxRequest"),
+								p2yMaxRequest = request.POST.get("p2yMaxRequest"),
 								mins = request.POST.get("mins"),
 								secs = request.POST.get("secs"),
 								nonBinding = nonBinding,

@@ -12,6 +12,7 @@ from rex import *
 from matcher import *
 from nex import *
 from widgets import *
+from monitor import *
 import pickle
 from time import time
 from time import sleep
@@ -28,36 +29,6 @@ def sessions(request):
 	return render_to_response('adminInterface/sessions.html', 
 							  {'expSessions': expSessions,
 							'experiments': experiments}, 
-							  context_instance=RequestContext(request))
-
-@login_required
-def monitor(request):
-	"""This page allows the experimenter to monitor the progress of a running experiment."""
-	# fetch all sessions for sessions drop down
-	expSessions = ExperimentSession.objects.all()
-	
-	
-	sid = request.GET.get('sid')
-	monitorSession = ExperimentSession.objects.get(id=sid)
-	participants = Participant.objects.filter(experimentSession__exact=sid)
-	
-	if(monitorSession.status.statusText == "Running"):
-		running = True
-	else:
-		running = False
-	
-	if(len(participants) > 0):
-		noParticipants = False
-	else:
-		noParticipants = True
-	
-
-	return render_to_response('adminInterface/monitor.html', 
-							  {'expSessions': expSessions, 
-							   'monitorSession':monitorSession,
-							   'participants':participants,
-							   'noParticipants':noParticipants,
-							   'running':running},
 							  context_instance=RequestContext(request))
 	
 
@@ -128,6 +99,9 @@ def componentCreate(request):
 	if (componentType.componentType == "Widget: Image"):
 		componentParams = widgetImageObj()	
 	
+	if (componentType.componentType == "Widget: Bank"):
+		componentParams = widgetBankObj()	
+	
 	
 	# Add component to the database
 	c = Component(	name = componentName,
@@ -150,20 +124,11 @@ def componentDelete(request):
 
 
 @login_required
-def editor(request):
-	"""The editor allow you to create new experiments and edit existing ones."""
-	experimentList = Experiment.objects.values('name', 'id')
-	
-	return render_to_response('adminInterface/editor.html', 
-							  { 'experimentList': experimentList }, 
-							  context_instance=RequestContext(request))
-
-@login_required
 def edit(request):
 	"""This view allows you to edit an existing experiment"""
 	expID = request.GET.get('id')
 	expDetails = Experiment.objects.get(id=expID)
-	componentList = Component.objects.all()
+	componentList = Component.objects.filter(componentType__componentType__in=['Matcher','Text Page','Questionnaire'])
 	experimentComponentsList = ExperimentComponents.objects.filter(experiment_id__exact=expID)	
 
 	return render_to_response('adminInterface/edit.html', 
@@ -237,12 +202,10 @@ def newExperiment(request):
 
 		# insert the new component into the database
 		e = Experiment	(	name = request.POST.get('experimentName'),
-					   		description = request.POST.get('experimentDescription'),
+					   		description = "",
 							status = experimentStatus.objects.get(statusText='Waiting for participants'),
 							minPlayers = 4,
-							maxPlayers = 4,
-							xValue = 10,
-							yValue = 10
+							maxPlayers = 4
 						)
 		e.save()
 		

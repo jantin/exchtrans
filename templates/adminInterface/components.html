@@ -6,25 +6,44 @@
 
 {% block adminContent %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
 
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+		
+		$(".slideToggler").bind("click", function(){
+			$('.createNewThing').slideToggle(500);
+		});
+		$("#createNewForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after"			
+		},{
+			inputclasserror: "fieldError",
+		});
+	});
+
+</script>
 <h1>Components</h1>
 <div class="helpText"> 
 <p>Components are the building blocks of experiments. There are two generic
 component types: questionnaires and reciprocal exchanges. You can create new
 components with the link below or by duplicating an existing component.</p>
 </div>
-<p><a href="#" onclick="$('.createNewThing').slideToggle(500);">Create a new component</a></p>
+<p><a href="#" class="slideToggler">Create a new component</a></p>
 <div class="createNewThing">
-	<form action="/components/create/" method="post" accept-charset="utf-8">
+	<form action="/components/create/" method="post" accept-charset="utf-8" id="createNewForm">
 		<p><label for="componentName">Component Name:<br/>
-		<input type="text" name="componentName" value="" id="componentName"></label></p>
+		<input type="text" name="componentName" value="" id="componentName" class="required" title="You must enter a name."></label></p>
 		<p><label for="componentType">Component Type:<br/>
 		<select name="componentType">
 			{% for ct in componentTypes %}
 				<option value="{{ ct.id }}">{{ ct.componentType }}</option>
 			{% endfor %}
 		</select></label></p>
-		<p><input type="button" value="Cancel" class="buttonSmall" onclick="$('.createNewThing').slideToggle(500);"/> <input type="submit" value="Create Component" class="buttonSmall"/></p>
+		<p><input type="button" value="Cancel" class="buttonSmall slideToggler"/> <input type="submit" value="Create Component" class="buttonSmall"/></p>
 	</form>	
 </div>
 <br/><br/>

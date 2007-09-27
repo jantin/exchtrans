@@ -4,6 +4,11 @@
 
 {% block sectionDivID %}dashboard{% endblock %}
 
+{% block extrahead %}
+<link rel="stylesheet" href="/site_media/css/monitor.css" type="text/css" media="screen" />
+
+{% endblock %}
+
 {% block adminContent %}
 <div id="breadCrumbs">
 	<a href="/sessions">Sessions</a> » Monitoring {{ monitorSession.experiment_id.name }} (session {{ monitorSession.id }})
@@ -38,12 +43,88 @@
 			{% endfor %}
 			</p>
 		{% endif %}
-
-
 	</div>
 	{% if running %}
 	<a href="/session/stop/?sid={{ monitorSession.id }}">Stop Session</a>
 	{% else %}
 	<a href="/session/start/?sid={{ monitorSession.id }}">Start Session</a>
 	{% endif %}
+	<h2>Status Table</h2>
+	
+	<div id="monitorTable">
+		<div class="componentsCol monitorTableCol">
+			<div class="monitorHeadBlock componentsHeadBlock">
+				<div id="componentColHeadingText">
+					Components
+				</div>
+			</div>
+			{% for c in experimentComponents %}
+				<div class="monitorTableBlock componentBlock">
+					{{c.name}}<br/>
+					({{c.componentType}})
+				</div>
+			{% endfor %}
+		</div>
+		<div class="participantCol monitorTableCol">
+			<div class="monitorHeadBlock participantHeadBlock">
+				<img src="/site_media/images/icons/1.png" alt="Participant Icon">
+				<div class="participantInfo">
+					Name: 2007_9_9-000545<br/>
+					Identity Letter: D<br/>
+					Player Number: 1
+				</div>
+			</div>
+			{% for c in experimentComponents %}
+				<div class="monitorTableBlock participantBlock">
+					Done.
+				</div>
+			{% endfor %}
+		</div>
+		<div class="participantCol monitorTableCol">
+			<div class="monitorHeadBlock participantHeadBlock">
+				<img src="/site_media/images/icons/2.png" alt="Participant Icon">
+				<div class="participantInfo">
+					Name: 2007_9_9-000545<br/>
+					Identity Letter: D<br/>
+					Player Number: 2
+				</div>
+			</div>
+			{% for c in experimentComponents %}
+				<div class="monitorTableBlock participantBlock">
+					Done.
+				</div>
+			{% endfor %}
+		</div>
+		<div class="participantCol monitorTableCol">
+			<div class="monitorHeadBlock participantHeadBlock">
+				<img src="/site_media/images/icons/3.png" alt="Participant Icon">
+				<div class="participantInfo">
+					Name: 2007_9_9-000545<br/>
+					Identity Letter: D<br/>
+					Player Number: 3
+				</div>
+			</div>
+			{% for c in experimentComponents %}
+				<div class="monitorTableBlock participantBlock">
+					Done.
+				</div>
+			{% endfor %}
+		</div>
+		<div class="participantCol monitorTableCol">
+			<div class="monitorHeadBlock participantHeadBlock">
+				<img src="/site_media/images/icons/4.png" alt="Participant Icon">
+				<div class="participantInfo">
+					Name: 2007_9_9-000545<br/>
+					Identity Letter: D<br/>
+					Player Number: 4
+				</div>
+			</div>
+			{% for c in experimentComponents %}
+				<div class="monitorTableBlock participantBlock">
+					Done.
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	
 {% endblock %}

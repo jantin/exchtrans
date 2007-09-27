@@ -6,7 +6,7 @@ urlpatterns = patterns('',
 	# ET Admin Pages
 	(r'^$', 'exchtran.et.views.sessions'),
 	(r'^sessions/$', 'exchtran.et.views.sessions'),
-	(r'^sessions/monitor/$', 'exchtran.et.views.monitor'),
+	(r'^sessions/monitor/$', 'exchtran.et.monitor.monitor'),
 
 	(r'^experiments/$', 'exchtran.et.views.experiments'),
 	(r'^experiments/view/$', 'exchtran.et.views.viewExperiment'),				
@@ -28,9 +28,6 @@ urlpatterns = patterns('',
 	
 	(r'^scratch/$', 'exchtran.et.views.scratch'),
 	(r'^httpRPS/$', 'exchtran.et.views.httpRPS'),
-
-	#Deprecated
-	(r'^editor/$', 'exchtran.et.views.editor'),	
 	
 	# ET Experiment Session Pages
 	(r'^session/join/$', 'exchtran.et.views.joinSession'),
@@ -94,6 +91,8 @@ urlpatterns = patterns('',
 	(r'^widgets/timer/editSubmit/$', 'exchtran.et.widgets.timerEdit'),
 	(r'^widgets/image/display/$', 'exchtran.et.widgets.imageDisplay'),
 	(r'^widgets/image/editSubmit/$', 'exchtran.et.widgets.imageEdit'),
+	(r'^widgets/bank/display/$', 'exchtran.et.widgets.bankDisplay'),
+	(r'^widgets/bank/editSubmit/$', 'exchtran.et.widgets.bankEdit'),
 	
 	# Rex: Reciprocal Exchange
 	(r'^rexOffer/$', 'exchtran.et.rex.rexOffer'),
