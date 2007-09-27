@@ -4,21 +4,26 @@
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.copyEvents.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
 	$(document).ready(function() { 
-	    var options = { 
-	        target: '#message',   // target element to be updated with server response
-	    };		
-	    // bind to the form's submit event 
-	    $('#componentForm').submit(function() { 
-	        $(this).ajaxSubmit(options);
-			$("#message").html("Component Saved");
-			$('#message').fadeIn('3000');
-			setTimeout("$('#message').fadeOut('3000');", 2000)
-	        return false; 
-	    });
+		$("#componentForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after",
+			onOk: function(){
+				$('#componentForm').ajaxSubmit({target: '#message' });
+				$('#message').fadeIn('3000');
+				setTimeout("$('#message').fadeOut('3000');", 2000)
+				return false; 
+			}
+			
+		},{
+			inputclasserror: "fieldError",
+		});
 		
 		// When page loads, make sure we're showing the right options
 		var checked = $("#randomPairingCheck").attr("checked");
@@ -84,7 +89,7 @@
 <table border="0" cellspacing="5" cellpadding="5">
 	<tr>
 		<th>Component Name: </th>
-		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"/></td>
+		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200" id="componentName" class="required" title="You must enter a component name."/></td>
 	</tr>
 	<tr>
 		<th>Component Description: </th>
@@ -156,7 +161,7 @@
 								{% endfor %}
 							</select>
 						</td>
-						<td><input type="text" name="rounds_{{forloop.counter0}}" class="roundsFormElement" value="{{pairing.rounds}}" size="2" maxlength="2"/></td>
+						<td><input type="text" name="rounds_{{forloop.counter0}}" class="roundsFormElement required integer" value="{{pairing.rounds}}" size="2" maxlength="2" id="rounds_{{forloop.counter0}}" title="You must enter an integer value."/></td>
 						<td><a href="#" class="subtractPairingLink">-</a> <a href="#" class="addPairingLink">+</a></td>
 					</tr>
 				</table>
@@ -177,7 +182,7 @@
 						{% endfor %}
 					</select>
 				</td>
-				<td><input type="text" name="randomRounds" value="{{parameters.randomRounds}}" size="2" maxlength="2"/></td>
+				<td><input type="text" name="randomRounds" value="{{parameters.randomRounds}}" size="2" maxlength="2" id="randomRounds" class="integer" title="You must enter an integer value."/></td>
 			</tr>
 		</table>
 	</div>

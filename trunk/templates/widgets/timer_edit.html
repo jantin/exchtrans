@@ -3,23 +3,30 @@
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
+
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
 	$(document).ready(function() { 
-	    var options = { 
-	        target: '#message',   // target element to be updated with server response
-	    };		
-	    // bind to the form's submit event 
-	    $('#componentForm').submit(function() { 
-	        $(this).ajaxSubmit(options);
-			$("#message").html("Component Saved");
-			$('#message').fadeIn('3000');
-			setTimeout("$('#message').fadeOut('3000');", 2000)
-	        return false; 
-	    });
-	});
-</script>
 
+		$("#componentForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after",
+			onOk: function(){
+				$('#componentForm').ajaxSubmit({target: '#message' });
+				$('#message').fadeIn('3000');
+				setTimeout("$('#message').fadeOut('3000');", 2000)
+				return false; 
+			}
+			
+		},{
+			inputclasserror: "fieldError",
+		});
+	});
+
+</script>
 {% endblock %}
 
 {% block bodyid %}tab3{% endblock %}
@@ -36,11 +43,19 @@
 <table border="0" cellspacing="5" cellpadding="5">
 	<tr>
 		<th>Component Name: </th>
-		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"/></td>
+		<td><input type="text" name="componentName" id="componentName" value="{{ component.name }}" size="40" maxlength="200" class="required" title="You must enter a component name."/></td>
 	</tr>
 	<tr>
 		<th>Component Description: </th>
 		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
+	</tr>
+	<tr>
+		<th>Minutes: </th>
+		<td><input type="text" name="mins" value="{{ parameters.mins }}" size="2" maxlength="2" id="mins" class="required integer" title="Minutes must be an integer between 0 and 60"/></td>
+	</tr>
+	<tr>
+		<th>Seconds: </th>
+		<td><input type="text" name="secs" value="{{ parameters.secs }}" size="2" maxlength="2" id="secs" class="required integer" title="Seconds must be an integer between 0 and 60"/></td>
 	</tr>
 </table>
 <p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>

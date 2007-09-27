@@ -6,35 +6,54 @@
 
 {% block adminContent %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
 
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+		
+		$(".slideToggler").bind("click", function(){
+			$('.createNewThing').slideToggle(500);
+		});
+		$("#createNewForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after"			
+		},{
+			inputclasserror: "fieldError",
+		});
+	});
+
+</script>
 <h1>Experiments</h1>
 <div class="helpText"> 
 <p>An experiment is an ordered collection of components. You can create a new experiment with the link below.</p>
 </div>
-<p><a href="#" onclick="$('.createNewThing').slideToggle(500);">Create a new experiment</a></p>
+<p><a href="#" class="slideToggler">Create a new experiment</a></p>
 <div class="createNewThing">
-	<form action="/experiments/edit/newExperiment/" method="post" accept-charset="utf-8">
+	<form action="/experiments/edit/newExperiment/" method="post" accept-charset="utf-8" id="createNewForm">
 		<p><label for="experimentName">Name:<br>
-		<input type="text" name="experimentName" id="experimentName" class="inputSmall" value="" size="20" /></label></p>
-		<p><label for="experimentDescription">Description:<br>
-		<textarea rows="4" cols="30" name="experimentDescription" id="experimentDescription" ></textarea></label></p>
-		<p><input type="button" value="Cancel" class="buttonSmall" onclick="$('.createNewThing').slideToggle(500);"/> <input class="buttonSmall" type="submit" value="Create Experiment"></p>
+			<input type="text" name="experimentName" value="" id="experimentName" class="required" title="You must enter a name."></label></p>
+		<p><input type="button" value="Cancel" class="buttonSmall slideToggler"/> <input class="buttonSmall" type="submit" value="Create Experiment"></p>
 	</form>
 </div>
 <br/><br/>
 <h3>Existing experiments table</h3>
 <table class="experimentTable">
 	<thead>
-	<tr><th>Date Created</th><th>Name</th><th>Actions</th></tr>
+	<tr><th>Name</th><th>Date Created</th><th>Actions</th></tr>
 	</thead>
 	{% for e in experiments %}
 	<tr class="{% cycle row1,row2 %}">
-		<td>{{ e.dateCreated }}</td>
 		<td>{{ e.name }}</td>
+		<td>{{ e.dateCreated }}</td>
+		
 		<!--
 			TODO Add Delete confirmation
 		-->
 		<td><!-- <a href="/experiments/view/?id={{ e.id }}">View</a> |  --><a href="/experiments/edit/?id={{ e.id }}">Edit</a> | <a href="/experiments/delete/?eid={{ e.id }}">Delete</a></td>
+	
 	</tr>
 	{% endfor %}
 </table>

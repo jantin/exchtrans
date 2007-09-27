@@ -38,12 +38,13 @@ class Experiment(models.Model):
 	dateModified = models.DateField(auto_now=True)
 	minPlayers = models.IntegerField()
 	maxPlayers = models.IntegerField()
-	xValue = models.IntegerField()
-	yValue = models.IntegerField()
 	
 	def __str__(self):
 		return self.name
 	
+	class Meta:
+		ordering = ('name',)
+		
 	class Admin:
 		pass
 	
@@ -88,6 +89,9 @@ class ComponentTypes(models.Model):
 	def __str__(self):
 		return self.componentType
 	
+	class Meta:
+		ordering = ('componentType',)
+	
 	class Admin:
 		pass
 	
@@ -95,16 +99,19 @@ class ComponentTypes(models.Model):
 
 class Component(models.Model):
 	name = models.CharField(maxlength=255)
-	description = models.TextField(null=True)
+	description = models.TextField(null=True, default="")
 	parameters = models.TextField(null=True)
 	dateCreated = models.DateField(auto_now_add=True)
 	dateModified = models.DateField(auto_now=True)
 	componentType = models.ForeignKey(ComponentTypes)
-	displayName = models.CharField(maxlength=255, null=True)
+	displayName = models.CharField(maxlength=255, null=True, default="")
 	
 	
 	def __str__(self):
 		return self.name
+	
+	class Meta:
+		ordering = ('name',)
 	
 	class Admin:
 		pass

@@ -3,21 +3,29 @@
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
+
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
 	$(document).ready(function() { 
-	    var options = { 
-	        target: '#message',   // target element to be updated with server response
-	    };		
-	    // bind to the form's submit event 
-	    $('#componentForm').submit(function() { 
-	        $(this).ajaxSubmit(options);
-			$("#message").html("Component Saved");
-			$('#message').fadeIn('3000');
-			setTimeout("$('#message').fadeOut('3000');", 2000)
-	        return false; 
-	    });
+
+		$("#componentForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after",
+			onOk: function(){
+				$('#componentForm').ajaxSubmit({target: '#message' });
+				$('#message').fadeIn('3000');
+				setTimeout("$('#message').fadeOut('3000');", 2000)
+				return false; 
+			}
+			
+		},{
+			inputclasserror: "fieldError",
+		});
 	});
+
 </script>
 
 {% endblock %}
@@ -36,7 +44,7 @@
 <table border="0" cellspacing="5" cellpadding="5">
 	<tr>
 		<th>Component Name: </th>
-		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"/></td>
+		<td><input type="text" name="componentName" id="componentName" value="{{ component.name }}" size="40" maxlength="200" class="required" title="You must enter a component name."/></td>
 	</tr>
 	<tr>
 		<th>Component Description: </th>
@@ -47,43 +55,64 @@
 <table>
 	<tr>
 		<td></td>
-		<th>Initial X</th>
-		<th>Initial Y</th>
-		<th>X Value</th>
-		<th>Y Value</th>
-		<th>Replenish X</th>
-		<th>Replenish Y</th>
-		<th>Clearing</th>
+		<th>Player 1</th>
+		<th>Player 2</th>
 	</tr>
 	<tr>
-		<th>Player 1</th>
-		<td><input type="text" name="p1x" value="{{parameters.p1x}}" size="3"/></td>
-		<td><input type="text" name="p1y" value="{{parameters.p1y}}" size="3"/></td>
-		<td><input type="text" name="p1xValue" value="{{parameters.p1xValue}}" size="3"/></td>
-		<td><input type="text" name="p1yValue" value="{{parameters.p1yValue}}" size="3"/></td>
-		<td><input type="text" name="p1xReplenish" value="{{parameters.p1xReplenish}}" size="3"/></td>
-		<td><input type="text" name="p1yReplenish" value="{{parameters.p1yReplenish}}" size="3"/></td>
+		<th>Initial X</th>
+		<td><input type="text" name="p1x" value="{{parameters.p1x}}" size="3" id="p1x" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2x" value="{{parameters.p2x}}" size="3" id="p2x" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Initial Y</th>
+		<td><input type="text" name="p1y" value="{{parameters.p1y}}" size="3" id="p1y" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2y" value="{{parameters.p2y}}" size="3" id="p2y" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>X Value</th>
+		<td><input type="text" name="p1xValue" value="{{parameters.p1xValue}}" size="3" id="p1xValue" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2xValue" value="{{parameters.p2xValue}}" size="3" id="p2xValue" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Y Value</th>
+		<td><input type="text" name="p1yValue" value="{{parameters.p1yValue}}" size="3" id="p1yValue" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2yValue" value="{{parameters.p2yValue}}" size="3" id="p2yValue" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Replenish X</th>
+		<td><input type="text" name="p1xReplenish" value="{{parameters.p1xReplenish}}" size="3" id="p1xReplenish" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2xReplenish" value="{{parameters.p2xReplenish}}" size="3" id="p2xReplenish" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Replenish Y</th>
+		<td><input type="text" name="p1yReplenish" value="{{parameters.p1yReplenish}}" size="3" id="p1yReplenish" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2yReplenish" value="{{parameters.p2yReplenish}}" size="3" id="p2yReplenish" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Clearing</th>
 		<td>
 			<select name="p1Clearing">
 				<option {% ifequal parameters.p1Clearing "End of round" %}selected="selected"{% endifequal %} >End of round</option>
 				<option {% ifequal parameters.p1Clearing "End of module" %}selected="selected"{% endifequal %}>End of module</option>
 			</select>
 		</td>
-	</tr>
-	<tr>
-		<th>Player 2</th>
-		<td><input type="text" name="p2x" value="{{parameters.p2x}}" size="3"/></td>
-		<td><input type="text" name="p2y" value="{{parameters.p2y}}" size="3"/></td>
-		<td><input type="text" name="p2xValue" value="{{parameters.p2xValue}}" size="3"/></td>
-		<td><input type="text" name="p2yValue" value="{{parameters.p2yValue}}" size="3"/></td>
-		<td><input type="text" name="p2xReplenish" value="{{parameters.p2xReplenish}}" size="3"/></td>
-		<td><input type="text" name="p2yReplenish" value="{{parameters.p2yReplenish}}" size="3"/></td>
 		<td>
 			<select name="p2Clearing">
 				<option {% ifequal parameters.p2Clearing "End of round" %}selected="selected"{% endifequal %} >End of round</option>
 				<option {% ifequal parameters.p2Clearing "End of module" %}selected="selected"{% endifequal %}>End of module</option>
 			</select>
 		</td>
+		
+	</tr>
+	<tr>
+		<th>Max X Request</th>
+		<td><input type="text" name="p1xMaxRequest" value="{{parameters.p1xMaxRequest}}" size="3" id="p1xMaxRequest" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2xMaxRequest" value="{{parameters.p2xMaxRequest}}" size="3" id="p2xMaxRequest" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Max Y Request</th>
+		<td><input type="text" name="p1yMaxRequest" value="{{parameters.p1yMaxRequest}}" size="3" id="p1yMaxRequest" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2yMaxRequest" value="{{parameters.p2yMaxRequest}}" size="3" id="p2yMaxRequest" class="required integer" title="You must enter an integer value."/></td>
 	</tr>
 </table>
 <h2>Time</h2>
@@ -100,7 +129,7 @@
 <h2>Options</h2>
 <p><input type="checkbox" name="nonBinding" {% if parameters.nonBinding %}checked="checked"{% endif %} /> Non-binding</p>
 <p><input type="checkbox" name="showPoints" {% if parameters.showPoints %}checked="checked"{% endif %}/> Show point value</p>
-<p>Display Name (Shown to Deciders)<br/><input type="text" name="displayName"  value="{{component.displayName}}" size="25"/></p>
+<p>Display Name (Shown to Deciders)<br/><input type="text" name="displayName"  value="{{component.displayName}}" size="25"  id="displayName"  class="required" title="You must enter a display name"/></p>
 
 	<p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>
 	<div id="message">

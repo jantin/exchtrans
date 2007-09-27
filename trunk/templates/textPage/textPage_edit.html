@@ -6,22 +6,29 @@
 <link rel="stylesheet" href="/site_media/css/thickbox.css" type="text/css" media="screen" />
 
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
+
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
 	$(document).ready(function() { 
-	    var options = { 
-	        target:        '#message',   // target element(s) to be updated with server response 
-	    }; 
 
-	    // bind to the form's submit event 
-	    $('#componentForm').submit(function() { 
-	        $(this).ajaxSubmit(options);
-			$("#message").html("Component Saved");
-			$('#message').fadeIn('3000');
-			setTimeout("$('#message').fadeOut('3000');", 2000)
-	        return false; 
-	    }); 
+		$("#componentForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after",
+			onOk: function(){
+				$('#componentForm').ajaxSubmit({target: '#message' });
+				$('#message').fadeIn('3000');
+				setTimeout("$('#message').fadeOut('3000');", 2000)
+				return false; 
+			}
+			
+		},{
+			inputclasserror: "fieldError",
+		});
 	});
+
 </script>
 
 {% endblock %}
@@ -40,26 +47,26 @@
 <table border="0" cellspacing="5" cellpadding="5">
 	<tr>
 		<th>Component Name: </th>
-		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200"></td>
+		<td><input type="text" name="componentName" value="{{ component.name }}" size="40" maxlength="200" id="componentName" class="required" title="You must enter a component name."></td>
 	</tr>
 	<tr>
 		<th>Component Description: </th>
 		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
 	</tr>
 	<tr>
-		<th>Heading (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<th>Heading: <!-- (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>) --></th>
 		<td><input type="text" name="heading" value="{{ parameters.heading }}" id="pointCount" size="40"/></td>
 	</tr>
 	<tr>
-		<th>Content (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<th>Content: <!-- (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>) --></th>
 		<td><textarea name="body" rows="6" cols="43">{{ parameters.body }}</textarea></td>
 	</tr>
 	<tr>
-		<th>Button Label (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
-		<td><input type="text" name="buttonLabel" value="{{ parameters.buttonLabel }}" size="40" maxlength="255"></td>
+		<th>Button Label: <!-- (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>) --></th>
+		<td><input type="text" name="buttonLabel" value="{{ parameters.buttonLabel }}" size="40" maxlength="100" id="buttonLabel" class="required" title="This field is required."></td>
 	</tr>
 	<tr>
-		<th>Enable Back Button (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>):</th>
+		<th>Enable Back Button: <!-- (<a href="/site_media/images/rex_offer.png" title="Player label text appears as indicated in the image above." class="thickbox">?</a>) --></th>
 		<td>
 			{% if parameters.enableBack %}
 				<input type="checkbox" name="enableBack" checked="checked" />
