@@ -348,16 +348,6 @@ def endSession(request):
 						  {'response': "Experiment finished"}, 
 						  context_instance=RequestContext(request))
 
-@login_required
-def bootParticipant(request):
-	# TODO Don't delete, add a field to the model for inactive or something like that.
-	"""Boots participants by deleting them"""
-	sid = request.GET.get('sid')
-	pid = request.GET.get('pid')
-	p = Participant.objects.get(id=pid)
-	p.delete()
-	
-	return HttpResponseRedirect('/sessions/monitor/?sid=' + sid)
 
 @login_required
 def booted(request):

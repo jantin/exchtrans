@@ -113,47 +113,6 @@ var timeout;
 		return;
 	}
 	
-	
-	
-	
-	// // This function polls the server
-	// function pollServer(url, interval){
-	// 	if(!killPolling){
-	// 		$.getJSON(url, function(pollResponseJSON){
-	// 			processPoll(url, interval, pollResponseJSON);
-	// 			}
-	// 		);
-	// 	}
-	// 	return;
-	// }
-	// 
-	// 
-	// // This function handles the response after each pole query.
-	// function processPoll(url, interval, pollResponseJSON){
-	// 	pollURL = url;
-	// 	pollInterval = interval;
-	// 			
-	// 	// If continuePolling is true, poll the server again after waiting
-	// 	if(pollResponseJSON['continuePolling'] == true){
-	// 		setTimeout("pollServer(pollURL, pollInterval)", pollInterval);			
-	// 	} else {
-	// 		killPolling = true;
-	// 	}
-	// 	
-	// 	// Change the screen if necessary
-	// 	if(pollResponseJSON['showScreen']){
-	// 		showScreen(pollResponseJSON['showScreen'])
-	// 	}
-	// 	
-	// 	// This allows one poll process to start another poll process
-	// 	if(pollResponseJSON['poll'] == true){
-	// 		killPolling = false;
-	// 		pollServer(pollResponseJSON['url'], pollResponseJSON['interval']);
-	// 	}
-	// 	
-	// 	return;
-	// }
-	
 	// This function displays only the specified screen. screenName should be the the div ID
 	// of the desired screen.
 	function showScreen(screenName){

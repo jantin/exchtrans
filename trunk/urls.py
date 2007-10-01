@@ -6,7 +6,10 @@ urlpatterns = patterns('',
 	# ET Admin Pages
 	(r'^$', 'exchtran.et.views.sessions'),
 	(r'^sessions/$', 'exchtran.et.views.sessions'),
+	
 	(r'^sessions/monitor/$', 'exchtran.et.monitor.monitor'),
+	(r'^sessions/monitor/updatePollProcess/$', 'exchtran.et.monitor.updatePollProcess'),
+	(r'^sessions/monitor/bootParticipant/$', 'exchtran.et.monitor.bootParticipant'),
 
 	(r'^experiments/$', 'exchtran.et.views.experiments'),
 	(r'^experiments/view/$', 'exchtran.et.views.viewExperiment'),				
@@ -37,7 +40,6 @@ urlpatterns = patterns('',
 	(r'^session/drive/$', 'exchtran.et.views.driveSession'),
 	(r'^session/delete/$', 'exchtran.et.views.deleteSession'),
 	(r'^session/end/$', 'exchtran.et.views.endSession'),
-	(r'^session/bootParticipant/$', 'exchtran.et.views.bootParticipant'),
 	(r'^session/booted/$', 'exchtran.et.views.booted'),
 			
 	# Registration Pages
