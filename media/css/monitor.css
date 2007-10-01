@@ -2,10 +2,8 @@
 
 #monitorTable{
 	float:left;
-	width:821px;
+	width:825px;
 	padding:0;
-	border-right:1px solid #000;
-	border-top:1px solid #000;
 	margin-bottom:50px;
 
 
@@ -15,6 +13,7 @@
 	float:left;
 	width:163px;
 	border-bottom:1px solid #000;
+	border-right:1px solid #000;
 
 	
 }
@@ -23,7 +22,8 @@
 	position:relative;
 	border-bottom:1px solid #000;
 	text-align:center;
-
+	border-top:1px solid #000;
+	
 	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
 	min-height:120px;
 	height:auto !important;
@@ -43,12 +43,20 @@
 
 }
 
+.rowSeparator{
+	clear:both;
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:20px;
+	height:auto !important;
+	height:20px;
+}
+
 
 /* Component Cols */
 
 .componentsCol{
 	border-left:1px solid #000;
-	border-right:1px solid #000;
+	border-right:2px solid #000;
 	
 }
 
@@ -69,7 +77,6 @@
 
 /* Participant Cols */
 .participantCol{
-	border-left:1px solid #000;
 }
 
 .participantHeadBlock{
@@ -77,6 +84,11 @@
 }
 
 .participantHeadBlock img{
+
+}
+
+.participantNumber{
+	font-size:3em;
 	position:absolute;
 	left:70px;
 	bottom:50px;
