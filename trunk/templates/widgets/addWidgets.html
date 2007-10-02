@@ -1,0 +1,73 @@
+<script type="text/javascript" charset="utf-8">
+	
+	$(document).ready(function() {
+		$('#widgetAddLink').bind("click", function(){
+			addWidget();
+			return false;
+		});
+		$('.widgetRemoveLink').bind("click", function(){
+			removeWidget($(this).attr("id"));
+			return false;
+		});
+	});
+	
+	function addWidget(){
+		var newIndex = parseInt($("#widgetCount").val()) + 1
+		wDiv = "";
+		wDiv += '<div id="widget_'+ newIndex +'" class="widget">';
+		wDiv += '	<span class="widgetNum">'+ newIndex +'</span>) ';
+		wDiv += '	<select name="widgetSelect_'+ newIndex +'" id="widget_'+ newIndex +'" class="widgetSelect">';
+		
+		{% for widget in widgetList %}
+		wDiv += '		<option value="{{widget.id}}">{{widget.name}} ({{widget.componentType}})</option>';
+		{% endfor %}
+		
+		wDiv += '	</select> <a href="#" class="widgetRemoveLink" id="'+ newIndex +'">Remove</a>';
+		wDiv += '</div>';
+		
+		$('#widgets').append(wDiv);
+		$("#widgetCount").val(newIndex)
+		
+		$('.widgetRemoveLink').bind("click", function(){
+			removeWidget($(this).attr("id"));
+			return false;
+		});
+		updateFormNames();
+	}
+	
+	function removeWidget(widgetIndex){
+		$("#widget_" + widgetIndex).remove();
+		updateFormNames();
+	}
+	
+	function updateFormNames(){
+		counter = 0;
+		$(".widgetSelect").each(function(){
+			counter++;
+			$(this).attr("name","widgetSelect_" + counter);
+			$(this).prev().html(counter);
+		});
+		
+		$("#widgetCount").val(counter);
+		return;
+	}
+</script>
+
+<h2>Widgets</h2>
+<div id="widgets">
+	{% for widget in parameters.widgets %}
+	<div id="widget_{{forloop.counter}}" class="widget">
+		<span class="widgetNum">{{forloop.counter}}</span>) 
+		<select name="widgetSelect_{{forloop.counter}}" id="widget_{{forloop.counter}}" class="widgetSelect">	
+			{% for widgetOption in widgetList %}
+			<option value="{{widgetOption.id}}" {% ifequal widget widgetOption.id %}selected="selected"{% endifequal %}>{{widgetOption.name}} ({{widgetOption.componentType}})</option>
+			{% endfor %}
+		</select>
+		<a href="#" class="widgetRemoveLink" id="{{forloop.counter}}">Remove</a>
+	</div>
+	{% endfor %}
+	
+</div>
+<input type="hidden" name="widgetCount" value="{{ parameters.widgets|length }}" id="widgetCount">
+<br/>
+<a href="#" id="widgetAddLink">Add Widget</a>

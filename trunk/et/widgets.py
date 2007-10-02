@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import Context, Template, RequestContext
+from django.template.loader import get_template
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
 from models import *
@@ -11,6 +12,49 @@ import pickle
 from time import time
 import exchtran.settings
 import os
+
+# 
+# Prepare Widgets
+#
+def prepareWidgets(widgetIDList):
+	"""Goes through each widget in widgetIDList an renders the templates. 
+	All the template text is concated and returned
+	
+	To add widgets to a component:
+	1) Put this code in the component's Python edit function
+	widgetCount = request.POST.get("widgetCount")
+	widgets = []
+	for i in range(int(widgetCount)):
+		widgets.append(int(request.POST.get("widgetSelect_" + str(i+1))))
+
+	(Be sure to add the widgets list to the component object)
+
+	2) Put this code in the component's HTML edit template
+	{% include "widgets/addWidgets.html" %}
+
+	3) Put this code in the component's Python display function
+	widgets = prepareWidgets(request.session['exchangeParameters'].widgets)
+
+	4) Put this code in the component's HTML display template in the Right Col div
+	{{widgets}}
+	
+	"""
+	counter = 1
+	renderedWidgets = ""
+	for widgetID in widgetIDList:
+		widget = Component.objects.get(id=widgetID)
+		widgetParams = pickle.loads(widget.parameters)
+		widgetTemplate = get_template(widget.componentType.kickoffTemplate)
+		widgetContext = Context({"widgetParams": widgetParams, "counter": counter})
+		renderedWidgets += widgetTemplate.render(widgetContext)
+		counter = counter + 1
+	
+	return renderedWidgets
+
+
+
+
+
 
 # 
 # Timer Widget
