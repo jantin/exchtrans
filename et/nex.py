@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
 from models import *
 from common import *
+from widgets import *
 from views import *
 import pickle
 from time import time
@@ -34,7 +35,8 @@ class nexObj(object):
 					mins = 2,
 					secs = 30,
 					nonBinding = False,
-					showPoints = False
+					showPoints = False,
+					widgets = []
 				):
 		self.p1x = p1x
 		self.p1y = p1y
@@ -58,6 +60,7 @@ class nexObj(object):
 		self.secs = secs
 		self.nonBinding = nonBinding
 		self.showPoints = showPoints
+		self.widgets = widgets
 
 
 class nexOfferObj(object):
@@ -95,8 +98,7 @@ def nexDisplay(request):
 	request.session['c'] = sesVars.componentsList[int(request.session['p'].currentComponent)].component_id
 
 	# get the current exchange component parameters
-	# TODO WHY is 51 hard coded?????
-	request.session['exchangeParameters'] = pickle.loads(Component.objects.get(id=51).parameters)
+	request.session['exchangeParameters'] = pickle.loads(Component.objects.get(id=exchangeComponentID).parameters)
 	
 	# Serialize the nex object into a dictionary that can be passed as JSON
 	exchangeParametersJSON = {}
@@ -132,11 +134,15 @@ def nexDisplay(request):
 		request.session['playerNumber'] = 2
 	else:
 		request.session['playerNumber'] = None
-		
+	
+	# Get widget content
+	widgets = prepareWidgets(request.session['exchangeParameters'].widgets)
+	
 	return render_to_response("nex/nex_display.html", 
 							{	'opponentIdentity': request.session['opponent'].identityLetter,
 								'exchangeParametersJSON': exchangeParametersJSON,
-								'playerNumber': request.session['playerNumber']
+								'playerNumber': request.session['playerNumber'],
+								'widgets': widgets
 							}, 
 						  	context_instance=RequestContext(request))
 
@@ -155,6 +161,11 @@ def nexEdit(request):
 		showPoints = True
 	else:
 		showPoints = False
+	
+	widgetCount = request.POST.get("widgetCount")
+	widgets = []
+	for i in range(int(widgetCount)):
+		widgets.append(int(request.POST.get("widgetSelect_" + str(i+1))))
 	
 	componentParams = nexObj(
 								p1x = request.POST.get("p1x"),
@@ -178,7 +189,8 @@ def nexEdit(request):
 								mins = request.POST.get("mins"),
 								secs = request.POST.get("secs"),
 								nonBinding = nonBinding,
-								showPoints = showPoints
+								showPoints = showPoints,
+								widgets = widgets
 								)
 
 	c = Component.objects.get(id=comID)

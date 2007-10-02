@@ -4,15 +4,15 @@ Timer
 
 */
 
-#widget_timer{
+.widget_timer{
 	text-align:center;
 }
 
-#widget_timer_numbers{
+.widget_timer_numbers{
 	font-size:3em;
 }
 
-#widget_timer_text{
+.widget_timer_text{
 	
 }
 

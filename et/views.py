@@ -54,10 +54,15 @@ def componentEdit(request):
 	nexID = ComponentTypes.objects.get(componentType__exact="Negotiated Exchange")
 	componentList = Component.objects.filter(Q(componentType__exact=nexID.id)|Q(componentType__exact=rexID.id))
 	
+	# Get a list of widgets that could potentially be added
+	widgetList = Component.objects.filter(componentType__componentType__startswith='Widget:')
+	
+	
 	return render_to_response(	component.componentType.editTemplate, 
 								{'component': component,
 								 'parameters': parameters,
-								 'componentList': componentList
+								 'componentList': componentList,
+								 'widgetList': widgetList
 								}, 
 						  		context_instance=RequestContext(request))
 

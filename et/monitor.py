@@ -21,7 +21,7 @@ def monitor(request):
 	sid = request.GET.get('sid')
 	monitorSession = ExperimentSession.objects.get(id=sid)
 	participants = Participant.objects.filter(experimentSession=sid)
-	experimentComponents = Component.objects.filter(experimentcomponents__experiment_id__experimentsession__id=57).extra(select={'order_col': "et_component__experimentcomponents.order"}).order_by('order_col')
+	experimentComponents = Component.objects.filter(experimentcomponents__experiment_id__experimentsession__id=sid).extra(select={'order_col': "et_component__experimentcomponents.order"}).order_by('order_col')
 	
 	if(monitorSession.status.statusText == "Running"):
 		running = True
@@ -33,7 +33,6 @@ def monitor(request):
 	else:
 		noParticipants = True
 	
-	print request
 	return render_to_response('adminInterface/monitor.html', 
 							{	'expSessions': expSessions, 
 								'monitorSession':monitorSession,
