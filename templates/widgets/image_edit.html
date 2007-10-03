@@ -3,6 +3,7 @@
 {% block extrahead %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<link rel="stylesheet" href="/site_media/css/widgets.css" type="text/css" media="screen" />
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function() { 
@@ -33,12 +34,18 @@
 		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
 	</tr>
 	<tr>
-		<th>Image Name: </th>
+		<th>Image Label: </th>
+		<td><input type="text" name="label" value="{{parameters.label}}" size="40"/></td>
+	</tr>
+	<tr>
+		<th>File Name: </th>
 		<td>{{parameters.fileName}}</td>
 	</tr>
 	<tr>
-		<th>Image Preview: </th>
-		<td><img src="{{parameters.webPath}}"/></td>
+		<th>Image Preview:</th>
+		<td><img src="{{parameters.webPath}}" class="widget_image"/>
+			<p>Note: Images are restrained to a maximum width of 279 pixels.</p>
+		</td>
 	</tr>
 	<tr>
 		<th>Upload New Image: </th>

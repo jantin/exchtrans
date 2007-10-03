@@ -6,7 +6,21 @@
 
 {% block adminContent %}
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.tablesorter.pack.js"></script>
 
+
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+		
+		$(".slideToggler").bind("click", function(){
+			$('.createNewThing').slideToggle(500);
+		});
+		
+		$("#sessionTable").tablesorter({widgets: ['zebra']}); 
+	});
+
+</script>
 
 
 <h1>Sessions</h1>
@@ -16,7 +30,7 @@ experiment with participants, you should create a new session with that experime
 Participants can join sessions and experimenters can monitor sessions. Data
 collected while running an experiment is stored with the session.</p>
 </div>
-<p><a href="#" onclick="$('.createNewThing').slideToggle(500);">Create a new session</a></p>
+<p><a href="#" class="slideToggler">Create a new session</a></p>
 <div class="createNewThing">
 	<form action="/experiments/newSession/" method="get" accept-charset="utf-8">
 		<p><label for="id">Select an experiment:<br/>
@@ -30,18 +44,20 @@ collected while running an experiment is stored with the session.</p>
 </div>
 <br/><br/>
 <h3>Existing sessions table</h3>
-<table class="experimentTable">
+<table class="experimentTable" id="sessionTable">
 	<thead>
 	<tr><th>ID</th><th>Status</th><th>Experiment Name</th><th>Actions</th></tr>
 	</thead>
+	<tbody>
 	{% for e in expSessions %}
-	<tr class="{% cycle row1,row2 %}">
+	<tr>
 		<td>{{ e.id }}</td>
 		<td>{{ e.status.statusText }}</td>
 		<td>{{ e.experiment_id.name }}</td>
 		<td><a href='/session/join/?sid={{ e.id }}'>Join</a> | <a href='/sessions/monitor/?sid={{ e.id }}'>Monitor</a> | <a href="/session/delete/?sid={{ e.id }}">Delete</a></td>
 	</tr>
 	{% endfor %}
+	</tbody>
 </table>
 
 {% endblock %}

@@ -1,4 +1,4 @@
-<!-- Start Timer Widget -->
+<!-- Start Timer Widget {{counter}}-->
 
 {% comment %}
 	{{counter}} is a reference to the display order. It's needed so multiple 
@@ -55,23 +55,16 @@ function widget_timerLoop{{counter}}(){
 
 </script>
 
-
-<div class="widget_timer{{counter}}">
-	<div class="widget_timer_text">
-		Time remaining for this round
-	</div>
-	<div class="widget_timer_numbers">
-		<span id="widget_timer_minutes{{counter}}"></span>:<span id="widget_timer_seconds{{counter}}"></span>
+<div class="widget">
+	<div class="widget_timer">
+		<div class="widget_timer_text widget_label">
+			{{widgetParams.label}}
+		</div>
+		<div class="widget_timer_numbers">
+			<span id="widget_timer_minutes{{counter}}"></span>:<span id="widget_timer_seconds{{counter}}"></span>
+		</div>
 	</div>
 </div>
 
-<!-- End Timer Widget -->
 
-
-
-
-
-
-
-
-
+<!-- End Timer Widget {{counter}}-->

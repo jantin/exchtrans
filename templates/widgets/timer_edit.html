@@ -50,6 +50,10 @@
 		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
 	</tr>
 	<tr>
+		<th>Timer Label: </th>
+		<td><input type="text" name="label" value="{{ parameters.label }}" size="40"/></td>
+	</tr>
+	<tr>
 		<th>Minutes: </th>
 		<td><input type="text" name="mins" value="{{ parameters.mins }}" size="2" maxlength="2" id="mins" class="required integer" title="Minutes must be an integer between 0 and 60"/></td>
 	</tr>

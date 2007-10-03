@@ -359,8 +359,8 @@ thead th.optional { font-weight:normal !important; }
 fieldset table { border-right:1px solid #eee; }
 tr.row-label td { font-size:9px; padding-top:2px; padding-bottom:0; border-bottom:none; color:#666; margin-top:-1px; }
 tr.alt { background:#f6f6f6; }
-.row1 { background:#EDF3FE; }
-.row2 { background:white; }
+.row1, .even { background:#EDF3FE; }
+.row2, .odd { background:white; }
 
 /* SORTABLE TABLES */
 thead th a:link, thead th a:visited { color:#666; display:block; }

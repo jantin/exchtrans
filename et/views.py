@@ -420,7 +420,7 @@ class sessionVariables:
 @login_required
 def scratch(request):
 	"""outputs scratch template for UI dev"""
-	return render_to_response('nex/nex_display.html', 
+	return render_to_response('scratch.html', 
 						  {'name': "value"}, 
 						  context_instance=RequestContext(request))
 

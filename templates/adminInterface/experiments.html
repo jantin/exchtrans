@@ -8,6 +8,7 @@
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/yav.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.tablesorter.pack.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
@@ -23,6 +24,8 @@
 		},{
 			inputclasserror: "fieldError",
 		});
+		
+		$("#experimentTableID").tablesorter({widgets: ['zebra']});
 	});
 
 </script>
@@ -40,12 +43,13 @@
 </div>
 <br/><br/>
 <h3>Existing experiments table</h3>
-<table class="experimentTable">
+<table class="experimentTable" id="experimentTableID">
 	<thead>
 	<tr><th>Name</th><th>Date Created</th><th>Actions</th></tr>
 	</thead>
+	<tbody>
 	{% for e in experiments %}
-	<tr class="{% cycle row1,row2 %}">
+	<tr>
 		<td>{{ e.name }}</td>
 		<td>{{ e.dateCreated }}</td>
 		
@@ -56,6 +60,7 @@
 	
 	</tr>
 	{% endfor %}
+	</tbody>
 </table>
 
 {% endblock %}
