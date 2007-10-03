@@ -1,9 +1,16 @@
+.widget{
+	margin-bottom:20px;
+}
+
+.widget_label{
+	text-align:center;
+}
+
 /* 
 
 Timer
 
 */
-
 .widget_timer{
 	text-align:center;
 }
@@ -16,9 +23,36 @@ Timer
 	
 }
 
+
 /* 
 
 Image
 
 */
+.widget_image{
+	text-align:center;
+}
 
+.widget_image{
+	max-width:279px;
+	/* Hack for IE to respect max width*/
+	width: expression(this.width > 279 ? 279: true);
+}
+
+/* 
+
+Bank
+
+*/
+.widget_bank{
+	text-align:center;
+}
+
+.widget_bank_label{
+
+}
+
+#widget_bank_points{
+	font-size:3em;
+	padding:5px;
+}

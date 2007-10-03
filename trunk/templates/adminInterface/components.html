@@ -8,6 +8,8 @@
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/yav.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.tablesorter.pack.js"></script>
+
 
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
@@ -23,6 +25,8 @@
 		},{
 			inputclasserror: "fieldError",
 		});
+		
+		$("#componentsTable").tablesorter({widgets: ['zebra']}); 
 	});
 
 </script>
@@ -48,18 +52,20 @@ components with the link below or by duplicating an existing component.</p>
 </div>
 <br/><br/>
 <h3>Existing components table</h3>
-<table class="experimentTable">
+<table class="experimentTable tablesorter" id="componentsTable">
 	<thead>
 	<tr><th>Name</th><th>Component Type</th><th>Last Modified</th><th>Actions</th></tr>
 	</thead>
+	<tbody>
 	{% for c in components %}
-	<tr class="{% cycle row1,row2 %}">
+	<tr >
 		<td>{{ c.name }}</td>
 		<td>{{ c.componentType }}</td>
 		<td>{{ c.dateModified }}</td>
 		<td><a href="/components/edit/?id={{ c.id }}">Edit</a> | <a href="/components/delete/?cid={{ c.id }}">Delete</a></td>
 	</tr>
 	{% endfor %}
+	</tbody>
 </table>
 
 {% endblock %}

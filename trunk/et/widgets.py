@@ -13,32 +13,36 @@ from time import time
 import exchtran.settings
 import os
 
+
+"""
+
+To add widgets to a component:
+1) Put this code in the component's Python edit function
+widgetCount = request.POST.get("widgetCount")
+widgets = []
+for i in range(int(widgetCount)):
+	widgets.append(int(request.POST.get("widgetSelect_" + str(i+1))))
+
+(Be sure to add the widgets list to the component object)
+
+2) Put this code in the component's HTML edit template
+{% include "widgets/addWidgets.html" %}
+
+3) Put this code in the component's Python display function
+widgets = prepareWidgets(request.session['exchangeParameters'].widgets)
+
+4) Put this code in the component's HTML display template in the Right Col div
+{{widgets}}
+
+"""
+
+
 # 
 # Prepare Widgets
 #
 def prepareWidgets(widgetIDList):
 	"""Goes through each widget in widgetIDList an renders the templates. 
-	All the template text is concated and returned
-	
-	To add widgets to a component:
-	1) Put this code in the component's Python edit function
-	widgetCount = request.POST.get("widgetCount")
-	widgets = []
-	for i in range(int(widgetCount)):
-		widgets.append(int(request.POST.get("widgetSelect_" + str(i+1))))
-
-	(Be sure to add the widgets list to the component object)
-
-	2) Put this code in the component's HTML edit template
-	{% include "widgets/addWidgets.html" %}
-
-	3) Put this code in the component's Python display function
-	widgets = prepareWidgets(request.session['exchangeParameters'].widgets)
-
-	4) Put this code in the component's HTML display template in the Right Col div
-	{{widgets}}
-	
-	"""
+	All the template text is concated and returned"""
 	counter = 1
 	renderedWidgets = ""
 	for widgetID in widgetIDList:
@@ -53,21 +57,19 @@ def prepareWidgets(widgetIDList):
 
 
 
-
-
-
 # 
 # Timer Widget
 # 
-
 class widgetTimerObj(object):
 	"""A Data structure holding a timer widget object"""
 	def __init__(	self, 
 					mins = 3,
-					secs = 30
+					secs = 30,
+					label = "Time remaining for this round"
 				):
 		self.mins = mins
 		self.secs = secs
+		self.label = label
 		
 @login_required
 def timerDisplay(request):
@@ -86,7 +88,8 @@ def timerEdit(request):
 		
 	componentParams = widgetTimerObj(
 									mins = request.POST.get("mins"),
-									secs = request.POST.get("secs")
+									secs = request.POST.get("secs"),
+									label = request.POST.get("label")
 									)
 
 	c = Component.objects.get(id=comID)
@@ -110,12 +113,14 @@ class widgetImageObj(object):
 					fileName = None,
 					filePath = None,
 					fileType = None,
-					webPath = None
+					webPath = None,
+					label = None
 				):
 		self.fileName = fileName
 		self.filePath = filePath
 		self.fileType = fileType
 		self.webPath = webPath
+		self.label = label
 
 @login_required
 def imageDisplay(request):
@@ -133,6 +138,7 @@ def imageEdit(request):
 	
 	comID = request.POST.get("comIM")
 	c = Component.objects.get(id=comID)
+	oldParameters = pickle.loads(c.parameters)
 	
 	# Handle file upload
 	try:
@@ -141,11 +147,12 @@ def imageEdit(request):
 		fileType = request.FILES['imageUpload']['content-type']
 		webPath = "/site_media/uploads/" + fileName
 	except:
-		pass
+		# There isn't a new fil to upload, so just update the label field
+		oldParameters.label = request.POST.get("label")
+		c.parameters = pickle.dumps(oldParameters)
 	else:
 		
 		# Check for previously uploaded images, delete if found
-		oldParameters = pickle.loads(c.parameters)
 		if(oldParameters.filePath != None):
 			os.remove(oldParameters.filePath)
 		
@@ -159,7 +166,8 @@ def imageEdit(request):
 									fileName = fileName,
 									filePath = filePath,
 									fileType = fileType,
-									webPath = webPath
+									webPath = webPath,
+									label = request.POST.get("label")
 									)
 		c.parameters = pickle.dumps(componentParams)
 	
