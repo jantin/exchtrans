@@ -132,65 +132,25 @@
 XY Value preview dialog
 
 */
-#valuePreviewDialog{
+#valuePreview{
+	margin-left:20px;
+	border: 1px solid #999;
+	padding:10px;
+}
+
+#possibleVariables{
 	display:none;
 }
 
-.valuePreviewDialog .ui-dialog,
-.valuePreviewDialog.ui-dialog {
-	background-color: #e6f7d4;
-}
 
-.valuePreviewDialog .ui-dialog .ui-dialog-titlebar,
-.valuePreviewDialog.ui-dialog .ui-dialog-titlebar {
-	border-bottom: 1px solid #d8d2aa;
-	background: #ff9900;
-	padding: 0px;
-	cursor: move;
-	height: 28px;
-	_height: 29px;
-}
 
-.valuePreviewDialog .ui-dialog .ui-dialog-titlebar-close,
-.valuePreviewDialog.ui-dialog .ui-dialog-titlebar-close {
-	width: 16px;
-	height: 16px;
-	position:absolute;
-	top: 6px;
-	right: 7px;
-	cursor: default;
-}
 
-.valuePreviewDialog .ui-dialog .ui-dialog-titlebar-close-hover,
-.valuePreviewDialog.ui-dialog .ui-dialog-titlebar-close-hover {
-}
 
-.valuePreviewDialog .ui-dialog .ui-dialog-title,
-.valuePreviewDialog.ui-dialog .ui-dialog-title {
-	margin-left: 5px;
-	color: white;
-	font-weight: bold;
-	position: relative;
-	top: 7px;
-	left: 4px;
-}
 
-.valuePreviewDialog .ui-dialog .ui-dialog-content,
-.valuePreviewDialog.ui-dialog .ui-dialog-content {
-	margin: 1.2em;
-}
 
-.valuePreviewDialog .ui-dialog .ui-dialog-buttonpane,
-.valuePreviewDialog.ui-dialog .ui-dialog-buttonpane {
-	position: absolute;
-	bottom: 8px;
-	right: 12px;
-	width: 100%;
-	text-align: right;
-}
 
-.valuePreviewDialog .ui-dialog .ui-dialog-buttonpane button,
-.valuePreviewDialog.ui-dialog .ui-dialog-buttonpane button {
-	margin: 6px;
-}
+
+
+
+
 

@@ -55,55 +55,98 @@
 			p2yValue: $("#p2yValue").val()
 		}
 		
-		if( options['whichPlayer'] == "p1"){
-			xValue = parseValueInput(options['p1xValue'], options);
-			yValue = parseValueInput(options['p1yValue'], options);
-			availableX = options['p1x'];
-			availableY = options['p1y'];
-		} else {
-			xValue = parseValueInput(options['p2xValue'], options);
-			yValue = parseValueInput(options['p2yValue'], options);
-			availableX = options['p2x'];
-			availableY = options['p2y'];
+		options['p1xValue'] = parseValueInput(options['p1xValue'], options);
+		options['p1yValue'] = parseValueInput(options['p1yValue'], options);
+		options['p2xValue'] = parseValueInput(options['p2xValue'], options);
+		options['p2yValue'] = parseValueInput(options['p2yValue'], options);
+		
+		// If any of the value fields have errors, update the point value table and return
+		if(!(options['p2yValue'] && options['p2xValue'] && options['p1yValue'] && options['p1xValue'])){
+			$("#offerFormulationP1Points").html("--");
+			$("#offerFormulationP2Points").html("--");
+			return false;
 		}
 		
 		// Calculate the current number of points held by the player this round
-		initialPoints = (availableX * xValue) + (availableY * yValue);
+		p1InitialPoints = (options['p1x'] * options['p1xValue']) + (options['p1yValue'] * options['p1yValue']);
+		p2InitialPoints = (options['p2x'] * options['p2xValue']) + (options['p2yValue'] * options['p2yValue']);
 		
 		// Calculate the loss from offering
 		if(options['offerUnit'] == "x"){
-			// Check that the input value is not beyond the available amount
-			if(parseInt(options['offer']) > parseInt(availableX)) {
-				options['offer'] = availableX;
-				$("#offerFormulationOffer").val(options['offer']);
-				$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
+			if(options['whichPlayer'] == "p1"){
+				// Check that the input value is not beyond the available amount
+				if(parseInt(options['offer']) > parseInt(options['p1x'])) {
+					options['offer'] = options['p1x'];
+					$("#offerFormulationOffer").val(options['offer']);
+					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
+				}
+				p1Loss = options['offer'] * options['p1xValue'];
+				p2Loss = options['request'] * options['p2xValue'];
+			} else {
+				if(parseInt(options['offer']) > parseInt(options['p2x'])) {
+					options['offer'] = options['p2x'];
+					$("#offerFormulationOffer").val(options['offer']);
+					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
+				}
+				p1Loss = options['request'] * options['p1xValue'];
+				p2Loss = options['offer'] * options['p2xValue'];
 			}
-			loss = options['offer'] * xValue;
 		} else {
-			// Check that the input value is not beyond the available amount
-			if(parseInt(options['offer']) > parseInt(availableY)) {
-				options['offer'] = availableY;
-				$("#offerFormulationOffer").val(options['offer']);
-				$("#offerFormulationOfferError").html("You only have " + availableY + " " + options['offerUnit']);
+			if(options['whichPlayer'] == "p1"){
+				if(parseInt(options['offer']) > parseInt(options['p1y'])) {
+					options['offer'] = options['p2x'];
+					$("#offerFormulationOffer").val(options['offer']);
+					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
+				}
+				p1Loss = options['offer'] * options['p1yValue'];
+				p2Loss = options['request'] * options['p2yValue'];
+			} else {
+				if(parseInt(options['offer']) > parseInt(options['p2y'])) {
+					options['offer'] = options['p2x'];
+					$("#offerFormulationOffer").val(options['offer']);
+					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
+				}
+				p1Loss = options['request'] * options['p1yValue'];
+				p2Loss = options['offer'] * options['p2yValue'];
 			}
-			loss = options['offer'] * yValue;
 		}
 		
 		// Calculate the potential gain from the request
 		if(options['requestUnit'] == "x"){
-			gain = options['request'] * xValue;
+			if(options['whichPlayer'] == "p1"){
+				p1Gain = options['request'] * options['p1xValue'];
+				p2Gain = options['offer'] * options['p2xValue'];
+			} else {
+				p1Gain = options['offer'] * options['p1xValue'];
+				p2Gain = options['request'] * options['p2xValue'];
+			}
 		} else {
-			gain = options['request'] * yValue;
+			if(options['whichPlayer'] == "p1"){
+				p1Gain = options['request'] * options['p1yValue'];
+				p2Gain = options['offer'] * options['p2yValue'];
+			} else {
+				p1Gain = options['offer'] * options['p1yValue'];
+				p2Gain = options['request'] * options['p2yValue'];
+			}
 		}
 		
 		// calculate the potential points
-		pointsPreview = initialPoints + (gain - loss);		
-		//alert(pointsPreview);
+		p1Points = p1InitialPoints + (p1Gain - p1Loss);
+		p2Points = p2InitialPoints + (p2Gain - p2Loss);		
+		
+		// alert("p1Points: " + p1Points);
+		// 		alert("p2Points: " + p2Points);
+		
 		// Display the preview points
-		$("#offerFormulationPoints").html(pointsPreview);
+		$("#offerFormulationP1Points").html(String(p1Points));
+		$("#offerFormulationP2Points").html(String(p2Points));
+		
+		return true;
 	}
 	
 	function parseValueInput(valueInput, options){
+		
+		originalValueInput = valueInput;
 		
 		//Check if input is just digits, if so return value input right away
 		if(/^\d+$/.test(valueInput)){
@@ -118,7 +161,6 @@
 			valueInput = valueInput.replace(/Ox/g, "0");
 			valueInput = valueInput.replace(/Oy/g, options['offer']);
 		}
-		
 		if(options['requestUnit'] == "x"){
 			valueInput = valueInput.replace(/Rx/g, options['request']);
 			valueInput = valueInput.replace(/Ry/g, "0");
@@ -126,14 +168,31 @@
 			valueInput = valueInput.replace(/Rx/g, "0");
 			valueInput = valueInput.replace(/Ry/g, options['request']);
 		}
+		if(options['whichPlayer'] == "p1"){
+			valueInput = valueInput.replace(/Axo/g, options['p1x']);
+			valueInput = valueInput.replace(/Ayo/g, options['p1y']);
+			valueInput = valueInput.replace(/Axr/g, options['p2x']);
+			valueInput = valueInput.replace(/Ayr/g, options['p2y']);
+		} else {
+			valueInput = valueInput.replace(/Axo/g, options['p2x']);
+			valueInput = valueInput.replace(/Ayo/g, options['p2y']);
+			valueInput = valueInput.replace(/Axr/g, options['p1x']);
+			valueInput = valueInput.replace(/Ayr/g, options['p1y']);
+		}
+
 		
-		valueInput = valueInput.replace(/Ax/g, options[options['whichPlayer'] + 'x']);
-		valueInput = valueInput.replace(/Ay/g, options[options['whichPlayer'] + 'y']);
 		
-		
-		alert(eval(valueInput));
 		//evaluate value expression and return it
-		return eval(valueInput);
+		try{
+			value = eval(valueInput);
+		} catch(err){
+			msg = "There is an error in one of your value fields!\n\n";
+			msg += "You entered: "+ originalValueInput + "\n";
+			msg += "Error: Syntax Error";
+			alert(msg);
+			value = false;
+		}
+		return value;
 	}
 </script>
 
@@ -220,12 +279,20 @@
 		<td>The number of Y's requested</td>
 	</tr>
 	<tr>
-		<td>Ax</td>
-		<td>The number of X's available to offer</td>
+		<td>Axo</td>
+		<td>The number of X's available to the offerer</td>
 	</tr>
 	<tr>
-		<td>Ay</td>
-		<td>The number of Y's available to offer</td>
+		<td>Ayo</td>
+		<td>The number of Y's available to the offerer</td>
+	</tr>
+	<tr>
+		<td>Axr</td>
+		<td>The number of X's available to the requester</td>
+	</tr>
+	<tr>
+		<td>Ayr</td>
+		<td>The number of Y's available to the requester</td>
 	</tr>
 </table>
 <br/><br/>
@@ -234,8 +301,8 @@
 	<tr><th></th><th>Player 1</th><th>Player 2</th></tr>
 	<tr>
 		<th>Total Points</th>
-		<td><span id="offerFormulationPoints">0</span></td>
-		<td><span id="offerFormulationPoints">0</span></td>
+		<td><span id="offerFormulationP1Points">0</span></td>
+		<td><span id="offerFormulationP2Points">0</span></td>
 	</tr>
 </table>
 <input type="button" name="refreshValues" value="Refresh Values" id="refreshValues">

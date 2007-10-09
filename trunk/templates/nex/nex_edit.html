@@ -5,6 +5,7 @@
 
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.alphanumeric.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/yav.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.dimensions.pack.js"></script>
@@ -38,19 +39,225 @@
 				width:500, 
 				buttons:{
 					close:function(){
-						$("#valuePreview").dialogClose()
+						$("#valuePreview").dialogClose();
 					}
 				}
 			});
 		})
 		
-
+		$('.offerFormulationInputs').numeric();
+		$('#refreshValues').click(function(){
+			offerFormulationProcessInput();
+		});
+		$("#variableListToggle").click(function() {
+			$("#possibleVariables").slideToggle(300);
+			return false;
+		});
+		$("#valuePreviewToggle").click(function() {
+			$("#valuePreview").slideToggle(300);
+			return false;
+		});
+		
 	});
 	
-	
-	
-</script>
+	// Updates the "This deal would get you" number on the offerFormulation screen
+	// Called on keyup of the input fields of the offerFormulation screen
+	function offerFormulationProcessInput(){		
+		// Clear the error if present
+		$("#offerFormulationOfferError").html("");
+		$("#offerFormulationRequestError").html("");
+		
+		var errorFlag = false;
+		
+		// Set up all our working variables
+		options = {
+			whichPlayer: $('#whichPlayer').val(),
+			offer: $("#offerFormulationOffer").val(),
+			request: $("#offerFormulationRequest").val(),
+			offerUnit: $("#offerFormulationOfferUnit").val(),
+			requestUnit: $("#offerFormulationRequestUnit").val(),
+			p1x: $("#p1x").val(),
+			p2x: $("#p2x").val(),
+			p1y: $("#p1y").val(),
+			p2y: $("#p2y").val(),
+			p1xValue: $("#p1xValue").val(),
+			p2xValue: $("#p2xValue").val(),
+			p1yValue: $("#p1yValue").val(),
+			p2yValue: $("#p2yValue").val(),
+			p1xMaxRequest: $("#p1xMaxRequest").val(),
+			p1yMaxRequest: $("#p1yMaxRequest").val(),
+			p2xMaxRequest: $("#p2xMaxRequest").val(),
+			p2yMaxRequest: $("#p2yMaxRequest").val()
+		}
+		
+		options['p1xValue'] = parseValueInput(options['p1xValue'], options);
+		options['p1yValue'] = parseValueInput(options['p1yValue'], options);
+		options['p2xValue'] = parseValueInput(options['p2xValue'], options);
+		options['p2yValue'] = parseValueInput(options['p2yValue'], options);
+		
+		// If any of the value fields have errors, update the point value table and return
+		if(!(options['p2yValue'] >= 0 && options['p2xValue'] >= 0 && options['p1yValue'] >= 0 && options['p1xValue'] >= 0)){
+			errorFlag = true;
+		}
+		
+		// Calculate the current number of points held by the player this round
+		p1InitialPoints = (options['p1x'] * options['p1xValue']) + (options['p1y'] * options['p1yValue']);
+		p2InitialPoints = (options['p2x'] * options['p2xValue']) + (options['p2y'] * options['p2yValue']);
+		
+		// Calculate the loss from offering
+		if(options['offerUnit'] == "x"){
+			if(options['whichPlayer'] == "p1"){
+				// Check that the input value is not beyond the available amount
+				if(parseInt(options['offer']) > parseInt(options['p1x'])) {
+					$("#offerFormulationOfferError").html("You only have " + options['p1x'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Loss = options['offer'] * options['p1xValue'];
+				p2Loss = options['request'] * options['p2xValue'];
+				
+			} else {
+				if(parseInt(options['offer']) > parseInt(options['p2x'])) {
+					$("#offerFormulationOfferError").html("You only have " + options['p2x'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Loss = options['request'] * options['p1xValue'];
+				p2Loss = options['offer'] * options['p2xValue'];
+			}
+		} else {
+			if(options['whichPlayer'] == "p1"){
+				if(parseInt(options['offer']) > parseInt(options['p1y'])) {
+					$("#offerFormulationOfferError").html("You only have " + options['p1y'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Loss = options['offer'] * options['p1yValue'];
+				p2Loss = options['request'] * options['p2yValue'];
+			} else {
+				if(parseInt(options['offer']) > parseInt(options['p2y'])) {
+					$("#offerFormulationOfferError").html("You only have " + options['p2y'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Loss = options['request'] * options['p1yValue'];
+				p2Loss = options['offer'] * options['p2yValue'];
+			}
+		}
+		
+		// Calculate the potential gain from the request
+		if(options['requestUnit'] == "x"){
+			if(options['whichPlayer'] == "p1"){
+				// Check that the input value is not beyond the available amount
+				if(parseInt(options['request']) > parseInt(options['p1xMaxRequest'])) {
+					$("#offerFormulationRequestError").html("Request less than " + options['p1xMaxRequest'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Gain = options['request'] * options['p1xValue'];
+				p2Gain = options['offer'] * options['p2xValue'];
+			} else {
+				if(parseInt(options['request']) > parseInt(options['p2xMaxRequest'])) {
+					$("#offerFormulationRequestError").html("Request less than " + options['p2xMaxRequest'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Gain = options['offer'] * options['p1xValue'];
+				p2Gain = options['request'] * options['p2xValue'];
+			}
+		} else {
+			if(options['whichPlayer'] == "p1"){
+				if(parseInt(options['request']) > parseInt(options['p1yMaxRequest'])) {
+					$("#offerFormulationRequestError").html("Request less than " + options['p1yMaxRequest'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Gain = options['request'] * options['p1yValue'];
+				p2Gain = options['offer'] * options['p2yValue'];
+			} else {
+				if(parseInt(options['request']) > parseInt(options['p2yMaxRequest'])) {
+					$("#offerFormulationRequestError").html("Request less than " + options['p2yMaxRequest'] + " " + options['offerUnit']);
+					errorFlag = true;
+				}
+				p1Gain = options['offer'] * options['p1yValue'];
+				p2Gain = options['request'] * options['p2yValue'];
+			}
+		}
 
+		// calculate the potential points
+		p1Points = p1InitialPoints + (p1Gain - p1Loss);
+		p2Points = p2InitialPoints + (p2Gain - p2Loss);		
+		
+		// alert("p1InitialPoints: " + p1InitialPoints);
+		// alert("p1Gain: " + p1Gain);
+		// alert("p1Loss: " + p1Loss);
+		// alert("p1Points: " + p1Points);
+		// 
+		// alert("p2InitialPoints: " + p2InitialPoints);
+		// alert("p2Gain: " + p2Gain);
+		// alert("p2Loss: " + p2Loss);
+		// alert("p2Points: " + p2Points);
+		// 
+		// alert("p1Points: " + p1Points);
+		// alert("p2Points: " + p2Points);
+		
+		if(errorFlag){
+			$("#offerFormulationP1Points").html("ERROR");
+			$("#offerFormulationP2Points").html("ERROR");
+		} else {
+			// Display the preview points
+			$("#offerFormulationP1Points").html(String(p1Points));
+			$("#offerFormulationP2Points").html(String(p2Points));
+		}
+
+		return true;
+	}
+	
+	function parseValueInput(valueInput, options){
+		
+		originalValueInput = valueInput;
+		
+		//Check if input is just digits, if so return value input right away
+		if(/^\d+$/.test(valueInput)){
+			return valueInput;	
+		}
+		//replace variables if present
+		if(options['offerUnit'] == "x"){
+			valueInput = valueInput.replace(/Ox/g, options['offer']);
+			valueInput = valueInput.replace(/Oy/g, "0");
+		} else {
+			valueInput = valueInput.replace(/Ox/g, "0");
+			valueInput = valueInput.replace(/Oy/g, options['offer']);
+		}
+		if(options['requestUnit'] == "x"){
+			valueInput = valueInput.replace(/Rx/g, options['request']);
+			valueInput = valueInput.replace(/Ry/g, "0");
+		} else {
+			valueInput = valueInput.replace(/Rx/g, "0");
+			valueInput = valueInput.replace(/Ry/g, options['request']);
+		}
+		if(options['whichPlayer'] == "p1"){
+			valueInput = valueInput.replace(/Axo/g, options['p1x']);
+			valueInput = valueInput.replace(/Ayo/g, options['p1y']);
+			valueInput = valueInput.replace(/Axr/g, options['p2x']);
+			valueInput = valueInput.replace(/Ayr/g, options['p2y']);
+		} else {
+			valueInput = valueInput.replace(/Axo/g, options['p2x']);
+			valueInput = valueInput.replace(/Ayo/g, options['p2y']);
+			valueInput = valueInput.replace(/Axr/g, options['p1x']);
+			valueInput = valueInput.replace(/Ayr/g, options['p1y']);
+		}
+
+		//evaluate value expression and return it
+		try{
+			value = eval(valueInput);
+			value = Math.round(value);
+		} catch(err){
+			msg = "There is an error in one of your value fields!\n\n";
+			msg += "You entered: "+ originalValueInput + "\n";
+			msg += "Error: Syntax Error";
+			alert(msg);
+			value = false;
+		}
+		
+		return value;
+	}
+		
+
+</script>
 {% endblock %}
 
 {% block bodyid %}tab3{% endblock %}
@@ -80,6 +287,52 @@
 		<td></td>
 		<th>Player 1</th>
 		<th>Player 2</th>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td rowspan="12">
+			<div id="valuePreview">
+				<h3>XY Value Tester</h3>
+				<p>Use this form to test how many points an offer will get each player. The initial and value fields to the left are used to calculate points.</p>
+				<h4>Offer Setup</h4>
+				<p>Who is the offer from?</p>
+				<p>
+				<select name="whichPlayer" id="whichPlayer">
+					<option value="p1">Player 1</option>
+					<option value="p2">Player 2</option>
+				</select>
+				</p>
+				<p>What will the player give?</p>
+				<p>
+					<input type="text" name="offerFormulationOffer" id="offerFormulationOffer" class="offerFormulationInputs" value="0" size="4"/>
+					<select name="offerFormulationOfferUnit" id="offerFormulationOfferUnit">
+						<option>x</option>
+						<option>y</option>
+					</select>
+					<span id="offerFormulationOfferError" class="offerFormulationError"></span>
+				</p>
+				<p>What does the player want in return?</p>
+				<p>
+					<input type="text" name="offerFormulationRequest" id="offerFormulationRequest" class="offerFormulationInputs" value="0" size="4"/>
+					<select name="offerFormulationRequestUnit" id="offerFormulationRequestUnit">
+						<option>y</option>
+						<option>x</option>
+					</select>
+					<span id="offerFormulationRequestError" class="offerFormulationError"></span>
+				</p>
+				<h4>Points</h4>
+				<p>				
+				Player 1 would get: <span id="offerFormulationP1Points">--</span><br/>
+				Player 2 would get: <span id="offerFormulationP2Points">--</span>
+				</p>
+				
+				<input type="button" name="refreshValues" value="Refresh Points" id="refreshValues">
+
+			</div>
+		</td>
 	</tr>
 	<tr>
 		<th>Initial X</th>
@@ -93,18 +346,66 @@
 	</tr>
 	<tr>
 		<th>X Value</th>
-		<td><input type="text" name="p1xValue" value="{{parameters.p1xValue}}" size="20" id="p1xValue" class="required integer" title="You must enter an integer value."/></td>
-		<td><input type="text" name="p2xValue" value="{{parameters.p2xValue}}" size="20" id="p2xValue" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p1xValue" value="{{parameters.p1xValue}}" size="20" id="p1xValue" class="required" title="You must enter a value."/></td>
+		<td><input type="text" name="p2xValue" value="{{parameters.p2xValue}}" size="20" id="p2xValue" class="required" title="You must enter a value."/></td>
 	</tr>
 	<tr>
 		<th>Y Value</th>
-		<td><input type="text" name="p1yValue" value="{{parameters.p1yValue}}" size="20" id="p1yValue" class="required integer" title="You must enter an integer value."/></td>
-		<td><input type="text" name="p2yValue" value="{{parameters.p2yValue}}" size="20" id="p2yValue" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p1yValue" value="{{parameters.p1yValue}}" size="20" id="p1yValue" class="required" title="You must enter a value."/></td>
+		<td><input type="text" name="p2yValue" value="{{parameters.p2yValue}}" size="20" id="p2yValue" class="required" title="You must enter a value."/></td>
 	</tr>
 	<tr>
 		<th></th>
-		<td colspan="2"><a href="#" id="dialogOpenerLink">Open XY Value Helper</a></td>
+		<td colspan="2"><a href="#" id="variableListToggle">Toggle Variable List</a></td>
 	</tr>
+	<tr>
+		<th></th>
+		<td colspan="2">
+			<div id="possibleVariables">
+				Use these variables when constructing value formulas. You can also use JavaScript <a href="http://www.google.com/search?q=javascript%20math%20functions">math functions</a>. 
+				<br/> <code>Example: Ox * 2</code>
+				<br/> <code>Example: 2 + (Axo / 2)</code>
+				<br/> <code>Example: Math.pow(Ox,2)</code>
+				<table>
+					<tr>
+						<th>Variable</th>
+						<th>Description</th>
+					</tr>
+					<tr>
+						<td>Ox</td>
+						<td>The number of X's offered</td>
+					</tr>
+					<tr>
+						<td>Oy</td>
+						<td>The number of Y's offered</td>
+					</tr>
+					<tr>
+						<td>Rx</td>
+						<td>The number of X's requested</td>
+					</tr>
+					<tr>	
+						<td>Ry</td>
+						<td>The number of Y's requested</td>
+					</tr>
+					<tr>
+						<td>Axo</td>
+						<td>The number of X's available to the offerer</td>
+					</tr>
+					<tr>
+						<td>Ayo</td>
+						<td>The number of Y's available to the offerer</td>
+					</tr>
+					<tr>
+						<td>Axr</td>
+						<td>The number of X's available to the requester</td>
+					</tr>
+					<tr>
+						<td>Ayr</td>
+						<td>The number of Y's available to the requester</td>
+					</tr>
+				</table>
+			</div>
+		</td>
 	<tr>
 		<th>Replenish X</th>
 		<td><input type="text" name="p1xReplenish" value="{{parameters.p1xReplenish}}" size="3" id="p1xReplenish" class="required integer" title="You must enter an integer value."/></td>
@@ -142,9 +443,6 @@
 		<td><input type="text" name="p2yMaxRequest" value="{{parameters.p2yMaxRequest}}" size="3" id="p2yMaxRequest" class="required integer" title="You must enter an integer value."/></td>
 	</tr>
 </table>
-
-
-<div id="valuePreview" class="valuePreviewDialog" title="Use this form to check your values" >I'm in a dialog!</div>
 
 <!-- <h2>Time</h2>
 <table>
