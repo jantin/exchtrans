@@ -1,0 +1,18 @@
+#labels Phase-QA
+=Testing procedures=
+This page describes steps for testing exchtrans
+
+==Testing component, experiment, and session creation==
+  # Go to http://exchtrans.homeip.net
+  # Click on the components tab. 
+  # Create new components of each type. Note that negotiated exchange components integrate with widgets. So you need to have widget components build before you can add them to negotiated exchange components. Likewise, matcher components require negotiated exchange and reciprocal exchange components.
+  # Click on the experiment tab and make a new experiment. Add components to the experiment, reorder them (drag and drop) and save the experiment.
+  # click on the sessions tab and create a new session from the experiment you made in step 4.
+
+==Testing experiment monitoring==
+  # make an experiment with four text page components. 
+  # make a new session with the text page experiment. After you make a new session you're dropped into the monitoring screen. 
+  # go back to the sessions tab. Shift click on the join link. This will open a new window representing a participant. Go back to the first window and shift click the join link again to open a third window. You should now have three windows: two participant windows and one window showing you the sessions.
+  # in the sessions window, click on the link to monitor the text page experiment. You should see a column for each participant.
+  # Click on the start session link. The two participant windows should change after a few seconds to the first text page. 
+  # advance the participant windows through the experiment. Each component the participant completes will be reflected in the monitoring screen. You do not need to refresh the monitoring screen. The status table is automatically updated every three seconds. 
