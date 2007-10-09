@@ -1,5 +1,4 @@
 #labels Phase-QA
-=Testing procedures=
 This page describes steps for testing exchtrans
 
 ==Testing component, experiment, and session creation==
