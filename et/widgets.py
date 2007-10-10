@@ -147,7 +147,7 @@ def imageEdit(request):
 		fileType = request.FILES['imageUpload']['content-type']
 		webPath = "/site_media/uploads/" + fileName
 	except:
-		# There isn't a new fil to upload, so just update the label field
+		# There isn't a new file to upload, so just update the label field
 		oldParameters.label = request.POST.get("label")
 		c.parameters = pickle.dumps(oldParameters)
 	else:

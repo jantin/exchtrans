@@ -14,6 +14,7 @@
 <script type="text/javascript" charset="utf-8">
 var participants = new Array();
 var componentCount = {{experimentComponents.count}};
+var sid = {{monitorSession.id}};
 var participantCount = 0;
 
 $(document).ready(function() {
@@ -27,13 +28,17 @@ function updateMonitor(){
 						dataType: "json", 
 						success: function(pollResponseJSON){
 							// pollResponseJSON is an array of participant objects
-							for(var i=0; i < pollResponseJSON.length; i++){
+							participantsJSON = pollResponseJSON['participants'];
+							
+							$('#expStatus').html(pollResponseJSON['experimentStatus']);
+							
+							for(var i=0; i < participantsJSON.length; i++){
 								//If we don't already know about the participant, add them
-								if(!participants[pollResponseJSON[i].name]){
-									addParticipant(pollResponseJSON[i]);
+								if(!participants[participantsJSON[i].name]){
+									addParticipant(participantsJSON[i]);
 								}
 								//update the participant's column
-								updateParticipantStatus(pollResponseJSON[i]);
+								updateParticipantStatus(participantsJSON[i]);
 							}
 						}
 					}
@@ -62,7 +67,7 @@ function addParticipant(pObject){
 	pDiv += '			Name: ' + pObject.name + '<br/>';
 	pDiv += '			Identity Letter: ' + pObject.identityLetter + '<br/>';
 	pDiv += '			Player Number: ' + (pObject.number+1) + '<br/>';
-	pDiv += '			<a href="/sessions/monitor/bootParticipant/?pid='+ pObject.id +'&sid=57" class="deleteLink">Remove Participant</a>';	
+	pDiv += '			<a href="/sessions/monitor/bootParticipant/?pid='+ pObject.id +'&sid=' + sid + '" class="deleteLink">Remove Participant</a>';	
 	pDiv += '		</div>';
 	pDiv += '	</div>';
 	for(var i=0; i < componentCount; i++){
@@ -112,7 +117,7 @@ function updateParticipantStatus(pObject){
 	</div>
 	<div id="sessionInfo">
 		<p><strong>Session ID:</strong> {{ monitorSession.id }}</p>
-		<p><strong>Status:</strong> {{ monitorSession.status.statusText }}</p>
+		<p><strong>Status:</strong> <span id="expStatus">{{ monitorSession.status.statusText }}</span></p>
 	</div>
 	{% if running %}
 	<a href="/session/stop/?sid={{ monitorSession.id }}">Stop Session</a>

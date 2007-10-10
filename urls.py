@@ -4,43 +4,44 @@ from exchtran.et.views import *
 
 urlpatterns = patterns('',
 	# ET Admin Pages
-	(r'^$', 'exchtran.et.views.sessions'),
-	(r'^sessions/$', 'exchtran.et.views.sessions'),
+	(r'^$', 'exchtran.et.session.sessions'),
 	
+	
+	# Monitoring
 	(r'^sessions/monitor/$', 'exchtran.et.monitor.monitor'),
 	(r'^sessions/monitor/updatePollProcess/$', 'exchtran.et.monitor.updatePollProcess'),
 	(r'^sessions/monitor/bootParticipant/$', 'exchtran.et.monitor.bootParticipant'),
 
-	(r'^experiments/$', 'exchtran.et.views.experiments'),
-	(r'^experiments/view/$', 'exchtran.et.views.viewExperiment'),				
-	(r'^experiments/edit/$', 'exchtran.et.views.edit'),
-	(r'^experiments/edit/addComponent/$', 'exchtran.et.views.addComponent'),
-	(r'^experiments/edit/removeComponent/$', 'exchtran.et.views.removeComponent'),
-	(r'^experiments/edit/updateExperimentName/$', 'exchtran.et.views.updateExperimentName'),
-	(r'^experiments/edit/updateExperimentDescription/$', 'exchtran.et.views.updateExperimentDescription'),	
-	(r'^experiments/edit/newExperiment/$', 'exchtran.et.views.newExperiment'),	
-	(r'^experiments/delete/$', 'exchtran.et.views.experimentDelete'),
-	(r'^experiments/newSession/$', 'exchtran.et.views.newSession'),
+	# Experiments
+	(r'^experiments/$', 'exchtran.et.experiment.experiments'),
+	(r'^experiments/view/$', 'exchtran.et.experiment.viewExperiment'),				
+	(r'^experiments/edit/$', 'exchtran.et.experiment.edit'),
+	(r'^experiments/edit/addComponent/$', 'exchtran.et.experiment.addComponent'),
+	(r'^experiments/edit/removeComponent/$', 'exchtran.et.experiment.removeComponent'),
+	(r'^experiments/edit/newExperiment/$', 'exchtran.et.experiment.newExperiment'),	
+	(r'^experiments/delete/$', 'exchtran.et.experiment.experimentDelete'),
+	(r'^experiments/newSession/$', 'exchtran.et.session.newSession'),
 	
-	(r'^components/$', 'exchtran.et.views.components'),
-	(r'^components/create/$', 'exchtran.et.views.componentCreate'),
-	(r'^components/edit/$', 'exchtran.et.views.componentEdit'),
-	(r'^components/delete/$', 'exchtran.et.views.componentDelete'),
-
-	(r'^users/$', 'exchtran.et.views.users'),
+	# Components
+	(r'^components/$', 'exchtran.et.component.components'),
+	(r'^components/create/$', 'exchtran.et.component.componentCreate'),
+	(r'^components/edit/$', 'exchtran.et.component.componentEdit'),
+	(r'^components/delete/$', 'exchtran.et.component.componentDelete'),
 	
+	# Misc utility pages
 	(r'^scratch/$', 'exchtran.et.views.scratch'),
 	(r'^httpRPS/$', 'exchtran.et.views.httpRPS'),
 	
 	# ET Experiment Session Pages
-	(r'^session/join/$', 'exchtran.et.views.joinSession'),
-	(r'^session/wait/$', 'exchtran.et.views.wait'),
-	(r'^session/start/$', 'exchtran.et.views.startSession'),
-	(r'^session/stop/$', 'exchtran.et.views.stopSession'),	
-	(r'^session/drive/$', 'exchtran.et.views.driveSession'),
-	(r'^session/delete/$', 'exchtran.et.views.deleteSession'),
-	(r'^session/end/$', 'exchtran.et.views.endSession'),
-	(r'^session/booted/$', 'exchtran.et.views.booted'),
+	(r'^sessions/$', 'exchtran.et.session.sessions'),
+	(r'^session/join/$', 'exchtran.et.session.joinSession'),
+	(r'^session/wait/$', 'exchtran.et.session.wait'),
+	(r'^session/start/$', 'exchtran.et.session.startSession'),
+	(r'^session/stop/$', 'exchtran.et.session.stopSession'),	
+	(r'^session/drive/$', 'exchtran.et.session.driveSession'),
+	(r'^session/delete/$', 'exchtran.et.session.deleteSession'),
+	(r'^session/end/$', 'exchtran.et.session.endSession'),
+	(r'^session/booted/$', 'exchtran.et.session.booted'),
 			
 	# Registration Pages
 	(r'^login/$', 'django.contrib.auth.views.login'),

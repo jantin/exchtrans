@@ -1,0 +1,1549 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>adminUI</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">adminUI</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new component</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>nex test (selenium)</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>componentType</td>
+	<td>label=Negotiated Exchange</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentDescription</td>
+	<td>Description here</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>nex test (selenium) updated</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yReplenish</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yReplenish</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>p1Clearing</td>
+	<td>label=End of module</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>p2Clearing</td>
+	<td>label=End of module</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yMaxRequest</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yMaxRequest</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>offerFormulationOffer</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>offerFormulationRequest</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>refreshValues</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>offerFormulationP1Points</td>
+	<td>400</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>offerFormulationP2Points</td>
+	<td>400</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>offerFormulationOffer</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>offerFormulationRequest</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>refreshValues</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>offerFormulationP1Points</td>
+	<td>340</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>offerFormulationP2Points</td>
+	<td>460</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>whichPlayer</td>
+	<td>label=Player 2</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>refreshValues</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>offerFormulationP1Points</td>
+	<td>460</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>offerFormulationP1Points</td>
+	<td>460</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>variableListToggle</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyVisible</td>
+	<td>possibleVariables</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>variableListToggle</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyNotVisible</td>
+	<td>possibleVariables</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>nonBinding</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>showPoints</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>displayName</td>
+	<td>Displaying Name (selenium)</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Edit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentName</td>
+	<td>nex test (selenium) updated</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>componentDescription</td>
+	<td>Description here</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1y</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2y</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1xValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2xValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1yValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2yValue</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1yReplenish</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2yReplenish</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1yMaxRequest</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2yMaxRequest</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>nonBinding</td>
+	<td>on</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>showPoints</td>
+	<td>on</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>displayName</td>
+	<td>Displaying Name (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//div[2]/div/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new component</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>componentType</td>
+	<td>label=Text Page</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>text Page (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>text Page (selenium) updated</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pointCount</td>
+	<td>My heading</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>body</td>
+	<td>some content</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>buttonLabel</td>
+	<td>Continue</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>enableBack</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/table/tbody/tr[2]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentName</td>
+	<td>text Page (selenium) updated</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>pointCount</td>
+	<td>My heading</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>body</td>
+	<td>some content</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>buttonLabel</td>
+	<td>Continue</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>enableBack</td>
+	<td>on</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new component</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>componentType</td>
+	<td>label=Widget: Bank</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>bank (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>bank (selenium) updated</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>topLabel</td>
+	<td>The Bank</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/table/tbody/tr[1]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentName</td>
+	<td>bank (selenium) updated</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>topLabel</td>
+	<td>The Bank</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new component</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>componentType</td>
+	<td>label=Widget: Image</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>image (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>image (selenium) updated</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>label</td>
+	<td>label text</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>imageUpload</td>
+	<td>/Users/jonlesser/Desktop/Picture 1.png</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentName</td>
+	<td>image (selenium) updated</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>label</td>
+	<td>label text</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[4]/td</td>
+	<td>Picture 1.png</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new component</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>componentType</td>
+	<td>label=Widget: Timer</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>timer (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>timer (selenium) updated</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>label</td>
+	<td>time time time</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>mins</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>secs</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/table/tbody/tr[5]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentName</td>
+	<td>timer (selenium) updated</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>label</td>
+	<td>time time time</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>mins</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>secs</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new component</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>componentType</td>
+	<td>label=Negotiated Exchange</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//label/p</td>
+	<td>You must enter a name.</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>nex test 2 (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1x</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2x</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1y</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2y</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xValue</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xValue</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yValue</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yValue</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xReplenish</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xReplenish</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yReplenish</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yReplenish</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xMaxRequest</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xMaxRequest</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yMaxRequest</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yMaxRequest</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//td[1]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//td[2]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[4]/td[1]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[4]/td[2]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[5]/td[1]/p</td>
+	<td>You must enter a value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[5]/td[2]/p</td>
+	<td>You must enter a value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[6]/td[1]/p</td>
+	<td>You must enter a value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[6]/td[2]/p</td>
+	<td>You must enter a value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[9]/td[1]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[9]/td[2]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[10]/td[1]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[10]/td[2]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[12]/td[1]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[12]/td[2]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[13]/td[1]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//tr[13]/td[2]/p</td>
+	<td>You must enter an integer value.</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//p[3]/p</td>
+	<td>You must enter a display name</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1y</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2y</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p1yMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p2yMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>displayName</td>
+	<td>Display Named</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2x</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1y</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2y</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1xValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2xValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1yValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2yValue</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1yReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2xReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1yReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2yReplenish</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2xMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p1yMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>p2yMaxRequest</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>displayName</td>
+	<td>Display Named</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new component</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>matcher test (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentName</td>
+	<td>matcher test (selenium) updated</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>randomPairingCheck</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=+</td>
+	<td></td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>componentChoices_0</td>
+	<td>label=nex test 2 (selenium) (Negotiated Exchange)</td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>componentChoices_1</td>
+	<td>label=nex test 2 (selenium) (Negotiated Exchange)</td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>componentChoices_1</td>
+	<td>label=nex test (selenium) updated (Negotiated Exchange)</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>rounds_1</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>p1_1</td>
+	<td>label=2</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>p2_1</td>
+	<td>label=4</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>decider_1</td>
+	<td>label=P1</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/table/tbody/tr[3]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentName</td>
+	<td>matcher test (selenium) updated</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>componentDescription</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>rounds_1</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>rounds_0</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>randomPairingCheck</td>
+	<td>off</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>randomPairingCheck</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>randomRounds</td>
+	<td>7</td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>randomChoices</td>
+	<td>label=nex test (selenium) updated (Negotiated Exchange)</td>
+</tr>
+<tr>
+	<td>removeSelection</td>
+	<td>randomChoices</td>
+	<td>label=nex test (selenium) updated (Negotiated Exchange)</td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>randomChoices</td>
+	<td>label=nex test 2 (selenium) (Negotiated Exchange)</td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>randomChoices</td>
+	<td>label=nex test (selenium) updated (Negotiated Exchange)</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/table/tbody/tr[3]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>randomRounds</td>
+	<td>7</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>randomPairingCheck</td>
+	<td>on</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/table/tbody/tr[5]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>widgetAddLink</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>widgetAddLink</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>widgetSelect_2</td>
+	<td>label=image (selenium) updated (Widget: Image)</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>widgetAddLink</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>widgetSelect_3</td>
+	<td>label=timer (selenium) updated (Widget: Timer)</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[3]/span</td>
+	<td>3</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[2]/span</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[1]/span</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[3]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>2</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[2]/span</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>widgetSelect_1</td>
+	<td>bank (selenium) updated (Widget: Bank) image (selenium) updated (Widget: Image) timer (selenium) updated (Widget: Timer)</td>
+</tr>
+<tr>
+	<td>verifyElementNotPresent</td>
+	<td>//div[3]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Changes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/table/tbody/tr[5]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[1]/span</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[2]/span</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Experiments</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new experiment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Create Experiment']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//label/p</td>
+	<td>You must enter a name.</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>experimentName</td>
+	<td>exp test (selenium)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create Experiment']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Add Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>addComponentID</td>
+	<td>label=text Page (selenium) updated (Text Page)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Add Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>addComponentID</td>
+	<td>label=text Page (selenium) updated (Text Page)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Add Component']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[1]/div/div[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//form[2]/div[1]/div[2]/div/div[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[3]/div/div[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//html/body/div/div/div[2]/form[2]/div/div[3]/div/div[2]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementNotPresent</td>
+	<td>//div[3]/div/div[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save Order']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Sessions</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create a new session</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Start Session']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>matcher test (selenium) updated<br /> (Matcher)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>text Page (selenium) updated<br /> (Text Page)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Sessions » Monitoring exp test (selenium)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//p[2]</td>
+	<td>exact:Status: Not Ready</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Start Session</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//p[2]</td>
+	<td>exact:Status: Not Ready</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Sessions</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Experiments</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Components</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Delete</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
