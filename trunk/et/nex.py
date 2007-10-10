@@ -165,7 +165,11 @@ def nexEdit(request):
 	widgetCount = request.POST.get("widgetCount")
 	widgets = []
 	for i in range(int(widgetCount)):
-		widgets.append(int(request.POST.get("widgetSelect_" + str(i+1))))
+		try:
+			widgets.append(int(request.POST.get("widgetSelect_" + str(i+1))))
+		except:
+			pass
+		
 	
 	componentParams = nexObj(
 								p1x = request.POST.get("p1x"),
@@ -219,8 +223,20 @@ def checkForOpponentPollProcess(request):
 	except:
 		response['continuePolling'] = True
 	else:
+		# check if the other player has set a start time message
+		showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['p'].name
+		try:
+			showTime = SessionVar.objects.filter(key=showTimeKey)[0].value
+		except:
+			# If not, set a start time and write it in a message to the other participant
+			showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['opponent'].name
+			showTime = int((time() + 3) * 1000)
+			SessionVar(key=showTimeKey, value=showTime, experimentSession=request.session['s']).save()
+			
+		response['showTime'] = showTime
 		response['continuePolling'] = False
-		response['showScreen'] = "makeOfferButton"
+		response['showScreen'] = "makeOfferButton"	
+		
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 

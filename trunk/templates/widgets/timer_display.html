@@ -1,8 +1,8 @@
-<!-- Start Timer Widget {{counter}}-->
+<!-- Start Timer Widget -->
 
 {% comment %}
-	{{counter}} is a reference to the display order. It's needed so multiple 
-	instances of the same widget component can be used on a single page.
+	
+	There can only be one timer on a page.
 	
 	When the timer reaches zero, widget_timer_event_timeout is fired on the html element.
 	
@@ -14,41 +14,53 @@
 
 <script type="text/javascript" charset="utf-8">
 
-var widget_timerTime{{counter}} = new Date();
-widget_timerTime{{counter}}.setMinutes({{widgetParams.mins}});
-widget_timerTime{{counter}}.setSeconds({{widgetParams.secs}});
-var widget_timerElapsed{{counter}} = widget_timerTime{{counter}}.getTime();
+var widget_timerTime = new Date();
+widget_timerTime.setMinutes({{widgetParams.mins}});
+widget_timerTime.setSeconds({{widgetParams.secs}});
+var widget_timerElapsed = widget_timerTime.getTime();
 
-widget_timerLoop{{counter}}();
+
+
+function widget_timerSchedule(showTime){
+	// allow showTime to be optional. If not given, timer will start right away.
+	//showTime = typeof(showTime) != 'undefined' ? showTime : 0;
+	
+	var nowTime = new Date().valueOf();
+	var delay = showTime - nowTime;
+	// alert("showTime: " + showTime);
+	// alert("nowTime: " + nowTime);
+	// alert("delay: " + delay);
+	setTimeout('widget_timerLoop();', delay);
+}
 
 /**
 * Decrements timer. If the timer reaches zero, the "widget_timer_event_timeout"
 * event is triggered and the loop stops.
 * 
 */
-function widget_timerLoop{{counter}}(){
+function widget_timerLoop(){
 	
 	// Get the mins and secs and convert them to strings
-	widget_timerMins{{counter}} = widget_timerTime{{counter}}.getMinutes().toString();
-	widget_timerSecs{{counter}} = widget_timerTime{{counter}}.getSeconds().toString();
+	widget_timerMins = widget_timerTime.getMinutes().toString();
+	widget_timerSecs = widget_timerTime.getSeconds().toString();
 
 	// Pad seconds with a 0 if neeeded
-	if(widget_timerSecs{{counter}}.length < 2){
-		widget_timerSecs{{counter}} = "0" + widget_timerSecs{{counter}};
+	if(widget_timerSecs.length < 2){
+		widget_timerSecs = "0" + widget_timerSecs;
 	}	
 
-	$('#widget_timer_minutes{{counter}}').text( widget_timerMins{{counter}} );
-	$('#widget_timer_seconds{{counter}}').text( widget_timerSecs{{counter}} );
+	$('#widget_timer_minutes').text( widget_timerMins );
+	$('#widget_timer_seconds').text( widget_timerSecs );
 
-	if(widget_timerMins{{counter}} == "0" && widget_timerSecs{{counter}} == "00"){
-		clearTimeout(widget_timerTimeout{{counter}});
+	if(widget_timerMins == "0" && widget_timerSecs == "00"){
+		clearTimeout(widget_timerTimeout);
 		$("html").trigger("widget_timer_event_timeout");
 		return;
 	}
 
-	widget_timerElapsed{{counter}} -= 1000;
-	widget_timerTime{{counter}}.setTime(widget_timerElapsed{{counter}});
-	widget_timerTimeout{{counter}} = setTimeout("widget_timerLoop{{counter}}()", 1000);
+	widget_timerElapsed -= 1000;
+	widget_timerTime.setTime(widget_timerElapsed);
+	widget_timerTimeout = setTimeout("widget_timerLoop()", 1000);
 	
 	return;
 }
@@ -61,10 +73,10 @@ function widget_timerLoop{{counter}}(){
 			{{widgetParams.label}}
 		</div>
 		<div class="widget_timer_numbers">
-			<span id="widget_timer_minutes{{counter}}"></span>:<span id="widget_timer_seconds{{counter}}"></span>
+			<span id="widget_timer_minutes"></span>:<span id="widget_timer_seconds"></span>
 		</div>
 	</div>
 </div>
 
 
-<!-- End Timer Widget {{counter}}-->
+<!-- End Timer Widget -->

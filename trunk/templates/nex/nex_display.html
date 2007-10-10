@@ -26,7 +26,6 @@ var timeout;
 		
 	    // bind the submit event of all forms on the page. The server response will be
 		// delivered to the processFormResponse() function.
-	    
 		$('form').ajaxForm({success: processFormResponse}); 
 		
 		// pNum is either 1 or 2 indicating if, within the current pairing, the player is the 1st or 2nd player
@@ -104,6 +103,14 @@ var timeout;
 						if(pollResponseJSON['poll'] == true){
 							killPolling = false;
 							pollServer(pollResponseJSON['url'], pollResponseJSON['interval']);
+						}
+						// Processor is a reference to the django view that processed the form.
+						// The switch excecute certain lines of javascript depending the processor.
+						switch( pollResponseJSON['processor'] ){
+							case "checkForOpponentPollProcess":
+								// Try to start the timer
+								widget_timerSchedule(pollResponseJSON['showTime']);
+								break;
 						}
 					} else {
 						timeout = setTimeout("pollServer('" + pollURL + "', " + interval + ")", interval);

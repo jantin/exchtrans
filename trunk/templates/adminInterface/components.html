@@ -15,8 +15,9 @@
 	// prepare the form when the DOM is ready 
 	$(document).ready(function() { 
 		
-		$(".slideToggler").bind("click", function(){
+		$(".slideToggler").click(function(){
 			$('.createNewThing').slideToggle(500);
+			return false;
 		});
 		$("#createNewForm").yav({
 			errorClass:"error",

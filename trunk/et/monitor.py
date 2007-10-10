@@ -45,13 +45,18 @@ def monitor(request):
 
 @login_required
 def updatePollProcess(request):
-	"""This process returns the status of all the participants."""
+	"""This process returns the status of all the participants and the experiement."""
 	sid = request.GET.get('sid')
-	response = []
+	response = {}
 	
 	# Get the participants
 	participants = Participant.objects.filter(experimentSession=sid).order_by('number')
 	
+	# Get the experiment status
+	experimentStatus = ExperimentSession.objects.get(id=sid).status.statusText
+	response['experimentStatus'] = experimentStatus
+
+	participantList = []
 	# For each participant...
 	for p in participants:
 		pObject = {}
@@ -61,7 +66,10 @@ def updatePollProcess(request):
 		pObject['number'] = p.number
 		pObject['currentComponent'] = p.currentComponent
 		pObject['cumulativePoints'] = p.cumulativePoints
-		response.append(pObject)
+		participantList.append(pObject)
+		print "made it"
+	
+	response['participants'] = participantList
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
@@ -71,10 +79,33 @@ def updatePollProcess(request):
 
 @login_required
 def bootParticipant(request):
-	# TODO Don't delete, add a field to the model for inactive or something like that.
 	"""Boots participants by deleting them"""
 	pid = request.GET.get('pid')
+	sid = request.GET.get('sid')
+	
 	p = Participant.objects.get(id=pid)
 	p.delete()
-
+		
+	# Get a list of all participants
+	participantList = Participant.objects.filter(experimentSession=sid)
+	
+	# Get the min and max participants for the experiment
+	s = ExperimentSession.objects.get(id=sid)
+	minParticipants = s.experiment_id.minPlayers
+	
+	if(len(participantList) < minParticipants):
+		s.status = experimentSessionStatus.objects.get(statusText="Not Ready")
+		s.save()
+	
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+
+
+
+
+
+
+
+
+
