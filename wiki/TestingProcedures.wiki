@@ -4,7 +4,7 @@ This page describes steps for testing exchtrans
 ==Testing component, experiment, and session creation==
   # Go to http://exchtrans.homeip.net
   # Click on the components tab. 
-  # Create new components of each type. Note that negotiated exchange components integrate with widgets. So you need to have widget components build before you can add them to negotiated exchange components. Likewise, matcher components require negotiated exchange and reciprocal exchange components.
+  # Create new components of each type. Note that negotiated exchange components integrate with widgets. So you need to have widget components built before you can add them to negotiated exchange components. Likewise, matcher components require negotiated exchange and reciprocal exchange components.
   # Click on the experiment tab and make a new experiment. Add components to the experiment, reorder them (drag and drop) and save the experiment.
   # click on the sessions tab and create a new session from the experiment you made in step 4.
 
