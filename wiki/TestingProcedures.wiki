@@ -15,3 +15,26 @@ This page describes steps for testing exchtrans
   # in the sessions window, click on the link to monitor the text page experiment. You should see a column for each participant.
   # Click on the start session link. The two participant windows should change after a few seconds to the first text page. 
   # advance the participant windows through the experiment. Each component the participant completes will be reflected in the monitoring screen. You do not need to refresh the monitoring screen. The status table is automatically updated every three seconds. 
+
+==Running experiments with a single PC==
+To simulate a running session with a single computer it is necessary to run multiple Firefox Instances. When a participant joins an experiment, exchtrans gives a cookies to the participant's browser. This cookies identifies the participant to the server. Each Firefox instance shares a single set of cookies. To start separate Firefox instances you use the command line to start Firefox's profile manager. Before you begin these steps, you should create an experiment.
+
+The procedure for starting new instances of Firefox is slightly different for windows and Mac OS X.
+
+If you're on windows, start the command line by clicking on Start and then Run. In the Run dialog box, enter the following: 
+{{{
+"C:\Program Files\Mozilla Firefox\firefox.exe" -ProfileManager
+}}}
+
+If you're on Mac OS X, open the terminal (Applications > Utilities > Terminal) and enter the following: 
+{{{
+/Applications/Firefox.app/Contents/MacOS/firefox -ProfileManager
+}}}
+
+  # When you launch Firefox with one of the above commands, you will be presented with the Firefox Profile Manager. The first time you get to the profile manager, create 5 new profiles. (Mine are named Test1 ... Test5) 
+  # Select your first new profile and click "Start Firefox". Point the instance to http://exchtrans.homeip.net and login. Use this instance to create a new session or monitor a session you already created. This instance represent the experimenter's station in the lab setting.
+  # Launch additional Firefox instance with the command line above for each participant you want to simulate. If you are testing an experiment with only two participants, you should launch two more instances, selecting the second and third profiles.
+  # Point all the additional instances to http://exchtrans.homeip.net and login with each instance.
+  # Click the "Join" link on the sessions tab with each participant instance. The monitor screen of the experimenter's instance will update with each player that joins.
+  # When all the participants have joined, go to the experimenter's instance and click on the start session link. (note: you will only be able to start the session if the number of joined players is within the range given on the experiment setup page.)
+  # Advance the participants through the experiment. The experimenter's monitoring screen will update to show the current component of each participant.
