@@ -105,14 +105,17 @@ def nexDisplay(request):
 	for key,value in request.session['exchangeParameters'].__dict__.items():
 		exchangeParametersJSON[key] = value
 	exchangeParametersJSON = simplejson.dumps(exchangeParametersJSON)
-
+		
 	# Get the current pairing
 	playerPairMapKey = "matcher" + str(request.session['c'].id) + "playerPairMap"
 	playerPairMap = SessionVar.objects.get(key=playerPairMapKey).value
 	request.session['playerPairMap'] = pickle.loads(playerPairMap)
-	request.session['currentPairingIndex'] = request.session['playerPairMap'][request.session['p'].number]
+	request.session['currentPairingIndex'] = request.session['playerPairMap'][request.session['p'].number] - 1
+		# -1 because the PairingIndex is incremented by the matcher before we get here
 	request.session['currentPairing'] = request.session['parameters'].pairings[int(request.session['currentPairingIndex'])]
 
+	# Set the current exchange round to 1. (used to determine if another rounds in the current pairing is needed)
+	request.session['currentRound'] = 1
 	
 	# get the identity of the other player
 	request.session['opponent'] = Participant.objects.get(name=opponentName)
@@ -122,18 +125,22 @@ def nexDisplay(request):
 	request.session['keyPrefix'] = str(request.session['c'].id) + "_" + exchangeComponentID + "_" + str(request.session['currentPairingIndex']) + "_0" 
 
 	# Register current player as being ready
-	key = request.session['keyPrefix'] + "_playerReady_" + pname
+	key = request.session['keyPrefix'] + "_playerReadyMessageTo_" + request.session['opponent'].name
 	sv = SessionVar(key=key, value="True", experimentSession=request.session['s'])
 	sv.save()
 	
-	
-	# Determine if the current player is player 1 or player 2 of the pairing
+	# Determine if the current player is player 1 or player 2 of the pairing. Also grab the right starting X and Y quantities
 	if (int(request.session['currentPairing']["p1"]) == int(request.session['p'].number)):
 		request.session['playerNumber'] = 1
+		startingX = request.session['exchangeParameters'].p1x
+		startingY = request.session['exchangeParameters'].p1y
 	elif (int(request.session['currentPairing']["p2"]) == int(request.session['p'].number)):
 		request.session['playerNumber'] = 2
+		startingX = request.session['exchangeParameters'].p2x
+		startingY = request.session['exchangeParameters'].p2y
 	else:
 		request.session['playerNumber'] = None
+
 	
 	# Get widget content
 	widgets = prepareWidgets(request.session['exchangeParameters'].widgets)
@@ -142,7 +149,10 @@ def nexDisplay(request):
 							{	'opponentIdentity': request.session['opponent'].identityLetter,
 								'exchangeParametersJSON': exchangeParametersJSON,
 								'playerNumber': request.session['playerNumber'],
-								'widgets': widgets
+								'widgets': widgets,
+								'playerPoints': request.session['p'].cumulativePoints,
+								'startingX': startingX,
+								'startingY': startingY
 							}, 
 						  	context_instance=RequestContext(request))
 
@@ -216,17 +226,22 @@ def checkForOpponentPollProcess(request):
 	
 	response['processor'] = "checkForOpponentPollProcess"
 
-	# Check if opponent is ready.
-	playerReadyKey = request.session['keyPrefix'] + "_playerReady_" + request.session['opponent'].name
+	# Check for a ready message addressed to the player
+	playerReadyKey = request.session['keyPrefix'] + "_playerReadyMessageTo_" + request.session['p'].name
 	try:
-		playerReady = SessionVar.objects.filter(key=playerReadyKey)[0].value
+		msg = SessionVar.objects.get(key=playerReadyKey,unread=True)
+		msg.unread = False
+		msg.save()
 	except:
 		response['continuePolling'] = True
 	else:
 		# check if the other player has set a start time message
 		showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['p'].name
 		try:
-			showTime = SessionVar.objects.filter(key=showTimeKey)[0].value
+			msg = SessionVar.objects.get(key=showTimeKey,unread=True)
+			showTime = msg.value
+			msg.unread = False
+			msg.save()
 		except:
 			# If not, set a start time and write it in a message to the other participant
 			showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['opponent'].name
@@ -263,16 +278,24 @@ def checkForOfferPollProcess(request):
 	response = {}
 	response['processor'] = "checkForOfferPollProcess"
 
-	# Check for unread messages with the value offerMade
-	messageKey = request.session['keyPrefix'] + "_messageTo_" + request.session['p'].name	
+	# Check for unread offer from opponent
+	offerKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['opponent'].name	
 	try:
-		message = SessionVar.objects.get(key=messageKey, value="offerMade") #, unread=True
+		offer = SessionVar.objects.get(key=offerKey, unread=True)
 	except:
 		response['continuePolling'] = True
 	else:
 		# Change the status of the message to read
-		message.unread = False
-		message.save()
+		offer.unread = False
+		offer.save()
+		
+		# unpickle the offer. Serialize the offer object into a dictionary that can be passed as JSON
+		offerObj = pickle.loads(offer.value)
+		offerJSON = {}
+		for key,value in offerObj.__dict__.items():
+			offerJSON[key] = value
+		
+		response['offer'] = offerJSON
 		response['continuePolling'] = False
 		response['poll'] = True
 		response['url'] = "/nex/checkForCancelWhileWaitingPollProcess/"
@@ -301,7 +324,8 @@ def checkForCancelWhileWaitingPollProcess(request):
 		message.unread = False
 		message.save()
 		response['showScreen'] = "transactionSummary"
-	
+		response['stopTimer'] = True
+		
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
 						  {'response': jsonString}, 
@@ -319,7 +343,7 @@ def offerFormulation(request):
 	
 	offerCheckKey = request.session['keyPrefix'] + "_messageTo_" + request.session['p'].name
 	try:
-		existingOffers = SessionVar.objects.filter(key=offerCheckKey)[0]
+		existingOfferMsg = SessionVar.objects.get(key=offerCheckKey, unread=True)
 	except:
 		offerObj = nexOfferObj(	offer=request.POST.get('offerFormulationOffer'), 
 								offerUnit=request.POST.get('offerFormulationOfferUnit'), 
@@ -330,8 +354,10 @@ def offerFormulation(request):
 		offerInsertKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['p'].name
 		offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
 		
-		messageToKey = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
-		messageTo = SessionVar(experimentSession=request.session['s'], key=messageToKey, value="offerMade").save()
+		offerJSON = {}
+		for key,value in offerObj.__dict__.items():
+			offerJSON[key] = value
+		response['offer'] = offerJSON
 		
 		response['continuePolling'] = False
 		response['showScreen'] = "waitingScreen"
@@ -339,6 +365,8 @@ def offerFormulation(request):
 		response['url'] = "/nex/waitingScreenPollProcess/"
 		response['interval'] = 2000
 	else:
+		existingOfferMsg.unread = False
+		existingOfferMsg.save()
 		response['showScreen'] = "incomingOffer"
 		response['continuePolling'] = False
 	
@@ -358,17 +386,22 @@ def counterOfferFormulation(request):
 	if(submit == "Cancel"):
 		response['showScreen'] = "incomingOffer"
 	elif(submit == "Counter Offer"):	
-		offerObj = nexOfferObj(	offer=request.POST.get('offerFormulationOffer'), 
-								offerUnit=request.POST.get('offerFormulationOfferUnit'), 
-								request=request.POST.get('offerFormulationRequest'), 
-								requestUnit=request.POST.get('offerFormulationRequestUnit'),
+		offerObj = nexOfferObj(	offer=request.POST.get('counterOfferFormulationOffer'), 
+								offerUnit=request.POST.get('counterOfferFormulationOfferUnit'), 
+								request=request.POST.get('counterOfferFormulationRequest'), 
+								requestUnit=request.POST.get('counterOfferFormulationRequestUnit'),
 								offeredBy=request.session['p'].name
 							   )
-		offerInsertKey = request.session['keyPrefix'] + "_offerMade_" + request.session['p'].name
+		offerInsertKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['p'].name
 		offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
 		
 		messageKey = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
 		message = SessionVar(experimentSession=request.session['s'], key=messageKey, value="counterOffered").save()
+		
+		offerJSON = {}
+		for key,value in offerObj.__dict__.items():
+			offerJSON[key] = value
+		response['offer'] = offerJSON
 		
 		response['showScreen'] = "waitingScreen"
 		response['poll'] = True
@@ -408,14 +441,32 @@ def waitingScreenPollProcess(request):
 			response['showScreen'] = "nonBindingConfirmation"
 		elif(message.value == "acceptBinding"):
 			response['showScreen'] = "transactionSummary"
+			response['stopTimer'] = True
 		elif(message.value == "counterOffered"):
 			response['continuePolling'] = False
 			response['poll'] = True
 			response['url'] = "/nex/checkForCancelWhileWaitingPollProcess/"
 			response['interval'] = 2000
 			response['showScreen'] = "incomingOffer"
+
+			# Grab the unread offer from opponent
+			offerKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['opponent'].name	
+			offer = SessionVar.objects.get(key=offerKey, unread=True)
+
+			# Change the status of the message to read
+			offer.unread = False
+			offer.save()
+
+			# unpickle the offer. Serialize the offer object into a dictionary that can be passed as JSON
+			offerObj = pickle.loads(offer.value)
+			offerJSON = {}
+			for key,value in offerObj.__dict__.items():
+				offerJSON[key] = value
+			response['offer'] = offerJSON
+			
 		elif(message.value == "endRound"):
 			response['showScreen'] = "transactionSummary"
+			response['stopTimer'] = True
 			
 		response['continuePolling'] = False
 		message.unread = False
@@ -438,6 +489,7 @@ def confirmCancel(request):
 		SessionVar(key=key, experimentSession=request.session['s'], value="canceledWhileWaiting").save()
 		response['showScreen'] = "transactionSummary"
 		response['continuePolling'] = False
+		response['stopTimer'] = True
 	elif(confirmed == 'No'):
 		response['showScreen'] = "waitingScreen"
 		
@@ -461,6 +513,7 @@ def incomingOffer(request):
 		else:
 			SessionVar(key=key, experimentSession=request.session['s'], value="acceptBinding").save()
 			response['showScreen'] = "transactionSummary"
+			response['stopTimer'] = True
 	elif(selection == "Counter Offer"):
 		response['showScreen'] = "counterOfferFormulation"
 	elif(selection == "End Round"):
@@ -482,6 +535,7 @@ def confirmEndRound(request):
 		key = request.session['keyPrefix'] + "_messageTo_" + request.session['opponent'].name
 		SessionVar(key=key, experimentSession=request.session['s'], value="endRound").save()
 		response['showScreen'] = "transactionSummary"
+		response['stopTimer'] = True
 	elif(confirmed == 'No'):
 		response['showScreen'] = "incomingOffer"
 		
@@ -504,9 +558,63 @@ def nonBindingConfirmation(request):
 
 
 def transactionSummary(request):
-	"""Handles the transactionSummary screen"""
+	"""Handles the transactionSummary screen's continue button"""
 	response = {}
 	response['processor'] = "transactionSummary"
+	
+	# Figure out if they're doing another round or moving on to the next pairing
+	request.session['currentRound'] += 1
+	if(int(request.session['currentRound']) > int(request.session['currentPairing']['rounds'])):
+		# If going on to the next pairing, redirect to the matcher display function which will figure out what to do next
+		response['redirect'] = "/matcher/display/?sid=" + str(request.session['s'].id) + "&pname=" + request.session['p'].name + "&increment=1"
+	else:
+		# Moving on to the next round. Write a message that the player is ready
+		playerReadyKey = request.session['keyPrefix'] + "_readyForNextRoundMessageTo_" + request.session['opponent'].name
+		SessionVar(key=playerReadyKey, value="Ready", experimentSession=request.session['s']).save()
+		
+		# send to the nextRoundCountdown screen and start a poll process
+		response['showScreen'] = "nextRoundCountdown"
+		response['poll'] = True
+		response['url'] = "/nex/nextRoundCountdownPollProcess/"
+		response['interval'] = 2000
+	
+	jsonString = simplejson.dumps(response)
+	return render_to_response('api.html', 
+						  {'response': jsonString}, 
+						  context_instance=RequestContext(request))
+
+def nextRoundCountdownPollProcess(request):
+	"""Waits for the other player to click continue after transaction summary screen."""
+	response = {}
+	
+	response['processor'] = "nextRoundCountdownPollProcess"
+
+	# Check if opponent is ready.
+	playerReadyKey = request.session['keyPrefix'] + "_readyForNextRoundMessageTo_" + request.session['p'].name
+	try:
+		msg = SessionVar.objects.get(key=playerReadyKey,unread=True)
+		msg.unread = False
+		msg.save()
+	except:
+		response['continuePolling'] = True
+	else:
+		# check if the other player has set a start time message
+		showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['p'].name
+		try:
+			msg = SessionVar.objects.get(key=showTimeKey,unread=True)
+			showTime = msg.value
+			msg.unread = False
+			msg.save()
+		except:
+			# If not, set a start time and write it in a message to the other participant
+			showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['opponent'].name
+			showTime = int((time() + 3) * 1000)
+			SessionVar(key=showTimeKey, value=showTime, experimentSession=request.session['s']).save()
+			
+		response['showTime'] = showTime
+		response['continuePolling'] = False
+		response['showScreen'] = "makeOfferButton"	
+		
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 

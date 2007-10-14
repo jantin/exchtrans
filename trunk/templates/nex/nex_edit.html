@@ -66,9 +66,7 @@
 		// Clear the error if present
 		$("#offerFormulationOfferError").html("");
 		$("#offerFormulationRequestError").html("");
-		
-		var errorFlag = false;
-		
+				
 		// Set up all our working variables
 		options = {
 			whichPlayer: $('#whichPlayer').val(),
@@ -96,46 +94,94 @@
 		options['p2yValue'] = parseValueInput(options['p2yValue'], options);
 		
 		// If any of the value fields have errors, update the point value table and return
-		if(!(options['p2yValue'] >= 0 && options['p2xValue'] >= 0 && options['p1yValue'] >= 0 && options['p1xValue'] >= 0)){
-			errorFlag = true;
+		if(options['p2yValue'] == "Error" || options['p2xValue'] == "Error" || options['p1yValue'] == "Error" || options['p1xValue'] == "Error"){
+			$("#offerFormulationP1Points").html("ERROR");
+			$("#offerFormulationP2Points").html("ERROR");
+			return false;
 		}
 		
 		// Calculate the current number of points held by the player this round
 		p1InitialPoints = (options['p1x'] * options['p1xValue']) + (options['p1y'] * options['p1yValue']);
 		p2InitialPoints = (options['p2x'] * options['p2xValue']) + (options['p2y'] * options['p2yValue']);
 		
+		// Error Check Offer input field
+		if(options['offerUnit'] == "x"){
+			if(options['whichPlayer'] == "p1"){
+				if(parseInt(options['offer']) > parseInt(options['p1x'])) {
+					$("#offerFormulationOffer").val(options['p1x']);
+					options['offer'] = options['p1x'];
+					$("#offerFormulationOfferError").html("You only have " + options['p1x'] + " " + options['offerUnit']);
+				}
+			} else {
+				if(parseInt(options['offer']) > parseInt(options['p2x'])) {
+					$("#offerFormulationOffer").val(options['p2x']);
+					options['offer'] = options['p2x'];
+					$("#offerFormulationOfferError").html("You only have " + options['p2x'] + " " + options['offerUnit']);
+				}
+			}
+		} else {
+			if(options['whichPlayer'] == "p1"){
+				if(parseInt(options['offer']) > parseInt(options['p1y'])) {
+					$("#offerFormulationOffer").val(options['p1y']);
+					options['offer'] = options['p1y'];
+					$("#offerFormulationOfferError").html("You only have " + options['p1y'] + " " + options['offerUnit']);
+				}
+			} else {
+				if(parseInt(options['offer']) > parseInt(options['p2y'])) {
+					$("#offerFormulationOffer").val(options['p2y']);
+					options['offer'] = options['p2y'];
+					$("#offerFormulationOfferError").html("You only have " + options['p2y'] + " " + options['offerUnit']);
+				}
+			}
+		}
+
+		
+		// Error Check Request input field
+		if(options['requestUnit'] == "x"){
+			if(options['whichPlayer'] == "p1"){
+				if(parseInt(options['request']) > parseInt(options['p1xMaxRequest'])) {
+					$("#offerFormulationRequest").val(options['p1xMaxRequest']);
+					options['request'] = options['p1xMaxRequest'];
+					$("#offerFormulationRequestError").html("You only have " + options['p1xMaxRequest'] + " " + options['requestUnit']);
+				}
+			} else {
+				if(parseInt(options['request']) > parseInt(options['p2xMaxRequest'])) {
+					$("#offerFormulationRequest").val(options['p2xMaxRequest']);
+					options['request'] = options['p2xMaxRequest'];
+					$("#offerFormulationRequestError").html("You only have " + options['p2xMaxRequest'] + " " + options['requestUnit']);
+				}
+			}
+		} else {
+			if(options['whichPlayer'] == "p1"){
+				if(parseInt(options['request']) > parseInt(options['p1yMaxRequest'])) {
+					$("#offerFormulationRequest").val(options['p1yMaxRequest']);
+					options['request'] = options['p1yMaxRequest'];
+					$("#offerFormulationRequestError").html("You only have " + options['p1yMaxRequest'] + " " + options['requestUnit']);
+				}
+			} else {
+				if(parseInt(options['request']) > parseInt(options['p2yMaxRequest'])) {
+					$("#offerFormulationRequest").val(options['p2yMaxRequest']);
+					options['request'] = options['p2yMaxRequest'];
+					$("#offerFormulationRequestError").html("You only have " + options['p2yMaxRequest'] + " " + options['requestUnit']);
+				}
+			}
+		}
+		
 		// Calculate the loss from offering
 		if(options['offerUnit'] == "x"){
 			if(options['whichPlayer'] == "p1"){
-				// Check that the input value is not beyond the available amount
-				if(parseInt(options['offer']) > parseInt(options['p1x'])) {
-					$("#offerFormulationOfferError").html("You only have " + options['p1x'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Loss = options['offer'] * options['p1xValue'];
 				p2Loss = options['request'] * options['p2xValue'];
 				
 			} else {
-				if(parseInt(options['offer']) > parseInt(options['p2x'])) {
-					$("#offerFormulationOfferError").html("You only have " + options['p2x'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Loss = options['request'] * options['p1xValue'];
 				p2Loss = options['offer'] * options['p2xValue'];
 			}
 		} else {
 			if(options['whichPlayer'] == "p1"){
-				if(parseInt(options['offer']) > parseInt(options['p1y'])) {
-					$("#offerFormulationOfferError").html("You only have " + options['p1y'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Loss = options['offer'] * options['p1yValue'];
 				p2Loss = options['request'] * options['p2yValue'];
 			} else {
-				if(parseInt(options['offer']) > parseInt(options['p2y'])) {
-					$("#offerFormulationOfferError").html("You only have " + options['p2y'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Loss = options['request'] * options['p1yValue'];
 				p2Loss = options['offer'] * options['p2yValue'];
 			}
@@ -144,34 +190,17 @@
 		// Calculate the potential gain from the request
 		if(options['requestUnit'] == "x"){
 			if(options['whichPlayer'] == "p1"){
-				// Check that the input value is not beyond the available amount
-				if(parseInt(options['request']) > parseInt(options['p1xMaxRequest'])) {
-					$("#offerFormulationRequestError").html("Request less than " + options['p1xMaxRequest'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Gain = options['request'] * options['p1xValue'];
 				p2Gain = options['offer'] * options['p2xValue'];
 			} else {
-				if(parseInt(options['request']) > parseInt(options['p2xMaxRequest'])) {
-					$("#offerFormulationRequestError").html("Request less than " + options['p2xMaxRequest'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Gain = options['offer'] * options['p1xValue'];
 				p2Gain = options['request'] * options['p2xValue'];
 			}
 		} else {
 			if(options['whichPlayer'] == "p1"){
-				if(parseInt(options['request']) > parseInt(options['p1yMaxRequest'])) {
-					$("#offerFormulationRequestError").html("Request less than " + options['p1yMaxRequest'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Gain = options['request'] * options['p1yValue'];
 				p2Gain = options['offer'] * options['p2yValue'];
 			} else {
-				if(parseInt(options['request']) > parseInt(options['p2yMaxRequest'])) {
-					$("#offerFormulationRequestError").html("Request less than " + options['p2yMaxRequest'] + " " + options['offerUnit']);
-					errorFlag = true;
-				}
 				p1Gain = options['offer'] * options['p1yValue'];
 				p2Gain = options['request'] * options['p2yValue'];
 			}
@@ -194,15 +223,10 @@
 		// alert("p1Points: " + p1Points);
 		// alert("p2Points: " + p2Points);
 		
-		if(errorFlag){
-			$("#offerFormulationP1Points").html("ERROR");
-			$("#offerFormulationP2Points").html("ERROR");
-		} else {
-			// Display the preview points
-			$("#offerFormulationP1Points").html(String(p1Points));
-			$("#offerFormulationP2Points").html(String(p2Points));
-		}
-
+		// Display the preview points
+		$("#offerFormulationP1Points").html(String(p1Points));
+		$("#offerFormulationP2Points").html(String(p2Points));
+		
 		return true;
 	}
 	
@@ -250,7 +274,7 @@
 			msg += "You entered: "+ originalValueInput + "\n";
 			msg += "Error: Syntax Error";
 			alert(msg);
-			value = false;
+			value = "Error";
 		}
 		
 		return value;
@@ -420,17 +444,16 @@
 		<th>Clearing</th>
 		<td>
 			<select name="p1Clearing">
-				<option {% ifequal parameters.p1Clearing "End of round" %}selected="selected"{% endifequal %} >End of round</option>
-				<option {% ifequal parameters.p1Clearing "End of module" %}selected="selected"{% endifequal %}>End of module</option>
+				<option {% ifequal parameters.p1Clearing "End of exchange opportunity" %}selected="selected"{% endifequal %} >End of exchange opportunity</option>
+				<option {% ifequal parameters.p1Clearing "End of pairing" %}selected="selected"{% endifequal %}>End of pairing</option>
 			</select>
 		</td>
 		<td>
 			<select name="p2Clearing">
-				<option {% ifequal parameters.p2Clearing "End of round" %}selected="selected"{% endifequal %} >End of round</option>
-				<option {% ifequal parameters.p2Clearing "End of module" %}selected="selected"{% endifequal %}>End of module</option>
+				<option {% ifequal parameters.p2Clearing "End of exchange opportunity" %}selected="selected"{% endifequal %} >End of exchange opportunity</option>
+				<option {% ifequal parameters.p2Clearing "End of pairing" %}selected="selected"{% endifequal %}>End of pairing</option>
 			</select>
 		</td>
-		
 	</tr>
 	<tr>
 		<th>Max X Request</th>

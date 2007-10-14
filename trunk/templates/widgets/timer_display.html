@@ -14,22 +14,66 @@
 
 <script type="text/javascript" charset="utf-8">
 
-var widget_timerTime = new Date();
-widget_timerTime.setMinutes({{widgetParams.mins}});
-widget_timerTime.setSeconds({{widgetParams.secs}});
-var widget_timerElapsed = widget_timerTime.getTime();
 
 
+var widget_timerTime;
+var widget_timerElapsed;
+var widget_timerTimeout;
+
+// Code to run after the page is completely loaded.
+$(document).ready(function() { 
+	// Bind widget callbacks
+	$("html").bind("widget_timer_event_startTimer", function (event) {
+		widget_timerStartTimer();
+	});
+	$("html").bind("widget_timer_event_stopTimer", function (event) {
+		widget_timerStopTimer();
+	});
+	$("html").bind("widget_timer_event_resetTimer", function (event) {
+		widget_timerResetAndStartTimer();
+	});
+	$("html").bind("widget_timer_event_scheduleTimer", function (event, showTime) {
+		widget_timerSchedule(showTime);
+	});
+	
+});
+
+/**
+* Configures the timer according to the widget's parameters
+* 
+*/
+function widget_timerInit(){
+	widget_timerTime = new Date();
+	widget_timerTime.setMinutes({{widgetParams.mins}});
+	widget_timerTime.setSeconds({{widgetParams.secs}});
+	widget_timerElapsed = widget_timerTime.getTime();
+}
+
+
+/**
+* These functions fire when the associated events fire
+* 
+*/
+function widget_timerStartTimer(){
+	widget_timerLoop();
+}
+
+function widget_timerStopTimer(){
+	clearTimeout(widget_timerTimeout);
+	$('#widget_timer_minutes').text("--");
+	$('#widget_timer_seconds').text("--");
+}
+
+function widget_timerResetAndStartTimer(){
+	clearTimeout(widget_timerTimeout);
+	widget_timerInit();
+	widget_timerLoop();
+}
 
 function widget_timerSchedule(showTime){
-	// allow showTime to be optional. If not given, timer will start right away.
-	//showTime = typeof(showTime) != 'undefined' ? showTime : 0;
-	
 	var nowTime = new Date().valueOf();
 	var delay = showTime - nowTime;
-	// alert("showTime: " + showTime);
-	// alert("nowTime: " + nowTime);
-	// alert("delay: " + delay);
+	widget_timerInit();
 	setTimeout('widget_timerLoop();', delay);
 }
 
@@ -54,7 +98,7 @@ function widget_timerLoop(){
 
 	if(widget_timerMins == "0" && widget_timerSecs == "00"){
 		clearTimeout(widget_timerTimeout);
-		$("html").trigger("widget_timer_event_timeout");
+		//$("html").trigger("widget_timer_event_timeout");
 		return;
 	}
 

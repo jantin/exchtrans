@@ -104,6 +104,7 @@ def matcherDisplay(request):
 	else:
 		pairings = parameters.pairings
 
+	# Check for the playerPairMap in the sessionVar table. Create if not found.
 	playerPairMapKey = "matcher" + str(c.id) + "playerPairMap"
 	try:
 		playerPairMapSessionVar = SessionVar.objects.get(experimentSession=s,key=playerPairMapKey)
@@ -114,9 +115,10 @@ def matcherDisplay(request):
 		playerPairMap = {}
 		players = range(len(sesVars.participantsList))
 		for i in players:
-			playerPairMap[i] = -1
+			playerPairMap[i] = 0
 		playerPairMapSessionVar = SessionVar(experimentSession=s, key=playerPairMapKey, value=pickle.dumps(playerPairMap))
 		playerPairMapSessionVar.save()
+	
 	
 	# Go through all of the remaining pairings and act as necessary.
 	for pairIndex in range(playerPairMap[p.number], len(pairings)):

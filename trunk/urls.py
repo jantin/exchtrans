@@ -70,6 +70,7 @@ urlpatterns = patterns('',
 	(r'^nex/confirmEndRound/$', 'exchtran.et.nex.confirmEndRound'),
 	(r'^nex/nonBindingConfirmation/$', 'exchtran.et.nex.nonBindingConfirmation'),
 	(r'^nex/transactionSummary/$', 'exchtran.et.nex.transactionSummary'),
+	(r'^nex/nextRoundCountdownPollProcess/$', 'exchtran.et.nex.nextRoundCountdownPollProcess'),	
 	(r'^nex/nextRoundCountdown/$', 'exchtran.et.nex.nextRoundCountdown'),
 			
 	# Matcher
