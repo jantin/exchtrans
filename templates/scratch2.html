@@ -1,121 +1,233 @@
-{% extends "adminBase.html" %}
-
-{% block extrahead %}
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
-
-<style type="text/css">
-
-.indicator
-{
-	width: 16px;
-	height: 16px;
-	background-color: #FF9900;
-	position: absolute;
-	overflow: hidden;
-	border: none;
-}
-
-.slider4
-{
-	width: 361px;
-	height: 15px;
-	position:relative;
-	border: 1px solid #000;
-	clear:both;
-}
-#indicator1,
-#indicator2,
-#indicator3{
-	background-color: #000;
-	display: none;
-}
-
-.question{
-	width:360px;
-	margin-bottom:50px;
-}
-
-.leftScale{
-	float:left;
-}
-
-.rightScale{
-	float:right;
-}
-
-</style>
-
-{% endblock %}
-
-{% block bodyid %}tab2{% endblock %}
-
-{% block sectionDivID %}editor{% endblock %}
-
-{% block adminContent %}
-
-
-<div class="question">
-	<p>This is the question</p>
-	<div class="slider4" id="sliderArea1">
-		<div class="indicator" id="indicator1">&nbsp;</div>
-	</div>
-	<div class="leftScale">Not Much</div><div class="rightScale">Very Much</div>
-</div>
-<div class="question">
-	<p>This is the question</p>
-	<div class="slider4" id="sliderArea2">
-		<div class="indicator" id="indicator2">&nbsp;</div>
-	</div>
-	<div class="leftScale">Not Much</div><div class="rightScale">Very Much</div>
-</div>
-<div class="question">
-	<p>This is the question</p>
-	<div class="slider4" id="sliderArea3">
-		<div class="indicator" id="indicator3">&nbsp;</div>
-	</div>
-	<div class="leftScale">Not Much</div><div class="rightScale">Very Much</div>
-</div>
-
-<script type="text/javascript">
-	$(document).ready(
-		function()
-		{
-			$('#sliderArea1').Slider(
-				{
-					accept : '#indicator1',
-					restricted: true,
-					fractions : 50,
-					values: [
-						[0,0]
-					]
-				}
-			);
-			$('#sliderArea2').Slider(
-				{
-					accept : '#indicator2',
-					restricted: true,
-					fractions : 50,
-					values: [
-						[0,0]
-					]
-				}
-			);
-			$('#sliderArea3').Slider(
-				{
-					accept : '#indicator3',
-					restricted: true,
-					fractions : 50,
-					values: [
-						[0,0]
-					]
-				}
-			);
-			
-			$("#sliderArea1").click( function() { $("#indicator1").css("display","inline"); } );
-			$("#sliderArea2").click( function() { $("#indicator2").css("display","inline"); } );
-			$("#sliderArea3").click( function() { $("#indicator3").css("display","inline"); } );
+// Updates the "This deal would get you" number on the offerFormulation screen
+// Called on keyup of the input fields of the offerFormulation screen
+function offerFormulationProcessInput(){
+		
+		pNum = "{{playerNumber}}";
+		
+		// Clear the error if present
+		$("#offerFormulationOfferError").html("");
+		
+		// exchangeParametersJSON contains the contents of the Nex component object
+		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
+		
+		// Set up all our working variables
+		offer = $("#offerFormulationOffer").val();
+		request = $("#offerFormulationRequest").val();
+		offerUnit = $("#offerFormulationOfferUnit").val();
+		requestUnit = $("#offerFormulationRequestUnit").val();
+		availableX = $("#availableX").text();
+		availableY = $("#availableY").text();
+		xValue = exchangeParametersJSON['p' + pNum + 'xValue'];
+		yValue = exchangeParametersJSON['p' + pNum + 'yValue'];
+				
+		// Calculate the current number of points held by the player this round
+		initialPoints = (availableX * xValue) + (availableY * yValue);
+		
+		// Calculate the loss from offering
+		if(offerUnit == "x"){
+			// Check that the input value is not beyond the available amount
+			if(parseInt(offer) > parseInt(availableX)) {
+				offer = availableX;
+				$("#offerFormulationOffer").val(offer);
+				$("#offerFormulationOfferError").html("You only have " + availableX + " " + offerUnit);
+			}
+			loss = offer * xValue;
+		} else {
+			// Check that the input value is not beyond the available amount
+			if(parseInt(offer) > parseInt(availableY)) {
+				offer = availableY;
+				$("#offerFormulationOffer").val(offer);
+				$("#offerFormulationOfferError").html("You only have " + availableY + " " + offerUnit);
+			}
+			loss = offer * yValue;
 		}
-	);
-</script>
-{% endblock %}
+		
+		// Calculate the potential gain from the request
+		if(requestUnit == "x"){
+			gain = request * xValue;
+		} else {
+			gain = request * yValue;
+		}
+		
+		// calculate the potential points
+		pointsPreview = initialPoints + (gain - loss);		
+		
+		// Display the preview points
+		$("#offerFormulationPoints").html(pointsPreview);
+}
+
+
+
+
+
+
+
+
+
+// Updates the "This deal would get you" number on the offerFormulation screen
+// Called on keyup of the input fields of the offerFormulation screen
+function offerFormulationProcessInput(){		
+	// Clear the error if present
+	$("#offerFormulationOfferError").html("");
+	$("#offerFormulationRequestError").html("");
+	
+	var errorFlag = false;
+	
+	// exchangeParametersJSON contains the contents of the Nex component object
+	exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
+	pNum = "{{playerNumber}}";
+	
+	// Set up all our working variables
+	options = {
+		offer: $("#offerFormulationOffer").val(),
+		request: $("#offerFormulationRequest").val(),
+		offerUnit: $("#offerFormulationOfferUnit").val(),
+		requestUnit: $("#offerFormulationRequestUnit").val(),
+		availableX: $("#availableX").text(),
+		availableY: $("#availableY").text(),
+		xValue: exchangeParametersJSON['p' + pNum + 'xValue'],
+		yValue: exchangeParametersJSON['p' + pNum + 'yValue'],
+		xMaxRequest: exchangeParametersJSON['p' + pNum + 'xMaxRequest'],
+		yMaxRequest: exchangeParametersJSON['p' + pNum + 'yMaxRequest']
+	}
+	
+	// Set up all our working variables
+	options = {
+		whichPlayer: $('#whichPlayer').val(),
+		offer: $("#offerFormulationOffer").val(),
+		request: $("#offerFormulationRequest").val(),
+		offerUnit: $("#offerFormulationOfferUnit").val(),
+		requestUnit: $("#offerFormulationRequestUnit").val(),
+		p1x: $("#p1x").val(),
+		p2x: $("#p2x").val(),
+		p1y: $("#p1y").val(),
+		p2y: $("#p2y").val(),
+		p1xValue: $("#p1xValue").val(),
+		p2xValue: $("#p2xValue").val(),
+		p1yValue: $("#p1yValue").val(),
+		p2yValue: $("#p2yValue").val(),
+		p1xMaxRequest: $("#p1xMaxRequest").val(),
+		p1yMaxRequest: $("#p1yMaxRequest").val(),
+		p2xMaxRequest: $("#p2xMaxRequest").val(),
+		p2yMaxRequest: $("#p2yMaxRequest").val()
+	}
+	
+	options['xValue'] = parseValueInput(options['xValue'], options);
+	options['yValue'] = parseValueInput(options['yValue'], options);
+	
+	// If any of the value fields have errors, update the point value table and return
+	if(!(options['xValue'] >= 0 && options['yValue'] >= 0)){
+		errorFlag = true;
+	}
+	
+	// Calculate the current number of points held by the player this round
+	initialPoints = (options['availableX'] * options['xValue']) + (options['availableY'] * options['yValue']);
+	
+	// Calculate the loss from offering
+	if(options['offerUnit'] == "x"){
+		// Check that the input value is not beyond the available amount
+		if(parseInt(options['offer']) > parseInt(options['availableX'])) {
+			$("#offerFormulationOfferError").html("You only have " + options['availableX'] + " " + options['offerUnit']);
+			errorFlag = true;
+		}
+		loss = options['offer'] * options['xValue'];
+	} else {
+		if(parseInt(options['offer']) > parseInt(options['availableY'])) {
+			$("#offerFormulationOfferError").html("You only have " + options['availableY'] + " " + options['offerUnit']);
+			errorFlag = true;
+		}
+		loss = options['offer'] * options['yValue'];
+	}
+	
+	// Calculate the potential gain from the request
+	if(options['requestUnit'] == "x"){
+		// Check that the input value is not beyond the available amount
+		if(parseInt(options['request']) > parseInt(options['xMaxRequest'])) {
+			$("#offerFormulationRequestError").html("Request less than " + options['xMaxRequest'] + " " + options['offerUnit']);
+			errorFlag = true;
+		}
+		gain = options['request'] * options['xValue'];
+	} else {
+		if(parseInt(options['request']) > parseInt(options['yMaxRequest'])) {
+			$("#offerFormulationRequestError").html("Request less than " + options['yMaxRequest'] + " " + options['offerUnit']);
+			errorFlag = true;
+		}
+		gain = options['request'] * options['yValue'];
+	}
+	
+
+	// calculate the potential points
+	points = initialPoints + (gain - loss);
+	
+	// alert("p1InitialPoints: " + p1InitialPoints);
+	// alert("p1Gain: " + p1Gain);
+	// alert("p1Loss: " + p1Loss);
+	// alert("p1Points: " + p1Points);
+	// 
+	// alert("p2InitialPoints: " + p2InitialPoints);
+	// alert("p2Gain: " + p2Gain);
+	// alert("p2Loss: " + p2Loss);
+	// alert("p2Points: " + p2Points);
+	// 
+	// alert("p1Points: " + p1Points);
+	// alert("p2Points: " + p2Points);
+	
+	if(errorFlag){
+		$("#offerFormulationPoints").html("---");
+	} else {
+		// Display the preview points
+		$("#offerFormulationPoints").html(String(p1Points));
+	}
+
+	return true;
+}
+
+function parseValueInput(valueInput, options){
+	
+	originalValueInput = valueInput;
+	
+	//Check if input is just digits, if so return value input right away
+	if(/^\d+$/.test(valueInput)){
+		return valueInput;	
+	}
+	//replace variables if present
+	if(options['offerUnit'] == "x"){
+		valueInput = valueInput.replace(/Ox/g, options['offer']);
+		valueInput = valueInput.replace(/Oy/g, "0");
+	} else {
+		valueInput = valueInput.replace(/Ox/g, "0");
+		valueInput = valueInput.replace(/Oy/g, options['offer']);
+	}
+	if(options['requestUnit'] == "x"){
+		valueInput = valueInput.replace(/Rx/g, options['request']);
+		valueInput = valueInput.replace(/Ry/g, "0");
+	} else {
+		valueInput = valueInput.replace(/Rx/g, "0");
+		valueInput = valueInput.replace(/Ry/g, options['request']);
+	}
+	if(options['whichPlayer'] == "p1"){
+		valueInput = valueInput.replace(/Axo/g, options['p1x']);
+		valueInput = valueInput.replace(/Ayo/g, options['p1y']);
+		valueInput = valueInput.replace(/Axr/g, options['p2x']);
+		valueInput = valueInput.replace(/Ayr/g, options['p2y']);
+	} else {
+		valueInput = valueInput.replace(/Axo/g, options['p2x']);
+		valueInput = valueInput.replace(/Ayo/g, options['p2y']);
+		valueInput = valueInput.replace(/Axr/g, options['p1x']);
+		valueInput = valueInput.replace(/Ayr/g, options['p1y']);
+	}
+
+	//evaluate value expression and return it
+	try{
+		value = eval(valueInput);
+		value = Math.round(value);
+	} catch(err){
+		msg = "There is an error in one of your value fields!\n\n";
+		msg += "Please report this to the experimenter RIGHT NOW!";
+		alert(msg);
+		value = false;
+	}
+	
+	return value;
+}
+

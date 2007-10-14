@@ -1,8 +1,16 @@
-<!-- Start Bank Widget {{counter}}-->
+<!-- Start Bank Widget -->
 <script src="/site_media/scripts/jquery/jquery.color.js" type="text/javascript" ></script>
 <script type="text/javascript" charset="utf-8">
 
-var widget_bank_counter = 0;
+
+// Code to run after the page is completely loaded.
+$(document).ready(function() { 
+	// Bind widget callbacks
+	$("html").bind("widget_bank_event_set", function (event, newPointVal) {
+		widget_bank_set(newPointVal);
+	});
+	
+});
 
 function widget_bank_set(newPointVal){
 	
@@ -18,13 +26,12 @@ function widget_bank_get(){
 }
 
 </script>
-
 <div class="widget">
 	<div class="widget_bank">
 		<div class="widget_bank_label widget_label">
 			{{widgetParams.topLabel}}
 		</div>
-		<div id="widget_bank_points">1010</div>
+		<div id="widget_bank_points">{{playerPoints}}</div>
 	</div>
 </div>
-<!-- End Bank Widget {{counter}}-->
+<!-- End Bank Widget -->

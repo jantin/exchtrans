@@ -66,9 +66,7 @@ def updatePollProcess(request):
 		pObject['number'] = p.number
 		pObject['currentComponent'] = p.currentComponent
 		pObject['cumulativePoints'] = p.cumulativePoints
-		participantList.append(pObject)
-		print "made it"
-	
+		participantList.append(pObject)	
 	response['participants'] = participantList
 	
 	jsonString = simplejson.dumps(response)
