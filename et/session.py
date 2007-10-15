@@ -204,6 +204,7 @@ def driveSession(request):
 		
 		# If that was the last component, redirect to the end screen
 		if(len(sesVars.componentsList) == p.currentComponent):
+			p.save()
 			return HttpResponseRedirect('/session/end/?sid=' + sid)
 	
 	# increment the current component iteration count and save participant vars to the DB.
