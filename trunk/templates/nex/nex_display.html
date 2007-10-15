@@ -5,6 +5,7 @@
 <script src="/site_media/scripts/jquery/jquery.form.js" type="text/javascript" charset="utf-8"></script>
 <script src="/site_media/scripts/jquery/jquery.alphanumeric.pack.js" type="text/javascript" ></script>
 <script src="/site_media/scripts/jquery/json.js" type="text/javascript" ></script>
+<script src="/site_media/scripts/jquery/jquery.color.js" type="text/javascript" ></script>
 
 
 <script type="text/javascript" charset="utf-8">
@@ -21,9 +22,13 @@ var timeout;
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
 			clearTimeout(timeout);
+			$("#transactionSummaryMessage").html("You ran out of time.");
+			$('#transactionSummaryOfferFromOpponent').css({display:"none"});
+			$('#transactionSummaryOfferToOpponent').css({display:"none"});
+			$("#transactionSummaryMessage").css({display:"block"});
 			showScreen("transactionSummary");
 		});
-
+		
 	    // bind the submit event of all forms on the page. The server response will be
 		// delivered to the processFormResponse() function.
 		$('form').ajaxForm({success: processFormResponse}); 
@@ -31,7 +36,7 @@ var timeout;
 		// pNum is either 1 or 2 indicating if, within the current pairing, the player is the 1st or 2nd player
 		// It's used when building keys to access nex parameters. e.g. exchangeParametersJSON['p' + pNum + 'x']
 		pNum = "{{playerNumber}}";
-
+		
 		// Bind the input fields of the offerFormulation screen
 		// Updates the "This deal would get you" number on the offerFormulation screen
 		$('.offerFormulationInputs').numeric();
@@ -95,17 +100,9 @@ var timeout;
 	
 	function examineJSON(responseJSON){
 		// Processor is a reference to the django view that processed the form.
-		if(responseJSON['processor'] == "makeOfferButton"){
-			calculatePoints("offer");
-		}
-		
-		if(responseJSON['showScreen']){
-			showScreen(responseJSON['showScreen']);
-		}
-		
-		if(responseJSON['continuePolling'] == false){
-			killPolling = true;
+		if(responseJSON['continuePolling'] != true){
 			clearTimeout(timeout);
+			killPolling = true;
 		}
 		if(responseJSON['redirect']){
 			window.location = responseJSON['redirect'];
@@ -122,18 +119,91 @@ var timeout;
 		if(responseJSON['showTime']){
 			$("html").trigger("widget_timer_event_scheduleTimer", [responseJSON['showTime']]);
 		}
-		if(responseJSON['offer']){
-			$('.currentOffer').html(String(responseJSON['offer']['offer']));
-			$('.currentOfferUnit').html(String(responseJSON['offer']['offerUnit']));
-			$('.currentRequest').html(String(responseJSON['offer']['request']));
-			$('.currentRequestUnit').html(String(responseJSON['offer']['requestUnit']));
-			calculatePoints("updateOffer");
+		if(responseJSON['incomingOffer']){
+			$('.currentOffer').html(String(responseJSON['incomingOffer']['offer']));
+			$('.currentOfferUnit').html(String(responseJSON['incomingOffer']['offerUnit']));
+			$('.currentRequest').html(String(responseJSON['incomingOffer']['request']));
+			$('.currentRequestUnit').html(String(responseJSON['incomingOffer']['requestUnit']));
+			calculatePoints("incomingOffer");
+		}
+		if(responseJSON['outgoingOffer']){
+			$('.currentOffer').html(String(responseJSON['outgoingOffer']['offer']));
+			$('.currentOfferUnit').html(String(responseJSON['outgoingOffer']['offerUnit']));
+			$('.currentRequest').html(String(responseJSON['outgoingOffer']['request']));
+			$('.currentRequestUnit').html(String(responseJSON['outgoingOffer']['requestUnit']));
+			calculatePoints("outgoingOffer");
 		}
 		// If the server set poll to true, start polling on the given url and interval
 		if(responseJSON['poll']){
 			killPolling = false;
 			pollServer(responseJSON['url'],responseJSON['interval']);
 		}
+		if(responseJSON['transactionType']){
+			$('#transactionSummaryOfferFromOpponent').css({display:"none"});
+			$('#transactionSummaryOfferToOpponent').css({display:"none"});
+			$('#transactionSummaryMessage').css({display:"none"});
+			switch(responseJSON['transactionType']){
+				case "youAccepted":
+					$("#transactionSummaryMessage").html("You accepted the offer.");
+					$('#transactionSummaryOfferFromOpponent').css({display:"block"});
+					break;
+				case "opponentAccepted":
+					$("#transactionSummaryMessage").html("The other player accepted your offer.");
+					$('#transactionSummaryOfferToOpponent').css({display:"block"});
+					break;
+
+				case "youEndedTheRound":
+					$("#transactionSummaryMessage").html("You ended the round.");
+					$('#transactionSummaryMessage').css({display:"block"});
+					break;
+				case "opponentEndedRound":
+					$("#transactionSummaryMessage").html("After seeing your offer, the other player ended the round.");
+					$('#transactionSummaryMessage').css({display:"block"});
+					break;
+
+				case "youCanceledOffer":
+					$("#transactionSummaryMessage").html("You canceled your offer.");
+					$('#transactionSummaryMessage').css({display:"block"});
+					break;
+				case "opponentCanceledOffer":
+					$("#transactionSummaryMessage").html("The other player canceled the offer before you responded.");
+					$('#transactionSummaryMessage').css({display:"block"});
+					break;
+			}
+		}
+		if(responseJSON['processor'] == "makeOfferButton"){
+			calculatePoints("offer");
+		}
+		if(responseJSON['showScreen']){
+			showScreen(responseJSON['showScreen']);
+		}
+		if(responseJSON['setX']){
+			setTimeout('setXandY("X","' + responseJSON["setX"] + '")', 0);
+		}
+		if(responseJSON['setY']){
+			setTimeout('setXandY("Y","' + responseJSON["setY"] + '")', 500);
+		}
+		if(responseJSON['initBank'] >= 0){
+			$("html").trigger("widget_bank_event_set", [responseJSON['initBank']]);
+		}
+		if(responseJSON['updateBank'] >= 0){
+			oldPoints = responseJSON['updateBank'];
+			currentPoints = $(".currentPoints").html();
+			updatedPoints = parseInt(oldPoints) + parseInt(currentPoints);
+			setTimeout('$("html").trigger("widget_bank_event_set", [updatedPoints])', 1000);
+		}
+		if(responseJSON['insufficientFunds'] == true){
+			$('#incomingOfferInsufficientFunds').css({display:"block"});
+		} else {
+			$('#incomingOfferInsufficientFunds').css({display:"none"});
+		}
+	}
+	
+	function setXandY(letter, amount){
+		letter = letter.toUpperCase();
+		$('#available' + letter).html(amount);
+		$("#available" + letter).css("backgroundColor","yellow");
+		$("#available" + letter).animate({ backgroundColor: "#FFF" }, {queue:false, duration:2000});
 	}
 	
 	// This function displays only the specified screen. screenName should be the the div ID
@@ -167,7 +237,12 @@ var timeout;
 			request = $("#counterOfferFormulationRequest").val();
 			offerUnit = $("#counterOfferFormulationOfferUnit").val();
 			requestUnit = $("#counterOfferFormulationRequestUnit").val();
-		} else if(offerType == "updateOffer"){
+		} else if(offerType == "incomingOffer"){
+			offer = $(".currentRequest:first").html();
+			request = $(".currentOffer:first").html();
+			offerUnit = $(".currentRequestUnit:first").html();
+			requestUnit = $(".currentOfferUnit:first").html();
+		} else if(offerType == "outgoingOffer"){
 			offer = $(".currentOffer:first").html();
 			request = $(".currentRequest:first").html();
 			offerUnit = $(".currentOfferUnit:first").html();
@@ -194,6 +269,15 @@ var timeout;
 			p1yMaxRequest: exchangeParametersJSON['p1yMaxRequest'],
 			p2xMaxRequest: exchangeParametersJSON['p2xMaxRequest'],
 			p2yMaxRequest: exchangeParametersJSON['p2yMaxRequest']
+		}
+		
+		// update available X and Y with what's currently displayed
+		if(pNum == 1){
+			options['p1x'] = $("#availableX").html();
+			options['p1y'] = $("#availableY").html();
+		} else {
+			options['p2x'] = $("#availableX").html();
+			options['p2y'] = $("#availableY").html();
 		}
 		
 		options['p1xValue'] = parseValueInput(options['p1xValue'], options);
@@ -250,13 +334,13 @@ var timeout;
 				if(parseInt(options['request']) > parseInt(options['p1xMaxRequest'])) {
 					$("#"+options['offerType']+"FormulationRequest").val(options['p1xMaxRequest']);
 					options['request'] = options['p1xMaxRequest'];
-					$(".requestError").html("You only have " + options['p1xMaxRequest'] + " " + options['requestUnit']);
+					$(".requestError").html("You can only request " + options['p1xMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
 			} else {
 				if(parseInt(options['request']) > parseInt(options['p2xMaxRequest'])) {
 					$("#"+options['offerType']+"FormulationRequest").val(options['p2xMaxRequest']);
 					options['request'] = options['p2xMaxRequest'];
-					$(".requestError").html("You only have " + options['p2xMaxRequest'] + " " + options['requestUnit']);
+					$(".requestError").html("You can only request " + options['p2xMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
 			}
 		} else {
@@ -264,13 +348,13 @@ var timeout;
 				if(parseInt(options['request']) > parseInt(options['p1yMaxRequest'])) {
 					$("#"+options['offerType']+"FormulationRequest").val(options['p1yMaxRequest']);
 					options['request'] = options['p1yMaxRequest'];
-					$(".requestError").html("You only have " + options['p1yMaxRequest'] + " " + options['requestUnit']);
+					$(".requestError").html("You can only request " + options['p1yMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
 			} else {
 				if(parseInt(options['request']) > parseInt(options['p2yMaxRequest'])) {
 					$("#"+options['offerType']+"FormulationRequest").val(options['p2yMaxRequest']);
 					options['request'] = options['p2yMaxRequest'];
-					$(".requestError").html("You only have " + options['p2yMaxRequest'] + " " + options['requestUnit']);
+					$(".requestError").html("You can only request " + options['p2yMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
 			}
 		}
@@ -319,8 +403,9 @@ var timeout;
 		p2Points = p2InitialPoints + (p2Gain - p2Loss);		
 		
 		points = String(eval("p" + pNum + "Points"));
-		if(offerType == "updateOffer"){
+		if(offerType == "incomingOffer" || offerType == "outgoingOffer"){
 			$(".currentPoints").html(points);
+			$("#transactionSummaryPoints").val(points);
 		} else {
 			$(".pointsPreview").html(points);
 		}
@@ -490,6 +575,7 @@ var timeout;
 		<strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>
 	</p>
 	<p>This deal would get you: <b><span class="currentPoints">-</span></b> points</p>
+	<div id="incomingOfferInsufficientFunds" style="display:none;">You don't have enough to fulfill Player {{opponentIdentity}}'s request!</div>
 	<p>
 		<form action="/nex/incomingOffer/" method="post" accept-charset="utf-8">
 			<input type="submit" name="incomingOfferSubmit" value="Accept" class="buttonBig"/> 
@@ -533,14 +619,27 @@ var timeout;
 	<br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/>
-	<p>You accepted player {{opponentIdentity}}'s offer of 
-		<strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong> 
-		for 
-		<strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>.</p>
-	<p>You received <b><span class="currentPoints">-</span></b> points for this deal.</p>
+	<div id="transactionSummaryMessage" style="display:none;">
+		-
+	</div>
+	<div id="transactionSummaryOfferFromOpponent" style="display:none;">
+		You accepted player {{opponentIdentity}}'s offer of <strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong>
+		in exchange for <strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>.
+		<br/>
+		You received <strong><span class="currentPoints">-</span></strong> 
+		points for this deal.
+	</div>
+	<div id="transactionSummaryOfferToOpponent" style="display:none;">
+		Player {{opponentIdentity}} accepted your offer of <strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong>
+		in exchange for <strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>.
+		<br/>
+		You received <strong><span class="currentPoints">-</span></strong> 
+		points for this deal.
+	</div>
 	<p>
 		<form action="/nex/transactionSummary/" method="post" accept-charset="utf-8">
-			<input type="submit" name="transactionSummarySubmit" value="Continue" class="buttonBig"/> 
+			<input type="submit" name="transactionSummarySubmit" value="Continue" class="buttonBig"/>
+			<input type="hidden" name="transactionSummaryPoints" value="-" id="transactionSummaryPoints">
 		</form>
 	</p>
 </div>
@@ -558,11 +657,11 @@ var timeout;
 
 <div id="currentPointsBox">
 	<p>Total X</p>
-	<div id="availableX" class="largePoints">{{startingX}}</div>
+	<div id="availableX" class="largePoints">-</div>
 </div>
 <div id="cumulativePointsBox">
 	<p>Total Y</p>
-	<div id="availableY" class="largePoints">{{startingY}}</div>
+	<div id="availableY" class="largePoints">-</div>
 </div>
 
 {% endblock %}
