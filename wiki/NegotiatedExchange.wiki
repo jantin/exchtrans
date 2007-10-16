@@ -1,4 +1,5 @@
 #summary Description of negotiated exchange parameters
+#labels Docs-user
 
 == Point Parameters ==
 || *Name* || *Type* || *Description* ||
