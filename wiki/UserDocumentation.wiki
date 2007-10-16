@@ -1,5 +1,5 @@
+#summary A user manual for people to create and run experiments with Exchtrans
 #labels Docs-user
-# A user manual for people to create and run experiments with Exchtrans
 
 = Table of Contents =
 
