@@ -1,5 +1,5 @@
-#labels Phase-QA
-This page describes steps for testing exchtrans
+#summary Procedures for testing exchtrans
+#labels Docs-dev
 
 ==Testing component, experiment, and session creation==
   # Go to http://exchtrans.homeip.net
