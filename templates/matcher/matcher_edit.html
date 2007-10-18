@@ -155,6 +155,7 @@
 							</select>
 						</td>
 						<td>
+						
 							<select multiple="multiple" size="6" name="componentChoices_{{forloop.counter0}}" class="componentChoicesFormElement">
 								{% for c in componentList %}
 									<option value="{{c.id}}" {% multipleSelectSelector pairing.choices c.id %}>{{c.name}} ({{c.componentType}})</option>

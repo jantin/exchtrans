@@ -106,13 +106,24 @@ def nexDisplay(request):
 		exchangeParametersJSON[key] = value
 	exchangeParametersJSON = simplejson.dumps(exchangeParametersJSON)
 		
-	# Get the current pairing
-	playerPairMapKey = "matcher" + str(request.session['c'].id) + "playerPairMap"
+	# Get the player pairing map
+	playerPairMapKey = "matcher_" + str(request.session['c'].id) + "_" + str(request.session['p'].currentComponent) + "_playerPairMap"
 	playerPairMap = SessionVar.objects.get(key=playerPairMapKey).value
 	request.session['playerPairMap'] = pickle.loads(playerPairMap)
+	
+	# Get the current pairing index. The -1 is because the PairingIndex is incremented by the matcher just before we get here
 	request.session['currentPairingIndex'] = request.session['playerPairMap'][request.session['p'].number] - 1
-		# -1 because the PairingIndex is incremented by the matcher before we get here
-	request.session['currentPairing'] = request.session['parameters'].pairings[int(request.session['currentPairingIndex'])]
+	
+	# Get the current pairing. Random pairings are in the Session Var table. Non-random pairings are stored in the matcher component
+	if(request.session['parameters'].randomPairing == True):
+		RandomPairsKey = "matcher_" + str(request.session['c'].id) + "_" + str(request.session['p'].currentComponent) + "_RandomPairs"
+		RandomPairs = SessionVar.objects.get(experimentSession=request.session['s'],key=RandomPairsKey)
+		RandomPairs = pickle.loads(RandomPairs.value)
+		request.session['pairings'] = RandomPairs
+		request.session['currentPairing'] = RandomPairs[int(request.session['currentPairingIndex'])]
+	else:
+		request.session['pairings'] = request.session['parameters'].pairings
+		request.session['currentPairing'] = request.session['parameters'].pairings[int(request.session['currentPairingIndex'])]
 
 	# Set the current exchange round to 1. (used to determine if another rounds in the current pairing is needed)
 	request.session['currentRound'] = 1
@@ -139,6 +150,8 @@ def nexDisplay(request):
 		request.session['clearing'] = request.session['exchangeParameters'].p1Clearing
 		request.session['currentX'] = int(request.session['exchangeParameters'].p1x)
 		request.session['currentY'] = int(request.session['exchangeParameters'].p1y)
+		request.session['xValue'] = int(request.session['exchangeParameters'].p1xValue)
+		request.session['yValue'] = int(request.session['exchangeParameters'].p1yValue)
 	elif (int(request.session['currentPairing']["p2"]) == int(request.session['p'].number)):
 		request.session['playerNumber'] = 2
 		request.session['startingX'] = int(request.session['exchangeParameters'].p2x)
@@ -148,6 +161,8 @@ def nexDisplay(request):
 		request.session['clearing'] = request.session['exchangeParameters'].p2Clearing
 		request.session['currentX'] = int(request.session['exchangeParameters'].p2x)
 		request.session['currentY'] = int(request.session['exchangeParameters'].p2y)
+		request.session['xValue'] = int(request.session['exchangeParameters'].p2xValue)
+		request.session['yValue'] = int(request.session['exchangeParameters'].p2yValue)
 	else:
 		request.session['playerNumber'] = None
 
@@ -161,7 +176,10 @@ def nexDisplay(request):
 								'playerNumber': request.session['playerNumber'],
 								'widgets': widgets,
 								'startingX': request.session['startingX'],
-								'startingY': request.session['startingY']
+								'startingY': request.session['startingY'],
+								'showXYValue': request.session['exchangeParameters'].showPoints,
+								'xValue': request.session['xValue'],
+								'yValue': request.session['yValue']
 							}, 
 						  	context_instance=RequestContext(request))
 
@@ -369,9 +387,21 @@ def offerFormulation(request):
 	try:
 		existingOffer = SessionVar.objects.get(key=offerCheckKey, unread=True)
 	except:
-		offerObj = nexOfferObj(	offer=request.POST.get('offerFormulationOffer'), 
+		# Error check input. Must be integer greater than zero. int conversion strips leading 'O's
+		if(len(request.POST.get('offerFormulationOffer')) == 0):
+			offerAmount = "0"
+		else:
+			offerAmount = int(request.POST.get('offerFormulationOffer'))
+			offerAmount = str(offerAmount)
+		if(len(request.POST.get('offerFormulationRequest')) == 0):
+			requestAmount = "0"
+		else:
+			requestAmount = int(request.POST.get('offerFormulationRequest'))
+			requestAmount = str(requestAmount)
+		
+		offerObj = nexOfferObj(	offer=offerAmount, 
 								offerUnit=request.POST.get('offerFormulationOfferUnit'), 
-								request=request.POST.get('offerFormulationRequest'), 
+								request=requestAmount, 
 								requestUnit=request.POST.get('offerFormulationRequestUnit'),
 								offeredBy=request.session['p'].name
 							   )
@@ -387,6 +417,7 @@ def offerFormulation(request):
 		request.session['currentOffer'] = offerObj
 		
 		response['continuePolling'] = False
+		response['resetFormulationForms'] = True
 		response['showScreen'] = "waitingScreen"
 		response['poll'] = True
 		response['url'] = "/nex/waitingScreenPollProcess/"
@@ -433,10 +464,23 @@ def counterOfferFormulation(request):
 	
 	if(submit == "Cancel"):
 		response['showScreen'] = "incomingOffer"
-	elif(submit == "Counter Offer"):	
-		offerObj = nexOfferObj(	offer=request.POST.get('counterOfferFormulationOffer'), 
+	elif(submit == "Counter Offer"):
+		
+		# Error check input. Must be integer greater than zero. int conversion strips leading 'O's
+		if(len(request.POST.get('counterOfferFormulationOffer')) == 0):
+			offerAmount = "0"
+		else:
+			offerAmount = int(request.POST.get('counterOfferFormulationOffer'))
+			offerAmount = str(offerAmount)
+		if(len(request.POST.get('counterOfferFormulationRequest')) == 0):
+			requestAmount = "0"
+		else:
+			requestAmount = int(request.POST.get('counterOfferFormulationRequest'))
+			requestAmount = str(requestAmount)
+					
+		offerObj = nexOfferObj(	offer=offerAmount, 
 								offerUnit=request.POST.get('counterOfferFormulationOfferUnit'), 
-								request=request.POST.get('counterOfferFormulationRequest'), 
+								request=requestAmount, 
 								requestUnit=request.POST.get('counterOfferFormulationRequestUnit'),
 								offeredBy=request.session['p'].name
 							   )
@@ -454,6 +498,7 @@ def counterOfferFormulation(request):
 		# While it's handy, save the offer to reqest.session
 		request.session['currentOffer'] = offerObj
 		
+		response['resetFormulationForms'] = True
 		response['showScreen'] = "waitingScreen"
 		response['poll'] = True
 		response['url'] = "/nex/waitingScreenPollProcess/"
@@ -490,6 +535,8 @@ def waitingScreenPollProcess(request):
 	else:
 		if(message.value == "acceptNonBinding"):
 			response['showScreen'] = "nonBindingConfirmation"
+			response['nonBindingOfferType'] = "OfferToOpponent"
+			response['stopTimer'] = True
 		elif(message.value == "acceptBinding"):
 			response['showScreen'] = "transactionSummary"
 			response['stopTimer'] = True
@@ -606,6 +653,8 @@ def incomingOffer(request):
 		if(request.session['exchangeParameters'].nonBinding):
 			SessionVar(key=key, experimentSession=request.session['s'], value="acceptNonBinding").save()
 			response['showScreen'] = "nonBindingConfirmation"
+			response['nonBindingOfferType'] = "OfferFromOpponent"
+			response['stopTimer'] = True
 		else:
 			SessionVar(key=key, experimentSession=request.session['s'], value="acceptBinding").save()
 			response['showScreen'] = "transactionSummary"
@@ -678,9 +727,103 @@ def confirmEndRound(request):
 
 def nonBindingConfirmation(request):
 	"""Handles the nonBindingConfirmation screen"""
+	choice = request.POST.get('nonBindingConfirmationSubmit')
 	response = {}
 	response['processor'] = "nonBindingConfirmation"
+	response['continuePolling'] = False
+	response['stopTimer'] = True
+	response['showScreen'] = "nonBindingWaitingScreen"
+	response['poll'] = True
+	response['url'] = "/nex/nonBindingPollProcess/"
+	response['interval'] = 2000
 	
+	key = request.session['keyPrefix'] + "_nonBindingMessageTo_" + request.session['opponent'].name	
+
+	if(choice == 'Yes'):
+		SessionVar(key=key, experimentSession=request.session['s'], value="followedThrough").save()
+		response['transactionType'] = "followedThrough"
+		request.session['didIFollowThrough'] = True
+	elif(choice == 'No'):
+		SessionVar(key=key, experimentSession=request.session['s'], value="reneged").save()
+		response['transactionType'] = "reneged"
+		request.session['didIFollowThrough'] = False
+		
+	jsonString = simplejson.dumps(response)
+	return render_to_response('api.html', 
+						  {'response': jsonString}, 
+						  context_instance=RequestContext(request))
+
+def nonBindingPollProcess(request):
+	"""Polls to see if the other player made a selection on the nonBinding Screen"""
+	response = {}	
+	response['processor'] = "nonBindingPollProcess"
+	
+	key = request.session['keyPrefix'] + "_nonBindingMessageTo_" + request.session['p'].name	
+	messageValues = ["followedThrough", "reneged"]
+	try:
+		message = SessionVar.objects.get(key=key, unread=True, value__in=messageValues)
+	except:
+		response['continuePolling'] = True
+	else:
+		# Determine how much X and Y the player has after the transaction. 
+		# 1) Check if the other player followed through or reneged
+		if(message.value == "followedThrough"):
+
+			# 2) Check if the current player followed through or reneged
+			if(request.session['didIFollowThrough']):
+				response['transactionType'] = "youFollowedThroughOpponentFollowedThrough"
+				
+				# 3) Check if the offer is from the current player or the opponent
+				if(request.session['currentOffer'].offeredBy == request.session['p'].name):
+					# Get the unit letter
+					offerXY = request.session['currentOffer'].offerUnit.upper()
+					requestXY = request.session['currentOffer'].requestUnit.upper()
+					# Update the request session
+					request.session['current' + offerXY] 	-= int(request.session['currentOffer'].offer)
+					request.session['current' + requestXY] 	+= int(request.session['currentOffer'].request)
+					# Update the players X and Y totals
+					response['set' + offerXY] = request.session['current' + offerXY]
+					response['set' + requestXY] = request.session['current' + requestXY]
+				elif(request.session['currentOffer'].offeredBy == request.session['opponent'].name):
+					# Get the unit letter
+					offerXY 	= request.session['currentOffer'].offerUnit.upper()
+					requestXY 	= request.session['currentOffer'].requestUnit.upper()
+					# Update the request session
+					request.session['current' + offerXY] 	+= int(request.session['currentOffer'].offer)
+					request.session['current' + requestXY] 	-= int(request.session['currentOffer'].request)
+					# Update the players X and Y totals
+					response['set' + offerXY] 	= request.session['current' + offerXY]
+					response['set' + requestXY] = request.session['current' + requestXY]
+			else:
+				response['transactionType'] = "youRenegedOpponentFollowedThrough"
+				if(request.session['currentOffer'].offeredBy == request.session['p'].name):
+					requestXY = request.session['currentOffer'].requestUnit.upper()
+					request.session['current' + requestXY] 	+= int(request.session['currentOffer'].request)
+					response['set' + requestXY] = request.session['current' + requestXY]
+				elif(request.session['currentOffer'].offeredBy == request.session['opponent'].name):
+					offerXY 	= request.session['currentOffer'].offerUnit.upper()
+					request.session['current' + offerXY] 	+= int(request.session['currentOffer'].offer)
+					response['set' + offerXY] 	= request.session['current' + offerXY]			
+		elif(message.value == "reneged"):
+			if(request.session['didIFollowThrough']):
+				response['transactionType'] = "youFollowedThroughOpponentReneged"
+				if(request.session['currentOffer'].offeredBy == request.session['p'].name):
+					offerXY = request.session['currentOffer'].offerUnit.upper()
+					request.session['current' + offerXY] 	-= int(request.session['currentOffer'].offer)
+					response['set' + offerXY] = request.session['current' + offerXY]
+				elif(request.session['currentOffer'].offeredBy == request.session['opponent'].name):
+					requestXY 	= request.session['currentOffer'].requestUnit.upper()
+					request.session['current' + requestXY] 	-= int(request.session['currentOffer'].request)
+					response['set' + requestXY] = request.session['current' + requestXY]
+			else:
+				response['transactionType'] = "youRenegedOpponentReneged"
+
+		response['showScreen'] = "transactionSummary"
+		response['continuePolling'] = False
+		response['updateBank'] = request.session['p'].cumulativePoints
+		
+		message.unread = False
+		message.save()
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 

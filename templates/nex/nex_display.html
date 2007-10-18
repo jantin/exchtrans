@@ -41,25 +41,26 @@ var timeout;
 		// Updates the "This deal would get you" number on the offerFormulation screen
 		$('.offerFormulationInputs').numeric();
 		$(".offerFormulationInputs").keyup(function(){
-			calculatePoints("offer");
-		});
+			calculatePoints("offerPreview");
+		});		
 		$("#offerFormulationOfferUnit").change(function(){
-			calculatePoints("offer");
+			calculatePoints("offerPreview");
 		});
 		$("#offerFormulationRequestUnit").change(function(){
-			calculatePoints("offer");
+			calculatePoints("offerPreview");
 		});
+		
 		
 		// counter offer screen fields
 		$('.counterOfferFormulationInputs').numeric();
 		$(".counterOfferFormulationInputs").keyup(function(){
-			calculatePoints("counterOffer");
+			calculatePoints("counterOfferPreview");
 		});
 		$("#counterOfferFormulationOfferUnit").change(function(){
-			calculatePoints("counterOffer");
+			calculatePoints("counterOfferPreview");
 		});
 		$("#counterOfferFormulationRequestUnit").change(function(){
-			calculatePoints("counterOffer");
+			calculatePoints("counterOfferPreview");
 		});
 		
 		// Start polling server to check for opponents
@@ -120,18 +121,18 @@ var timeout;
 			$("html").trigger("widget_timer_event_scheduleTimer", [responseJSON['showTime']]);
 		}
 		if(responseJSON['incomingOffer']){
-			$('.currentOffer').html(String(responseJSON['incomingOffer']['offer']));
-			$('.currentOfferUnit').html(String(responseJSON['incomingOffer']['offerUnit']));
-			$('.currentRequest').html(String(responseJSON['incomingOffer']['request']));
-			$('.currentRequestUnit').html(String(responseJSON['incomingOffer']['requestUnit']));
-			calculatePoints("incomingOffer");
+			$('.currentGain').html(String(responseJSON['incomingOffer']['offer']));
+			$('.currentGainUnit').html(String(responseJSON['incomingOffer']['offerUnit']));
+			$('.currentLoss').html(String(responseJSON['incomingOffer']['request']));
+			$('.currentLossUnit').html(String(responseJSON['incomingOffer']['requestUnit']));			
+			calculatePoints("newOffer");
 		}
 		if(responseJSON['outgoingOffer']){
-			$('.currentOffer').html(String(responseJSON['outgoingOffer']['offer']));
-			$('.currentOfferUnit').html(String(responseJSON['outgoingOffer']['offerUnit']));
-			$('.currentRequest').html(String(responseJSON['outgoingOffer']['request']));
-			$('.currentRequestUnit').html(String(responseJSON['outgoingOffer']['requestUnit']));
-			calculatePoints("outgoingOffer");
+			$('.currentGain').html(String(responseJSON['outgoingOffer']['request']));
+			$('.currentGainUnit').html(String(responseJSON['outgoingOffer']['requestUnit']));
+			$('.currentLoss').html(String(responseJSON['outgoingOffer']['offer']));
+			$('.currentLossUnit').html(String(responseJSON['outgoingOffer']['offerUnit']));
+			calculatePoints("newOffer");
 		}
 		// If the server set poll to true, start polling on the given url and interval
 		if(responseJSON['poll']){
@@ -139,48 +140,21 @@ var timeout;
 			pollServer(responseJSON['url'],responseJSON['interval']);
 		}
 		if(responseJSON['transactionType']){
-			$('#transactionSummaryOfferFromOpponent').css({display:"none"});
-			$('#transactionSummaryOfferToOpponent').css({display:"none"});
-			$('#transactionSummaryMessage').css({display:"none"});
-			switch(responseJSON['transactionType']){
-				case "youAccepted":
-					$("#transactionSummaryMessage").html("You accepted the offer.");
-					$('#transactionSummaryOfferFromOpponent').css({display:"block"});
-					break;
-				case "opponentAccepted":
-					$("#transactionSummaryMessage").html("The other player accepted your offer.");
-					$('#transactionSummaryOfferToOpponent').css({display:"block"});
-					break;
-
-				case "youEndedTheRound":
-					$("#transactionSummaryMessage").html("You ended the round.");
-					$('#transactionSummaryMessage').css({display:"block"});
-					break;
-				case "opponentEndedRound":
-					$("#transactionSummaryMessage").html("After seeing your offer, the other player ended the round.");
-					$('#transactionSummaryMessage').css({display:"block"});
-					break;
-
-				case "youCanceledOffer":
-					$("#transactionSummaryMessage").html("You canceled your offer.");
-					$('#transactionSummaryMessage').css({display:"block"});
-					break;
-				case "opponentCanceledOffer":
-					$("#transactionSummaryMessage").html("The other player canceled the offer before you responded.");
-					$('#transactionSummaryMessage').css({display:"block"});
-					break;
-			}
+			$('.transactionSummaryMessages').css({display:"none"});
+			$('#transactionSummary_' + responseJSON['transactionType']).css({display:"block"});
+		}
+		if(responseJSON['nonBindingOfferType']){
+			$('#nonBindingConfirmationOfferFromOpponent').css({display:"none"});
+			$('#nonBindingConfirmationOfferToOpponent').css({display:"none"});
+			$('#nonBindingConfirmation' + responseJSON['nonBindingOfferType']).css({display:"block"});
 		}
 		if(responseJSON['processor'] == "makeOfferButton"){
-			calculatePoints("offer");
+			calculatePoints("offerPreview");
 		}
-		if(responseJSON['showScreen']){
-			showScreen(responseJSON['showScreen']);
-		}
-		if(responseJSON['setX']){
+		if(responseJSON['setX'] >= 0){
 			setTimeout('setXandY("X","' + responseJSON["setX"] + '")', 0);
 		}
-		if(responseJSON['setY']){
+		if(responseJSON['setY'] >= 0){
 			setTimeout('setXandY("Y","' + responseJSON["setY"] + '")', 500);
 		}
 		if(responseJSON['initBank'] >= 0){
@@ -188,14 +162,31 @@ var timeout;
 		}
 		if(responseJSON['updateBank'] >= 0){
 			oldPoints = responseJSON['updateBank'];
-			currentPoints = $(".currentPoints").html();
+			currentPoints = $(".currentPoints:first").html();
 			updatedPoints = parseInt(oldPoints) + parseInt(currentPoints);
 			setTimeout('$("html").trigger("widget_bank_event_set", [updatedPoints])', 1000);
 		}
 		if(responseJSON['insufficientFunds'] == true){
 			$('#incomingOfferInsufficientFunds').css({display:"block"});
+			$('#incomingOfferAcceptButton').attr({disabled:"disabled"});
 		} else {
 			$('#incomingOfferInsufficientFunds').css({display:"none"});
+			$('#incomingOfferAcceptButton').removeAttr("disabled");
+		}
+		if(responseJSON['resetFormulationForms']){
+			$(".offerError").html("");
+			$(".requestError").html("");
+			$("#counterOfferFormulationOffer").val("");
+			$("#counterOfferFormulationRequest").val("");
+			$("#counterOfferFormulationOfferUnit").val("x");
+			$("#counterOfferFormulationRequestUnit").val("y");
+			$("#offerFormulationOffer").val("");
+			$("#offerFormulationRequest").val("");
+			$("#offerFormulationOfferUnit").val("x");
+			$("#offerFormulationRequestUnit").val("y");
+		}
+		if(responseJSON['showScreen']){
+			showScreen(responseJSON['showScreen']);
 		}
 	}
 	
@@ -220,35 +211,32 @@ var timeout;
 	// Called on keyup of the input fields of the offerFormulation screen
 	function calculatePoints(offerType){		
 		// Clear the error if present
-		$("#offerError").html("");
-		$("#requestError").html("");
+		$(".offerError").html("");
+		$(".requestError").html("");
 				
 		// exchangeParametersJSON contains the contents of the Nex component object
 		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
 		pNum = "{{playerNumber}}";
 		
-		if(offerType == "offer"){
+		if(offerType == "offerPreview"){
 			offer = $("#offerFormulationOffer").val();
 			request = $("#offerFormulationRequest").val();
 			offerUnit = $("#offerFormulationOfferUnit").val();
 			requestUnit = $("#offerFormulationRequestUnit").val();
-		} else if(offerType == "counterOffer"){
+			divPrefix = "offer"; //used in the error checking
+		} else if(offerType == "counterOfferPreview"){
 			offer = $("#counterOfferFormulationOffer").val();
 			request = $("#counterOfferFormulationRequest").val();
 			offerUnit = $("#counterOfferFormulationOfferUnit").val();
 			requestUnit = $("#counterOfferFormulationRequestUnit").val();
-		} else if(offerType == "incomingOffer"){
-			offer = $(".currentRequest:first").html();
-			request = $(".currentOffer:first").html();
-			offerUnit = $(".currentRequestUnit:first").html();
-			requestUnit = $(".currentOfferUnit:first").html();
-		} else if(offerType == "outgoingOffer"){
-			offer = $(".currentOffer:first").html();
-			request = $(".currentRequest:first").html();
-			offerUnit = $(".currentOfferUnit:first").html();
-			requestUnit = $(".currentRequestUnit:first").html();
+			divPrefix = "counterOffer"; //used in the error checking
+		} else if(offerType == "newOffer"){
+			offer = $(".currentLoss:first").html();
+			offerUnit = $(".currentLossUnit:first").html();
+			request = $(".currentGain:first").html();
+			requestUnit = $(".currentGainUnit:first").html();
 		}
-		
+
 		// Set up all our working variables
 		options = {
 			offerType: offerType,
@@ -300,13 +288,13 @@ var timeout;
 		if(options['offerUnit'] == "x"){
 			if(options['whichPlayer'] == "p1"){
 				if(parseInt(options['offer']) > parseInt(options['p1x'])) {
-					$("#"+options['offerType']+"FormulationOffer").val(options['p1x']);
+					$("#"+divPrefix+"FormulationOffer").val(options['p1x']);
 					options['offer'] = options['p1x'];
 					$(".offerError").html("You only have " + options['p1x'] + " " + options['offerUnit']);
 				}
 			} else {
 				if(parseInt(options['offer']) > parseInt(options['p2x'])) {
-					$("#"+options['offerType']+"FormulationOffer").val(options['p2x']);
+					$("#"+divPrefix+"FormulationOffer").val(options['p2x']);
 					options['offer'] = options['p2x'];
 					$(".offerError").html("You only have " + options['p2x'] + " " + options['offerUnit']);
 				}
@@ -314,13 +302,13 @@ var timeout;
 		} else {
 			if(options['whichPlayer'] == "p1"){
 				if(parseInt(options['offer']) > parseInt(options['p1y'])) {
-					$("#"+options['offerType']+"FormulationOffer").val(options['p1y']);
+					$("#"+divPrefix+"FormulationOffer").val(options['p1y']);
 					options['offer'] = options['p1y'];
 					$(".offerError").html("You only have " + options['p1y'] + " " + options['offerUnit']);
 				}
 			} else {
 				if(parseInt(options['offer']) > parseInt(options['p2y'])) {
-					$("#"+options['offerType']+"FormulationOffer").val(options['p2y']);
+					$("#"+divPrefix+"FormulationOffer").val(options['p2y']);
 					options['offer'] = options['p2y'];
 					$(".offerError").html("You only have " + options['p2y'] + " " + options['offerUnit']);
 				}
@@ -332,13 +320,13 @@ var timeout;
 		if(options['requestUnit'] == "x"){
 			if(options['whichPlayer'] == "p1"){
 				if(parseInt(options['request']) > parseInt(options['p1xMaxRequest'])) {
-					$("#"+options['offerType']+"FormulationRequest").val(options['p1xMaxRequest']);
+					$("#"+divPrefix+"FormulationRequest").val(options['p1xMaxRequest']);
 					options['request'] = options['p1xMaxRequest'];
 					$(".requestError").html("You can only request " + options['p1xMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
 			} else {
 				if(parseInt(options['request']) > parseInt(options['p2xMaxRequest'])) {
-					$("#"+options['offerType']+"FormulationRequest").val(options['p2xMaxRequest']);
+					$("#"+divPrefix+"FormulationRequest").val(options['p2xMaxRequest']);
 					options['request'] = options['p2xMaxRequest'];
 					$(".requestError").html("You can only request " + options['p2xMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
@@ -346,13 +334,13 @@ var timeout;
 		} else {
 			if(options['whichPlayer'] == "p1"){
 				if(parseInt(options['request']) > parseInt(options['p1yMaxRequest'])) {
-					$("#"+options['offerType']+"FormulationRequest").val(options['p1yMaxRequest']);
+					$("#"+divPrefix+"FormulationRequest").val(options['p1yMaxRequest']);
 					options['request'] = options['p1yMaxRequest'];
 					$(".requestError").html("You can only request " + options['p1yMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
 			} else {
 				if(parseInt(options['request']) > parseInt(options['p2yMaxRequest'])) {
-					$("#"+options['offerType']+"FormulationRequest").val(options['p2yMaxRequest']);
+					$("#"+divPrefix+"FormulationRequest").val(options['p2yMaxRequest']);
 					options['request'] = options['p2yMaxRequest'];
 					$(".requestError").html("You can only request " + options['p2yMaxRequest'] + " " + options['requestUnit'] + " or less");
 				}
@@ -403,7 +391,7 @@ var timeout;
 		p2Points = p2InitialPoints + (p2Gain - p2Loss);		
 		
 		points = String(eval("p" + pNum + "Points"));
-		if(offerType == "incomingOffer" || offerType == "outgoingOffer"){
+		if(offerType == "newOffer"){
 			$(".currentPoints").html(points);
 			$("#transactionSummaryPoints").val(points);
 		} else {
@@ -483,7 +471,7 @@ var timeout;
 </div>
 <div id="offerFormulation" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
-	<form action="/nex/offerFormulation/" method="post" accept-charset="utf-8">
+	<form action="/nex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off">
 		<p>What will you give?</p>
 		<p>
 			<input type="text" name="offerFormulationOffer" id="offerFormulationOffer" class="offerFormulationInputs" value="0" size="4" maxlength="4"/>
@@ -491,7 +479,7 @@ var timeout;
 				<option>x</option>
 				<option>y</option>
 			</select>
-			<span id="offerError" class="offerError"></span>
+			<span class="offerError"></span>
 		</p>
 		<p>What do you want in return?</p>
 		<p>
@@ -500,7 +488,7 @@ var timeout;
 				<option>y</option>
 				<option>x</option>
 			</select>
-			<span id="requestError" class="requestError"></span>
+			<span class="requestError"></span>
 		</p>
 		<br/>
 		<p>This deal would get you: <b><span class="pointsPreview">-</span></b> points</p>
@@ -509,12 +497,12 @@ var timeout;
 </div>
 <div id="counterOfferFormulation" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
-	<form action="/nex/counterOfferFormulation/" method="post" accept-charset="utf-8">
+	<form action="/nex/counterOfferFormulation/" method="post" accept-charset="utf-8" autocomplete="off">
 		<p>
 			Player {{opponentIdentity}} offered you 
-			<strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong>
+			<strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>
 			 for 
-			<strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>. 
+			<strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>. 
 			<br/>This deal would get you: <b><span class="currentPoints">-</span></b> points.
 		</p>
 		<p>Enter your counter offer below.</p>
@@ -525,7 +513,7 @@ var timeout;
 				<option>x</option>
 				<option>y</option>
 			</select>
-			<span id="offerError" class="offerError"></span>
+			<span class="offerError"></span>
 		</p>
 		<p>What do you want in return?</p>
 		<p>
@@ -534,7 +522,7 @@ var timeout;
 				<option>y</option>
 				<option>x</option>
 			</select>
-			<span id="requestError" class="requestError"></span>
+			<span class="requestError"></span>
 		</p>
 		<br/>
 		<p>This deal would get you: <b><span class="pointsPreview">-</span></b> points</p>
@@ -570,15 +558,15 @@ var timeout;
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/>
 	<p>Player {{opponentIdentity}} offered you 
-		<strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong>
+		<strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>
 		 for 
-		<strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>
+		<strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>
 	</p>
 	<p>This deal would get you: <b><span class="currentPoints">-</span></b> points</p>
 	<div id="incomingOfferInsufficientFunds" style="display:none;">You don't have enough to fulfill Player {{opponentIdentity}}'s request!</div>
 	<p>
 		<form action="/nex/incomingOffer/" method="post" accept-charset="utf-8">
-			<input type="submit" name="incomingOfferSubmit" value="Accept" class="buttonBig"/> 
+			<input type="submit" name="incomingOfferSubmit" value="Accept" class="buttonBig" id="incomingOfferAcceptButton"/> 
 			<input type="submit" name="incomingOfferSubmit" value="Counter Offer" class="buttonBig"/>
 			<input type="submit" name="incomingOfferSubmit" value="End Round" class="buttonBig"/>
 		</form>	
@@ -599,14 +587,23 @@ var timeout;
 <div id="nonBindingConfirmation" style="display:none;" class="exchangeScreen">
 		<br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
-	<br/>
-	<p>
-		You accepted player {{opponentIdentity}}'s offer of 
-		<strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong> 
-		for 
-		<strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>.
-		<br/>This deal would get you: <b><span class="currentPoints">-</span></b> points.</p>
-	<p>Do you want to follow through on your part of the deal<br/> and give <span class="currentRequest">-</span> <span class="currentRequestUnit">-</span> to player {{opponentIdentity}}?</p>
+	<br/>	
+	<div id="nonBindingConfirmationOfferFromOpponent" style="display:none;">
+		You accepted player {{opponentIdentity}}'s offer of <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>
+		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.
+		<br/><br/>
+		Do you want to follow through on your part of the deal<br/> 
+		and give <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>
+		to player {{opponentIdentity}}?
+	</div>
+	<div id="nonBindingConfirmationOfferToOpponent" style="display:none;">
+		You accepted player {{opponentIdentity}}'s offer of <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>
+		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.
+		<br/><br/>
+		Do you want to follow through on your part of the deal<br/> 
+		and give <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>
+		to player {{opponentIdentity}}?
+	</div>
 	<br/>
 	<p>
 		<form action="/nex/nonBindingConfirmation/" method="post" accept-charset="utf-8">
@@ -615,26 +612,66 @@ var timeout;
 		</form>
 	</p>
 </div>
+<div id="nonBindingWaitingScreen" style="display:none;" class="exchangeScreen">
+	<br/><br/><br/>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
+	<br/>
+	<h3>Please wait for player {{opponentIdentity}}</h3>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
+</div>
 <div id="transactionSummary" style="display:none;" class="exchangeScreen">
 	<br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/>
-	<div id="transactionSummaryMessage" style="display:none;">
-		-
+	<div id="transactionSummary_youEndedTheRound" class="transactionSummaryMessages">
+		You ended the round.
 	</div>
-	<div id="transactionSummaryOfferFromOpponent" style="display:none;">
-		You accepted player {{opponentIdentity}}'s offer of <strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong>
-		in exchange for <strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>.
+	<div id="transactionSummary_opponentEndedRound" class="transactionSummaryMessages">
+		After seeing your offer, the other player ended the round.
+	</div>
+	<div id="transactionSummary_youCanceledOffer" class="transactionSummaryMessages">
+		You canceled your offer.
+	</div>
+	<div id="transactionSummary_opponentCanceledOffer" class="transactionSummaryMessages">
+		The other player canceled the offer before you responded.
+	</div>
+	<div id="transactionSummary_youAccepted" class="transactionSummaryMessages">
+		You accepted player {{opponentIdentity}}'s offer of <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>
+		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.
 		<br/>
 		You received <strong><span class="currentPoints">-</span></strong> 
 		points for this deal.
 	</div>
-	<div id="transactionSummaryOfferToOpponent" style="display:none;">
-		Player {{opponentIdentity}} accepted your offer of <strong><span class="currentOffer">-</span> <span class="currentOfferUnit">-</span></strong>
-		in exchange for <strong><span class="currentRequest">-</span> <span class="currentRequestUnit">-</span></strong>.
+	<div id="transactionSummary_opponentAccepted" class="transactionSummaryMessages">
+		Player {{opponentIdentity}} accepted your offer of <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>
+		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.
 		<br/>
 		You received <strong><span class="currentPoints">-</span></strong> 
 		points for this deal.
+	</div>
+	<div id="transactionSummary_youRenegedOpponentReneged" class="transactionSummaryMessages">
+		<p>Player {{opponentIdentity}} chose not to follow through on the deal
+			and did NOT give you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>.</p>
+		<p>You chose not to follow through on the deal
+			and did NOT give player {{opponentIdentity}} <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.</p>
+	</div>
+	<div id="transactionSummary_youRenegedOpponentFollowedThrough" class="transactionSummaryMessages">
+		<p>Player {{opponentIdentity}} followed through on the deal 
+			and gave you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>.</p>
+		<p>You chose not to follow through on the deal
+			and did NOT give player {{opponentIdentity}} <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.</p>
+	</div>
+	<div id="transactionSummary_youFollowedThroughOpponentReneged" class="transactionSummaryMessages">
+		<p>Player {{opponentIdentity}} chose not to follow through on the deal
+			and did NOT give you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>.</p>
+		<p>You followed through on the deal
+			and gave player {{opponentIdentity}} <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.</p>
+	</div>
+	<div id="transactionSummary_youFollowedThroughOpponentFollowedThrough" class="transactionSummaryMessages">
+		<p>Player {{opponentIdentity}} followed through on the deal 
+			and gave you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>.</p>
+		<p>You followed through on the deal
+			and gave player {{opponentIdentity}} <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>.</p>
 	</div>
 	<p>
 		<form action="/nex/transactionSummary/" method="post" accept-charset="utf-8">
@@ -658,10 +695,21 @@ var timeout;
 <div id="currentPointsBox">
 	<p>Total X</p>
 	<div id="availableX" class="largePoints">-</div>
+	{% if showXYValue %}
+		<div id="valueOfEachX">
+			Each X is worth {{xValue}} points
+		</div>	
+	{% endif %}
+
 </div>
 <div id="cumulativePointsBox">
 	<p>Total Y</p>
 	<div id="availableY" class="largePoints">-</div>
+	{% if showXYValue %}
+	<div id="valueOfEachX">
+		Each Y is worth {{yValue}} points
+	</div>	
+	{% endif %}
 </div>
 
 {% endblock %}
