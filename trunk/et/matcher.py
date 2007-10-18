@@ -86,8 +86,7 @@ def matcherDisplay(request):
 		# check if the pairings have been created already by checking for
 		# a session variable in the SessionVar table.
 		
-		# This key may be problematic if the experiment contains the same component multiple times
-		RandomPairsKey = "matcher" + str(c.id) + "RandomPairs"
+		RandomPairsKey = "matcher_" + str(c.id) + "_" + str(p.currentComponent) + "_RandomPairs"
 		try:
 			pairings = SessionVar.objects.get(experimentSession=s,key=RandomPairsKey)
 			pairings = pickle.loads(pairings.value)
@@ -105,7 +104,7 @@ def matcherDisplay(request):
 		pairings = parameters.pairings
 
 	# Check for the playerPairMap in the sessionVar table. Create if not found.
-	playerPairMapKey = "matcher" + str(c.id) + "playerPairMap"
+	playerPairMapKey = "matcher_" + str(c.id) + "_" + str(p.currentComponent) + "_playerPairMap"
 	try:
 		playerPairMapSessionVar = SessionVar.objects.get(experimentSession=s,key=playerPairMapKey)
 		playerPairMap = pickle.loads(playerPairMapSessionVar.value)
@@ -122,8 +121,9 @@ def matcherDisplay(request):
 	
 	# Go through all of the remaining pairings and act as necessary.
 	for pairIndex in range(playerPairMap[p.number], len(pairings)):
-		
+
 		pair = pairings[pairIndex]
+		
 		# check to see if participant is involved in pairing
 		if ( checkPairForPlayer(pair, p.number) ):
 			
@@ -138,14 +138,17 @@ def matcherDisplay(request):
 		
 			# check if there is a decider involved
 			if( checkForDecider(pair) ):
-				# is the current player the decider?
-				if ( checkPlayerIsDecider(pair, p.number) ):
+				# Get a list of possible components
+				choices = []
+				for choice in pair["choices"]:
+					choices.append(Component.objects.get(id=choice))					
+				# Make sure there is at least one component associated with the match.
+				if(len(choices) < 1):
+					raise AssertionError, "No exchange components were selected for this matcher. Edit the matcher component and add some."
 				
-					# Get a list of possible components
-					choices = []
-					for choice in pair["choices"]:
-						choices.append(Component.objects.get(id=choice))					
-					
+				# If the current player is the decider...
+				if ( checkPlayerIsDecider(pair, p.number) ):
+									
 					# Send to decider choice screen
 					return render_to_response("matcher/matcher_decider.html", 
 											{	'sid': sid, 
@@ -169,8 +172,10 @@ def matcherDisplay(request):
 			else:
 				# There is no decider, therefore direct the player to the first of the selected
 				# decider choices. In theory, if there is no decider specified, there should be only one selected anyways.
-			
-				choiceID = pair["choices"][0]
+				try:
+					choiceID = pair["choices"][0]
+				except:
+					raise AssertionError, "No exchange components were selected for this matcher. Edit the matcher component and add some."
 			
 				# get the component object
 				chosenComponent = Component.objects.get(id=choiceID)
@@ -269,41 +274,53 @@ def followDecider(request):
 def matcherEdit(request):
 	"""Saves the contents of the matcher form"""
 	comID = request.POST.get("comIM")
-	# Slightly different form handling depending on the random pairing checkbox
-	if(request.POST.get("randomPairingCheck") == "on"):
-		componentParams = matcherObj(
-									randomPairing = True,
-									randomRounds = request.POST.get("randomRounds"),
-									randomChoices = request.POST.getlist("randomChoices")
-									)
+	
+	# List of nex and rex components. The first item from this list is used if no component choices were selected.
+	rexID = ComponentTypes.objects.get(componentType__exact="Reciprocal Exchange")
+	nexID = ComponentTypes.objects.get(componentType__exact="Negotiated Exchange")
+	componentList = Component.objects.filter(Q(componentType__exact=nexID.id)|Q(componentType__exact=rexID.id))
+	
+	if(len(componentList) == 0):
+		response = "ERROR: You must create exchange components."
+		return render_to_response('api.html', 
+							  {'response': response}, 
+							  context_instance=RequestContext(request))
 	else:
-		pairingCount = request.POST.get("pairingCount")
-		pairings = []
-		for i in range(int(pairingCount)):
-			pairings.append	(
-								{ 	'p1': request.POST.get("p1_" + str(i)),
-									'p2': request.POST.get("p2_" + str(i)),
-									'decider': request.POST.get("decider_" + str(i)),
-									'rounds': request.POST.get("rounds_" + str(i)),
-									'choices': request.POST.getlist("componentChoices_" + str(i))
-								}
-							)
-		componentParams = matcherObj(
-										randomPairing = False,
-										pairings = pairings
-									)
+		# Slightly different form handling depending on the random pairing checkbox
+		if(request.POST.get("randomPairingCheck") == "on"):
+			componentParams = matcherObj(
+										randomPairing = True,
+										randomRounds = request.POST.get("randomRounds"),
+										randomChoices = request.POST.getlist("randomChoices")
+										)
+		else:
+			pairingCount = request.POST.get("pairingCount")
+			pairings = []
+			for i in range(int(pairingCount)):
+				pairings.append	(
+									{ 	'p1': request.POST.get("p1_" + str(i)),
+										'p2': request.POST.get("p2_" + str(i)),
+										'decider': request.POST.get("decider_" + str(i)),
+										'rounds': request.POST.get("rounds_" + str(i)),
+										'choices': request.POST.getlist("componentChoices_" + str(i))
+									}
+								)
+			componentParams = matcherObj(
+											randomPairing = False,
+											pairings = pairings
+										)
 	
-	c = Component.objects.get(id=comID)
-	c.name = request.POST.get("componentName")
-	c.description = request.POST.get("componentDescription")
-	c.parameters = pickle.dumps(componentParams)
+		c = Component.objects.get(id=comID)
+		c.name = request.POST.get("componentName")
+		c.description = request.POST.get("componentDescription")
+		c.parameters = pickle.dumps(componentParams)
 	
-	c.save()
-	
-	response = "Component Saved"
-	return render_to_response('api.html', 
-						  {'response': response}, 
-						  context_instance=RequestContext(request))
+		c.save()
+
+		response = "Component Saved"
+		return render_to_response('api.html', 
+							  {'response': response}, 
+							  context_instance=RequestContext(request))
 
 
 def roundRobin(units, decider=0, rounds=1, choices=[], sets=None):
