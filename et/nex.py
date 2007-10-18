@@ -66,11 +66,11 @@ class nexObj(object):
 class nexOfferObj(object):
 	"""A Data structure holding a negotiated exchange offer"""
 	def __init__(	self, 
-					offer, 
-					offerUnit,
-					request, 
-					requestUnit,
-					offeredBy
+					offer = None, 
+					offerUnit = None,
+					request = None, 
+					requestUnit = None,
+					offeredBy = None
 				):
 		self.offer = offer
 		self.offerUnit = offerUnit
@@ -765,6 +765,7 @@ def nonBindingPollProcess(request):
 	except:
 		response['continuePolling'] = True
 	else:
+		
 		# Determine how much X and Y the player has after the transaction. 
 		# 1) Check if the other player followed through or reneged
 		if(message.value == "followedThrough"):
@@ -800,10 +801,12 @@ def nonBindingPollProcess(request):
 					requestXY = request.session['currentOffer'].requestUnit.upper()
 					request.session['current' + requestXY] 	+= int(request.session['currentOffer'].request)
 					response['set' + requestXY] = request.session['current' + requestXY]
+					request.session['currentOffer'].offer = 0
 				elif(request.session['currentOffer'].offeredBy == request.session['opponent'].name):
 					offerXY 	= request.session['currentOffer'].offerUnit.upper()
 					request.session['current' + offerXY] 	+= int(request.session['currentOffer'].offer)
-					response['set' + offerXY] 	= request.session['current' + offerXY]			
+					response['set' + offerXY] 	= request.session['current' + offerXY]
+					request.session['currentOffer'].request = 0
 		elif(message.value == "reneged"):
 			if(request.session['didIFollowThrough']):
 				response['transactionType'] = "youFollowedThroughOpponentReneged"
@@ -811,13 +814,36 @@ def nonBindingPollProcess(request):
 					offerXY = request.session['currentOffer'].offerUnit.upper()
 					request.session['current' + offerXY] 	-= int(request.session['currentOffer'].offer)
 					response['set' + offerXY] = request.session['current' + offerXY]
+					request.session['currentOffer'].request = 0
 				elif(request.session['currentOffer'].offeredBy == request.session['opponent'].name):
 					requestXY 	= request.session['currentOffer'].requestUnit.upper()
 					request.session['current' + requestXY] 	-= int(request.session['currentOffer'].request)
 					response['set' + requestXY] = request.session['current' + requestXY]
+					request.session['currentOffer'].offer = 0
 			else:
 				response['transactionType'] = "youRenegedOpponentReneged"
-
+				request.session['currentOffer'].request = 0
+				request.session['currentOffer'].offer = 0
+		
+		# If the offer was changed because a player reneged
+		if(not response['transactionType'] == "youFollowedThroughOpponentFollowedThrough"):		
+			offerJSON = {}
+			for key,value in request.session['currentOffer'].__dict__.items():
+				offerJSON[key] = value
+			
+			if(request.session['currentOffer'].offeredBy == request.session['opponent'].name):
+				modifiedOfferKey = request.session['keyPrefix'] + "_modifiedOfferFrom_" + request.session['opponent'].name	
+				response['incomingOffer'] = offerJSON
+			else:
+				modifiedOfferKey = request.session['keyPrefix'] + "_modifiedOfferFrom_" + request.session['p'].name	
+				response['outgoingOffer'] = offerJSON
+		
+			#Save the modified session into the Session Var table in case it's useful later
+			SessionVar(key=modifiedOfferKey, experimentSession=request.session['s'], value=pickle.dumps(request.session['currentOffer'])).save()
+		
+			# save the modified offer into request.session
+			request.session.modified = True
+		
 		response['showScreen'] = "transactionSummary"
 		response['continuePolling'] = False
 		response['updateBank'] = request.session['p'].cumulativePoints
