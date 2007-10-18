@@ -38,3 +38,11 @@ If you're on Mac OS X, open the terminal (Applications > Utilities > Terminal) a
   # Click the "Join" link on the sessions tab with each participant instance. The monitor screen of the experimenter's instance will update with each player that joins.
   # When all the participants have joined, go to the experimenter's instance and click on the start session link. (note: you will only be able to start the session if the number of joined players is within the range given on the experiment setup page.)
   # Advance the participants through the experiment. The experimenter's monitoring screen will update to show the current component of each participant.
+
+== Testing with multiple PCs ==
+To use these directions you need 2 or 4 computers and preferably one person for each computer. The procedure for two players is described, but you could just as well try this with any even number of players. (Using an odd number of players would be experimental, but could work...theoretically)
+  # Have the person at PC-1 open up Firefox and some other browser (could be Internet Explorer, Opera, Camino, anything but firefox)
+  # Have the person at PC-2 open Firefox
+  # Point all the open browsers at http://exchtrans.homeip.net and login.
+  # Use the non-firefox browser on PC-1 to monitor the experiment
+  # Use the firefox browsers on each PC to join the experiment
