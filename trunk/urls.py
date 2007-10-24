@@ -100,13 +100,17 @@ urlpatterns = patterns('',
 	(r'^widgets/bank/editSubmit/$', 'exchtran.et.widgets.bankEdit'),
 	
 	# Rex: Reciprocal Exchange
-	(r'^rexOffer/$', 'exchtran.et.rex.rexOffer'),
-	(r'^rexOffer/submit/$', 'exchtran.et.rex.rexOfferSubmit'),
-	(r'^rex/wait/$', 'exchtran.et.rex.rexWait'),
-	(r'^rex/reconcile/$', 'exchtran.et.rex.rexReconcile'),
-	(r'^rex/CheckAllOffered/$', 'exchtran.et.rex.rexCheckAllOffered'),
-	(r'^rex/component/submit/$', 'exchtran.et.rex.rexComponentSubmit'),
-	
+	(r'^rex/component/submit/$', 'exchtran.et.rex.rexEdit'),
+	(r'^rex/display/$', 'exchtran.et.rex.rexDisplay'),
+	(r'^rex/checkForOpponentPollProcess/$', 'exchtran.et.rex.checkForOpponentPollProcess'),
+	(r'^rex/makeOfferButton/$', 'exchtran.et.rex.makeOfferButton'),
+	(r'^rex/offerFormulation/$', 'exchtran.et.rex.offerFormulation'),
+	(r'^rex/waitingScreen/$', 'exchtran.et.rex.waitingScreen'),
+	(r'^rex/waitingScreenPollProcess/$', 'exchtran.et.rex.waitingScreenPollProcess'),	
+	(r'^rex/transactionSummary/$', 'exchtran.et.rex.transactionSummary'),
+	(r'^rex/nextRoundCountdownPollProcess/$', 'exchtran.et.rex.nextRoundCountdownPollProcess'),	
+	(r'^rex/nextRoundCountdown/$', 'exchtran.et.rex.nextRoundCountdown'),
+		
 	# API
 	(r'^api/sessionStatus/$', 'exchtran.et.api.sessionStatus'),
 	(r'^api/rex_toolTipImages/$', 'exchtran.et.api.rex_toolTipImages'),

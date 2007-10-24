@@ -9,10 +9,6 @@
 <script type="text/javascript" src="/site_media/scripts/yav.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.dimensions.pack.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.ui-1.0/ui.dialog.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.ui-1.0/ui.resizable.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.ui-1.0/ui.mouse.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.ui-1.0/ui.draggable.js"></script>
 
 
 <script type="text/javascript" charset="utf-8">
@@ -33,17 +29,6 @@
 		},{
 			inputclasserror: "fieldError",
 		});
-		$("#dialogOpenerLink").bind("click", function(){
-			$("#valuePreview").dialog({
-				height:500, 
-				width:500, 
-				buttons:{
-					close:function(){
-						$("#valuePreview").dialogClose();
-					}
-				}
-			});
-		})
 		
 		$('.offerFormulationInputs').numeric();
 		$('#refreshValues').click(function(){
@@ -51,10 +36,6 @@
 		});
 		$("#variableListToggle").click(function() {
 			$("#possibleVariables").slideToggle(300);
-			return false;
-		});
-		$("#valuePreviewToggle").click(function() {
-			$("#valuePreview").slideToggle(300);
 			return false;
 		});
 		
