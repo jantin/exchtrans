@@ -104,7 +104,7 @@ class Component(models.Model):
 	dateCreated = models.DateField(auto_now_add=True)
 	dateModified = models.DateField(auto_now=True)
 	componentType = models.ForeignKey(ComponentTypes)
-	displayName = models.CharField(maxlength=255, null=True, default="")
+	displayName = models.CharField(maxlength=255, null=True, default="Exchange Component")
 	
 	
 	def __str__(self):
