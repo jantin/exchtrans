@@ -12,7 +12,7 @@ from time import time
 class freeTextQ(object):
 	"""A Data structure for freeText questions"""
 	def __init__(	self,
-					questionText = "Click to edit question text", 
+					questionText = "Click me to edit question text", 
 					inputType = "textarea", 
 					textAreaCols = 30, 
 					textAreaRows = 5, 
@@ -29,8 +29,8 @@ class freeTextQ(object):
 class radioButtonQ(object):
 	"""A Data structure for radio button questions"""
 	def __init__(	self, 
-					questionText = "Click to edit question text", 
-					questionChoices = ["option1", "option2"],
+					questionText = "Click me to edit question text", 
+					questionChoices = ["Click to edit me", "Click to edit me"],
 					questionType = "Radio Button"
 					):
 		self.questionText = questionText
@@ -40,7 +40,7 @@ class radioButtonQ(object):
 class sliderQ(object):
 	"""A Data structure for slider questions"""
 	def __init__(	self, 	
-					questionText = "Click to edit question text", 
+					questionText = "Click me to edit question text", 
 					leftScale = "Left Scale",
 					rightScale = "Right Scale",
 					sliderWidth = 400, 

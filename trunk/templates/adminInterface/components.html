@@ -9,7 +9,7 @@
 <script type="text/javascript" src="/site_media/scripts/yav.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.tablesorter.pack.js"></script>
-
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.impromptu.1.0.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 	// prepare the form when the DOM is ready 
@@ -27,7 +27,34 @@
 			inputclasserror: "fieldError",
 		});
 		
-		$("#componentsTable").tablesorter({widgets: ['zebra']}); 
+		$("#componentsTable").tablesorter({widgets: ['zebra']});
+		
+		//Require a confirm step for deleting
+		$(".deleteLink").click(function(){
+			msg  = 'Are you sure you want to delete this component?';
+			msg += '<input type="hidden" value="'+this.id+'" id="itemID"/>';
+			msg += '<input type="hidden" value="'+this.href+'" id="itemHref"/>';
+			$.prompt(msg, { buttons: { Yes: "Yes", No: "No" }, 
+							callback: deleteItem, 
+							show:"fadeIn",
+							container: "html",
+							opacity: 0.8,
+							overlayspeed: "fast"
+							});
+			return false;
+		});
+		
+		function deleteItem(buttonValue, msg){
+			if(buttonValue == "No"){
+				return;
+			} else {
+				itemID = msg.children('#itemID').val();
+				itemHref = msg.children('#itemHref').val();
+				$.ajax({url: itemHref, success:function(){
+					location.reload();
+				}});
+			}
+		}
 	});
 
 </script>
@@ -59,11 +86,11 @@ components with the link below or by duplicating an existing component.</p>
 	</thead>
 	<tbody>
 	{% for c in components %}
-	<tr >
+	<tr id="row_{{ c.id }}">
 		<td>{{ c.name }}</td>
 		<td>{{ c.componentType }}</td>
 		<td>{{ c.dateModified }}</td>
-		<td><a href="/components/edit/?id={{ c.id }}">Edit</a> | <a href="/components/delete/?cid={{ c.id }}">Delete</a></td>
+		<td><a href="/components/edit/?id={{ c.id }}">Edit</a> | <a href="/components/delete/?cid={{ c.id }}" class="deleteLink" id="{{ c.id }}">Delete</a></td>
 	</tr>
 	{% endfor %}
 	</tbody>

@@ -126,7 +126,8 @@ textarea{
 	background-color: #FFFFFF;
 	font-weight: bold;
 	font-family: Helvetica, Arial, sans-serif;
-	width:100px;
+	padding-left:2em;
+	padding-right:2em;
 	height:2.5em;
 }
 
@@ -300,6 +301,38 @@ textarea{
 
 }
 
+/* Dialogs by the jquery Impromptu plugin */
+
+div.jqifade{
+      background-color: #000;
+}
+div.jqi{
+      background-color: #ccc;
+      padding: 2px;
+      width: 300px;
+}
+div.jqi .jqicontainer{
+      padding: 5px;
+      color: #000;
+}
+div.jqi .jqimessage{
+      background-color: #fff;
+      padding: 15px;
+}
+div.jqi .jqibuttons{
+      text-align: center;
+      padding: 5px 0 0 0;
+}
+div.jqi button{
+	border: 1px solid #999999;
+	border-top-color: #CCCCCC;
+	border-left-color: #CCCCCC;
+	background-color: #FFFFFF;
+	font-weight: bold;
+	height:2em;
+	font-size: .8em;
+	margin: 0 10px;
+}
 
 
 /* Tabs  */

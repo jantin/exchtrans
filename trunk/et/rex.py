@@ -214,6 +214,9 @@ def rexDisplay(request):
 		request.session['currentY'] = int(request.session['exchangeParameters'].p1y)
 		request.session['xValue'] = int(request.session['exchangeParameters'].p1xValue)
 		request.session['yValue'] = int(request.session['exchangeParameters'].p1yValue)
+		request.session['requiredGift'] = request.session['exchangeParameters'].p1RequireGift
+		request.session['xRequiredGift'] = int(request.session['exchangeParameters'].p1xRequiredGift)
+		request.session['yRequiredGift'] = int(request.session['exchangeParameters'].p1yRequiredGift)
 	elif (int(request.session['currentPairing']["p2"]) == int(request.session['p'].number)):
 		request.session['playerNumber'] = 2
 		request.session['startingX'] = int(request.session['exchangeParameters'].p2x)
@@ -225,6 +228,9 @@ def rexDisplay(request):
 		request.session['currentY'] = int(request.session['exchangeParameters'].p2y)
 		request.session['xValue'] = int(request.session['exchangeParameters'].p2xValue)
 		request.session['yValue'] = int(request.session['exchangeParameters'].p2yValue)
+		request.session['requiredGift'] = request.session['exchangeParameters'].p2RequireGift
+		request.session['xRequiredGift'] = int(request.session['exchangeParameters'].p2xRequiredGift)
+		request.session['yRequiredGift'] = int(request.session['exchangeParameters'].p2yRequiredGift)
 	else:
 		request.session['playerNumber'] = None
 
@@ -295,6 +301,11 @@ def makeOfferButton(request):
 	response['processor'] = "makeOfferButton"
 	response['showScreen'] = "offerFormulation"
 	
+	if(request.session['requiredGift']):
+		response['requiredGift'] = True
+		response['xRequiredGift'] = request.session['xRequiredGift']
+		response['yRequiredGift'] = request.session['yRequiredGift']
+	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
 						  {'response': jsonString}, 
@@ -306,17 +317,23 @@ def offerFormulation(request):
 	response = {}
 	response['processor'] = "offerFormulation"
 	
-	# Error check input. Must be integer greater than zero. int conversion strips leading 'O's
-	if(len(request.POST.get('offerFormulationOfferX')) == 0):
+	# If it's no, it was a required gift situation that the player declined.
+	if(request.POST.get('offerFormulationOfferSubmit') == "No"):
 		offeredX = "0"
-	else:
-		offeredX = int(request.POST.get('offerFormulationOfferX'))
-		offeredX = str(offeredX)
-	if(len(request.POST.get('offerFormulationOfferY')) == 0):
 		offeredY = "0"
+		response['declinedToGiveRequiredGift'] = True
 	else:
-		offeredY = int(request.POST.get('offerFormulationOfferY'))
-		offeredY = str(offeredY)
+		# Error check input. Must be integer greater than zero. int conversion strips leading 'O's
+		if(len(request.POST.get('offerFormulationOfferX')) == 0):
+			offeredX = "0"
+		else:
+			offeredX = int(request.POST.get('offerFormulationOfferX'))
+			offeredX = str(offeredX)
+		if(len(request.POST.get('offerFormulationOfferY')) == 0):
+			offeredY = "0"
+		else:
+			offeredY = int(request.POST.get('offerFormulationOfferY'))
+			offeredY = str(offeredY)
 		
 	offerObj = rexOfferObj(	offeredX = offeredX,
 							offeredY = offeredY,
@@ -349,12 +366,16 @@ def waitingScreenPollProcess(request):
 	"""Polls to see if the other player has offered"""
 	response = {}	
 	response['processor'] = "waitingScreenPollProcess"
+	
+	# Try to get an offer from the other player
 	offerCheckKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['opponent'].name
 	try:
 		offerCheck = SessionVar.objects.get(key=offerCheckKey, unread=True)
 	except:
+		# If there's no offer, keep polling
 		response['continuePolling'] = True
 	else:
+		# If there is an offer, unpickle it
 		offerObj = pickle.loads(offerCheck.value)
 		
 		response['showScreen'] = "transactionSummary"
@@ -368,7 +389,13 @@ def waitingScreenPollProcess(request):
 		response['setY'] = request.session['currentY']
 				
 		response['updateBank'] = request.session['p'].cumulativePoints
-			
+		
+		# Serialize the offer object into a dictionary that can be passed as JSON
+		offerJSON = {}
+		for key,value in offerObj.__dict__.items():
+			offerJSON[key] = value
+		response['incomingOffer'] = offerJSON
+		
 		offerCheck.unread = False
 		offerCheck.save()
 	
