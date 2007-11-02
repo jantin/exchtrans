@@ -68,7 +68,7 @@ def componentCreate(request):
 	
 	# Set default parameters
 	if (componentType.componentType == "Reciprocal Exchange"):
-		componentParams = rexParameters()
+		componentParams = rexObj()
 	
 	if (componentType.componentType == "Questionnaire"):
 		componentParams = questionSet()
