@@ -1,311 +1,60 @@
-{% extends "adminBase.html" %}{% block extrahead %}
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
-<script src="/site_media/scripts/jquery/jquery.alphanumeric.pack.js" type="text/javascript" ></script>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<style type="text/css">
-
-
-
-</style>
-<script type="text/javascript">
-	$(document).ready(
-		function(){
-			// Bind the input fields of the offerFormulation screen
-			// Updates the "This deal would get you" number on the offerFormulation screen
-			$('.offerFormulationInputs').numeric();
-			// $(".offerFormulationInputs").keyup(function(){
-			// 	offerFormulationProcessInput();
-			// });
-			// $(".valueInputs").keyup(function(){
-			// 	offerFormulationProcessInput();
-			// });
-			// $("#offerFormulationOfferUnit").change(function(){
-			// 	offerFormulationProcessInput();
-			// });
-			// $("#offerFormulationRequestUnit").change(function(){
-			// 	offerFormulationProcessInput();
-			// });
-			
-			$('#refreshValues').bind("click", function(){
-				offerFormulationProcessInput();
-			});
-		}
-	);
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	
-	// Updates the "This deal would get you" number on the offerFormulation screen
-	// Called on keyup of the input fields of the offerFormulation screen
-	function offerFormulationProcessInput(){		
-		// Clear the error if present
-		$("#offerFormulationOfferError").html("");
+	<link rel="stylesheet" href="/site_media/css/style.css" />
+	
+	
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script src="/site_media/scripts/disableRightClick.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/site_media/css/matcher.css" type="text/css" media="screen" />
 
-		// Set up all our working variables
-		options = {
-			whichPlayer: $('#whichPlayer').val(),
-			offer: $("#offerFormulationOffer").val(),
-			request: $("#offerFormulationRequest").val(),
-			offerUnit: $("#offerFormulationOfferUnit").val(),
-			requestUnit: $("#offerFormulationRequestUnit").val(),
-			p1x: $("#p1x").val(),
-			p2x: $("#p2x").val(),
-			p1y: $("#p1y").val(),
-			p2y: $("#p2y").val(),
-			p1xValue: $("#p1xValue").val(),
-			p2xValue: $("#p2xValue").val(),
-			p1yValue: $("#p1yValue").val(),
-			p2yValue: $("#p2yValue").val()
-		}
-		
-		options['p1xValue'] = parseValueInput(options['p1xValue'], options);
-		options['p1yValue'] = parseValueInput(options['p1yValue'], options);
-		options['p2xValue'] = parseValueInput(options['p2xValue'], options);
-		options['p2yValue'] = parseValueInput(options['p2yValue'], options);
-		
-		// If any of the value fields have errors, update the point value table and return
-		if(!(options['p2yValue'] && options['p2xValue'] && options['p1yValue'] && options['p1xValue'])){
-			$("#offerFormulationP1Points").html("--");
-			$("#offerFormulationP2Points").html("--");
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	// Does a check to make sure that at least one option is selected.
+	$("form").submit(function() {
+		var n = $("input:checked").length;
+		if(n == 0){
+			$(".error").show();		
 			return false;
 		}
-		
-		// Calculate the current number of points held by the player this round
-		p1InitialPoints = (options['p1x'] * options['p1xValue']) + (options['p1yValue'] * options['p1yValue']);
-		p2InitialPoints = (options['p2x'] * options['p2xValue']) + (options['p2yValue'] * options['p2yValue']);
-		
-		// Calculate the loss from offering
-		if(options['offerUnit'] == "x"){
-			if(options['whichPlayer'] == "p1"){
-				// Check that the input value is not beyond the available amount
-				if(parseInt(options['offer']) > parseInt(options['p1x'])) {
-					options['offer'] = options['p1x'];
-					$("#offerFormulationOffer").val(options['offer']);
-					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
-				}
-				p1Loss = options['offer'] * options['p1xValue'];
-				p2Loss = options['request'] * options['p2xValue'];
-			} else {
-				if(parseInt(options['offer']) > parseInt(options['p2x'])) {
-					options['offer'] = options['p2x'];
-					$("#offerFormulationOffer").val(options['offer']);
-					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
-				}
-				p1Loss = options['request'] * options['p1xValue'];
-				p2Loss = options['offer'] * options['p2xValue'];
-			}
-		} else {
-			if(options['whichPlayer'] == "p1"){
-				if(parseInt(options['offer']) > parseInt(options['p1y'])) {
-					options['offer'] = options['p2x'];
-					$("#offerFormulationOffer").val(options['offer']);
-					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
-				}
-				p1Loss = options['offer'] * options['p1yValue'];
-				p2Loss = options['request'] * options['p2yValue'];
-			} else {
-				if(parseInt(options['offer']) > parseInt(options['p2y'])) {
-					options['offer'] = options['p2x'];
-					$("#offerFormulationOffer").val(options['offer']);
-					$("#offerFormulationOfferError").html("You only have " + availableX + " " + options['offerUnit']);
-				}
-				p1Loss = options['request'] * options['p1yValue'];
-				p2Loss = options['offer'] * options['p2yValue'];
-			}
-		}
-		
-		// Calculate the potential gain from the request
-		if(options['requestUnit'] == "x"){
-			if(options['whichPlayer'] == "p1"){
-				p1Gain = options['request'] * options['p1xValue'];
-				p2Gain = options['offer'] * options['p2xValue'];
-			} else {
-				p1Gain = options['offer'] * options['p1xValue'];
-				p2Gain = options['request'] * options['p2xValue'];
-			}
-		} else {
-			if(options['whichPlayer'] == "p1"){
-				p1Gain = options['request'] * options['p1yValue'];
-				p2Gain = options['offer'] * options['p2yValue'];
-			} else {
-				p1Gain = options['offer'] * options['p1yValue'];
-				p2Gain = options['request'] * options['p2yValue'];
-			}
-		}
-		
-		// calculate the potential points
-		p1Points = p1InitialPoints + (p1Gain - p1Loss);
-		p2Points = p2InitialPoints + (p2Gain - p2Loss);		
-		
-		// alert("p1Points: " + p1Points);
-		// 		alert("p2Points: " + p2Points);
-		
-		// Display the preview points
-		$("#offerFormulationP1Points").html(String(p1Points));
-		$("#offerFormulationP2Points").html(String(p2Points));
-		
-		return true;
-	}
-	
-	function parseValueInput(valueInput, options){
-		
-		originalValueInput = valueInput;
-		
-		//Check if input is just digits, if so return value input right away
-		if(/^\d+$/.test(valueInput)){
-			return valueInput;	
-		}
-				 
-		//replace variables if present
-		if(options['offerUnit'] == "x"){
-			valueInput = valueInput.replace(/Ox/g, options['offer']);
-			valueInput = valueInput.replace(/Oy/g, "0");
-		} else {
-			valueInput = valueInput.replace(/Ox/g, "0");
-			valueInput = valueInput.replace(/Oy/g, options['offer']);
-		}
-		if(options['requestUnit'] == "x"){
-			valueInput = valueInput.replace(/Rx/g, options['request']);
-			valueInput = valueInput.replace(/Ry/g, "0");
-		} else {
-			valueInput = valueInput.replace(/Rx/g, "0");
-			valueInput = valueInput.replace(/Ry/g, options['request']);
-		}
-		if(options['whichPlayer'] == "p1"){
-			valueInput = valueInput.replace(/Axo/g, options['p1x']);
-			valueInput = valueInput.replace(/Ayo/g, options['p1y']);
-			valueInput = valueInput.replace(/Axr/g, options['p2x']);
-			valueInput = valueInput.replace(/Ayr/g, options['p2y']);
-		} else {
-			valueInput = valueInput.replace(/Axo/g, options['p2x']);
-			valueInput = valueInput.replace(/Ayo/g, options['p2y']);
-			valueInput = valueInput.replace(/Axr/g, options['p1x']);
-			valueInput = valueInput.replace(/Ayr/g, options['p1y']);
-		}
-
-		
-		
-		//evaluate value expression and return it
-		try{
-			value = eval(valueInput);
-		} catch(err){
-			msg = "There is an error in one of your value fields!\n\n";
-			msg += "You entered: "+ originalValueInput + "\n";
-			msg += "Error: Syntax Error";
-			alert(msg);
-			value = false;
-		}
-		return value;
-	}
+	});
+});
 </script>
 
-{% endblock %}{% block bodyid %}tab2{% endblock %}{% block sectionDivID %}editor{% endblock %}{% block adminContent %}
 
+</head>
 
-<div id="valuePreview" class="valuePreviewDialog" title="Use this form to check your values" >
+<body id="waiting">
+	
 
-<h3>Starting XY Quantities</h3>
-<table>
-	<tr><th></th><th>Player 1</th><th>Player 2</th></tr>
-	<tr>
-		<th>X</th>
-		<td><input type="text" name="p1x" value="10" size="4" id="p1x" class="offerFormulationInputs"/></td>
-		<td><input type="text" name="p2x" value="10" size="4" id="p2x" class="offerFormulationInputs"/></td>
-	</tr>
-	<tr>
-		<th>Y</th>
-		<td><input type="text" name="p1y" value="10" size="4" id="p1y" class="offerFormulationInputs"/></td>
-		<td><input type="text" name="p2y" value="10" size="4" id="p2y" class="offerFormulationInputs"/></td>
-	</tr>
-</table>
+<div id="verticalCenter">
+	<h2>You are about to exchange with player D</h2>
 
-<h3>Offer Setup</h3>
-<p>Who is the offer from?</p>
-<p>
-<select name="whichPlayer" id="whichPlayer">
-	<option value="p1">Player 1</option>
-	<option value="p2">Player 2</option>
-</select>
-</p>
-<p>What will the player give?</p>
-<p>
-	<input type="text" name="offerFormulationOffer" id="offerFormulationOffer" class="offerFormulationInputs" value="0" size="4"/>
-	<select name="offerFormulationOfferUnit" id="offerFormulationOfferUnit">
-		<option>x</option>
-		<option>y</option>
-	</select>
-	<span id="offerFormulationOfferError" class="offerFormulationError"></span>
-</p>
-<p>What does the player want in return?</p>
-<p>
-	<input type="text" name="offerFormulationRequest" id="offerFormulationRequest" class="offerFormulationInputs" value="0" size="4"/>
-	<select name="offerFormulationRequestUnit" id="offerFormulationRequestUnit">
-		<option>y</option>
-		<option>x</option>
-	</select>
-</p>
+	<p>You get to choose the form of exchange</p>
+	<div id="deciderForm">
+		<form action="#" method="POST" accept-charset="utf-8" id="theForm">
+			
+			
+			<input type="radio" name="deciderChoice" value="114" id="114" class="required" title="You must select an option."/>rex apple<br/>
+			<input type="radio" name="deciderChoice" value="115" id="115" class="required" title="You must select an option."/>rex apple<br/>
+			<input type="radio" name="deciderChoice" value="116" id="116" class="required" title="You must select an option."/>rex apple<br/>
+			<input type="radio" name="deciderChoice" value="117" id="117" class="required" title="You must select an option."/>rex apple<br/>
+			<br/>
+			<input type="hidden" name="pname" value="2007-11-03_000865"/>
+			<input type="hidden" name="sid" value="73"/>
+			<input type="hidden" name="opponentName" value="2007-11-03_000866"/>
 
-<h3>Value Formulas</h3>
-<table>
-	<tr><th></th><th>Player 1</th><th>Player 2</th></tr>
-	<tr>
-		<th>X</th>
-		<td><input type="text" name="p1xValue" value="10" size="20" id="p1xValue" class="valueInputs"/></td>
-		<td><input type="text" name="p2xValue" value="10" size="20" id="p2xValue" class="valueInputs"/></td>
-	</tr>
-	<tr>
-		<th>Y</th>
-		<td><input type="text" name="p1yValue" value="10" size="20" id="p1yValue" class="valueInputs"/></td>
-		<td><input type="text" name="p2yValue" value="10" size="20" id="p2yValue" class="valueInputs"/></td>
-	</tr>
-</table>
-<p>Possible Variables:</p>
-<table>
-	<tr>
-		<th>Variable</th>
-		<th>Description</th>
-	</tr>
-	<tr>
-		<td>Ox</td>
-		<td>The number of X's offered</td>
-	</tr>
-	<tr>
-		<td>Oy</td>
-		<td>The number of Y's offered</td>
-	</tr>
-	<tr>
-		<td>Rx</td>
-		<td>The number of X's requested</td>
-	</tr>
-	<tr>	
-		<td>Ry</td>
-		<td>The number of Y's requested</td>
-	</tr>
-	<tr>
-		<td>Axo</td>
-		<td>The number of X's available to the offerer</td>
-	</tr>
-	<tr>
-		<td>Ayo</td>
-		<td>The number of Y's available to the offerer</td>
-	</tr>
-	<tr>
-		<td>Axr</td>
-		<td>The number of X's available to the requester</td>
-	</tr>
-	<tr>
-		<td>Ayr</td>
-		<td>The number of Y's available to the requester</td>
-	</tr>
-</table>
-<br/><br/>
-<h3>Point Value</h3>
-<table>
-	<tr><th></th><th>Player 1</th><th>Player 2</th></tr>
-	<tr>
-		<th>Total Points</th>
-		<td><span id="offerFormulationP1Points">0</span></td>
-		<td><span id="offerFormulationP2Points">0</span></td>
-	</tr>
-</table>
-<input type="button" name="refreshValues" value="Refresh Values" id="refreshValues">
+			<input type="submit" value="Select" class="buttonSmall"/>
+		</form>
+	</div>
 </div>
 
-{% endblock %}
+
+</body>
+</html>

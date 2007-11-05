@@ -53,8 +53,8 @@ jQuery.extend({
 			}
 		});
 		
-		jqif.fadeIn(o.overlayspeed);
-		jqi[o.show](o.promptspeed);
+		jqif.show(o.overlayspeed);
+		jqi.show(o.promptspeed);
 		return jqi;	
 	}	
 });
