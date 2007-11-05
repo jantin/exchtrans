@@ -217,7 +217,6 @@ def driveSession(request):
 	# redirect to the kickoff function of the next component
 	return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid)
 
-	
 class sessionVariables:
 	"""A data structure for session variables (not http sessions)"""	
 	def __init__(self, componentsList, currentComponent, currentIteration, participantsList):

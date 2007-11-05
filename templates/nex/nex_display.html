@@ -7,15 +7,16 @@
 <script src="/site_media/scripts/jquery/jquery.alphanumeric.pack.js" type="text/javascript" ></script>
 <script src="/site_media/scripts/jquery/json.js" type="text/javascript" ></script>
 <script src="/site_media/scripts/jquery/jquery.color.js" type="text/javascript" ></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.impromptu.1.0.js"></script>
 
 
 <script type="text/javascript" charset="utf-8">
-// killPolling is defined as a global because polling can be stopped either by either 
-// the poll process itself or a submitted form action
-killPolling = false;
 
-// timeout is used for polling
-var timeout;
+// The toJSONString method is removed because otherwise, it shows up as a button with the
+// Impromptu jQuery plug in. See http://jquery.com/plugins/node/813
+// NOTE!: this means that toJSONString can't be used on objects! Not a problem at this
+// point, but this may not be tennnable in the future.
+delete(Object.prototype.toJSONString);
 
 
 	// Code to run after the page is completely loaded.
@@ -37,6 +38,9 @@ var timeout;
 		// pNum is either 1 or 2 indicating if, within the current pairing, the player is the 1st or 2nd player
 		// It's used when building keys to access nex parameters. e.g. exchangeParametersJSON['p' + pNum + 'x']
 		pNum = "{{playerNumber}}";
+		
+		// The letter identity of the other player in the pairing. 
+		opponentIdentity = "{{opponentIdentity}}";
 		
 		// Bind the input fields of the offerFormulation screen
 		// Updates the "This deal would get you" number on the offerFormulation screen
@@ -65,7 +69,7 @@ var timeout;
 		});
 		
 		// Start polling server to check for opponents
-		pollServer("/nex/checkForOpponentPollProcess/", 2000);
+		pollServer();
 		
 	});
 
@@ -79,33 +83,34 @@ var timeout;
 		return;
 	}
 	
-	var pollURL = "";
-	var pollInterval = "";
-
-	// This function polls the server
-	function pollServer(pollURL, interval){
-		clearTimeout(timeout);
-		if(!killPolling){
-			$.ajax({url: pollURL, dataType: "json", success: function(responseJSON){
-					if(responseJSON['continuePolling'] != true){
-						clearTimeout(timeout);
-						killPolling = true;
-						examineJSON(responseJSON);
-					} else {
-						timeout = setTimeout("pollServer('" + pollURL + "', " + interval + ")", interval);
+	// This function polls the server with two AJAX requrests. The first grabs the location of the current poll process
+	// and the second polls the URL resource.
+	var execLog = new Array();
+	
+	function pollServer(){
+		startTime = new Date().getTime();
+		$.ajax({	url: "/nex/getPollURL/",
+					dataType: "json", 
+					success: function(pollServer){
+						if(pollServer['pollURL'] == "None"){
+							setTimeout("pollServer()", 1000);
+						} else {
+							$.ajax({	url: pollServer['pollURL'], 
+										dataType: "json", 
+										success: function(responseJSON){
+											examineJSON(responseJSON);
+											setTimeout("pollServer()", 1000);
+											endTime = new Date().getTime();
+											execLog.push(endTime-startTime);
+											execLog.push(pollServer['pollURL']);
+										}
+									});
+						}
 					}
-				}
-			});
-		}
-		return;
+				});
 	}
 	
 	function examineJSON(responseJSON){
-		// Processor is a reference to the django view that processed the form.
-		if(responseJSON['continuePolling'] != true){
-			clearTimeout(timeout);
-			killPolling = true;
-		}
 		if(responseJSON['redirect']){
 			window.location = responseJSON['redirect'];
 		}
@@ -134,11 +139,6 @@ var timeout;
 			$('.currentLoss').html(String(responseJSON['outgoingOffer']['offer']));
 			$('.currentLossUnit').html(String(responseJSON['outgoingOffer']['offerUnit']));
 			calculatePoints("newOffer");
-		}
-		// If the server set poll to true, start polling on the given url and interval
-		if(responseJSON['poll']){
-			killPolling = false;
-			pollServer(responseJSON['url'],responseJSON['interval']);
 		}
 		if(responseJSON['transactionType']){
 			$('.transactionSummaryMessages').css({display:"none"});
@@ -186,6 +186,9 @@ var timeout;
 			$("#offerFormulationOfferUnit").val("x");
 			$("#offerFormulationRequestUnit").val("y");
 		}
+		if(responseJSON['showDialog']){
+			showDialog(responseJSON['showDialog']);
+		}
 		if(responseJSON['showScreen']){
 			showScreen(responseJSON['showScreen']);
 		}
@@ -206,6 +209,40 @@ var timeout;
 		// turn on the specified screen
 		$("#" + screenName).css("display", "block");
 		return;
+	}
+	
+	// These functions set up and trigger the appropriate dialog screens
+	function showDialog(dialogName){
+		if(dialogName == "incomingOffer"){
+			msg  = "You've received an offer from player " + opponentIdentity;
+			buttons = { "View Offer": "View Offer", "Do Not View Offer": "Do Not View Offer" };
+			$.prompt(msg, { buttons: { "View Offer": "View Offer", "Do Not View Offer": "Do Not View Offer" }, 
+							callback: incomingOfferDialogAction, 
+							container: "html",
+							opacity: 0.8,
+							show:"fadeIn",
+							overlayspeed: 0,
+							promptspeed: 0
+							});	
+		}
+	}
+	
+	function incomingOfferDialogAction(buttonValue, msg){
+		if(buttonValue == "View Offer"){
+			// Check if the transactionSummary screen is showing. If so
+			// the other player must have canceled the offer while waiting.
+			if($("#transactionSummary").css("display") != "block"){
+				showScreen("incomingOffer");
+			}
+		} else {
+			// Send message that the player chose not to see the offer
+			$.ajax({url: "/nex/incomingOfferDeclinedToView/", 
+					dataType: "json", 
+					success: 	function(responseJSON){
+									examineJSON(responseJSON);
+								}
+			});
+		}
 	}
 	
 	// Updates the "This deal would get you" number on the offerFormulation screen
