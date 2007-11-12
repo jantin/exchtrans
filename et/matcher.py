@@ -53,33 +53,7 @@ def matcherDisplay(request):
 	s = ExperimentSession.objects.get(id=sid)
 	# get the current component object
 	c = sesVars.componentsList[int(p.currentComponent)].component_id
-
-	# Log start time
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "timestamp",
-				messageText = "start"
-				)
 	
-	# Log component Type
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "componentType",
-				messageText = c.componentType
-				)
-
-	# Log component paramerters
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "componentParams",
-				messageText = pickle.dumps(parameters)
-				)
-	
-	
-		
 	# if random, create pairings (first player to get here only)
 	# first, check if the pairings have been created already
 	if( parameters.randomPairing ):

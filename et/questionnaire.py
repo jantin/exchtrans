@@ -44,7 +44,7 @@ class sliderQ(object):
 					leftScale = "Left Scale",
 					rightScale = "Right Scale",
 					sliderWidth = 400, 
-					sliderStops = 20,
+					sliderStops = 50,
 					questionType = "Slider"
 					):
 		self.questionText = questionText
@@ -80,40 +80,42 @@ def questionnaireDisplay(request):
 	s = ExperimentSession.objects.get(id=sid)
 	# get the current component object
 	c = sesVars.componentsList[int(p.currentComponent)].component_id
-
-	# Log start time
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "timestamp",
-				messageText = "start"
-				)
-	
-	# Log component Type
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "componentType",
-				messageText = c.componentType
-				)
-
-	# Log component paramerters
-	logWrite(	participant = p, 
-				component = c, 
-				session = s,
-				messageType = "componentParams",
-				messageText = pickle.dumps(parameters)
-				)
 	
 	return render_to_response("questionnaire/questionnaire_display.html", 
 							{	'sid': sid, 
 								'pname': pname,
 								'parameters': parameters,
 								'cumulativePoints': cumulativePoints
-							}, 
-						  	context_instance=RequestContext(request))
+							}, context_instance=RequestContext(request))
 
 
+@login_required
+def participantSubmit(request):
+	"""Handles the submit of a questionnaire."""
+	# Get the component
+	sid = request.POST.get('sid')
+	pname = request.POST.get('pname')
+	
+	p = Participant.objects.get(name=pname)
+	sesVars = loadSessionVars(sid)
+	parameters = pickle.loads(sesVars.componentsList[int(p.currentComponent)].component_id.parameters)
+	
+	# get the current component object
+	c = sesVars.componentsList[int(p.currentComponent)].component_id
+	
+	qIndex = 1
+	for q in parameters.questions:		
+		log_questionnaire(	sid=sid,
+							cid=c.id,
+							componentIndex=p.currentComponent,
+							participantName=p.name,
+							questionType=q.questionType,
+							questionText=q.questionText,
+							questionResponse=request.POST.get('question_' + str(qIndex))
+							).save()
+		qIndex = qIndex + 1
+	
+	return HttpResponseRedirect('/session/drive/?sid='+sid+'&pname='+pname)
 
 @login_required
 def questionnaireAddQ(request):
@@ -123,7 +125,7 @@ def questionnaireAddQ(request):
 	
 	# Load the component from the DB
 	component = Component.objects.get(id=comId)
-
+	
 	# Unpickle, update, and repickle the question set
 	qSet = pickle.loads(component.parameters)
 	exec("qSet.questions.append(" + qType + "())")	
@@ -140,7 +142,7 @@ def questionnaireDeleteQ(request):
 	
 	# Load the component from the DB
 	component = Component.objects.get(id=comId)
-
+	
 	# Unpickle, update, and repickle the question set
 	qSet = pickle.loads(component.parameters)
 	exec("qSet.questions.pop(" + str(qNum) + ")")	
@@ -157,7 +159,7 @@ def addRadioChoice(request):
 	
 	# Load the component from the DB
 	component = Component.objects.get(id=comId)
-
+	
 	# Unpickle, update, and repickle the question set
 	qSet = pickle.loads(component.parameters)
 	qSet.questions[qNum].questionChoices.append("Click to edit me")	
@@ -175,7 +177,7 @@ def deleteRadioChoice(request):
 	
 	# Load the component from the DB
 	component = Component.objects.get(id=comId)
-
+	
 	# Unpickle, update, and repickle the question set
 	qSet = pickle.loads(component.parameters)
 	qSet.questions[qNum].questionChoices.pop(qc)	
@@ -196,13 +198,13 @@ def editRadioChoice(request):
 	
 	# Load the component from the DB
 	component = Component.objects.get(id=comId)
-
+	
 	# Unpickle, update, and repickle the question set
 	qSet = pickle.loads(component.parameters)
 	qSet.questions[qNum].questionChoices[qc] = newValue
 	component.parameters = pickle.dumps(qSet)
 	component.save()
-
+	
 	return render_to_response('api.html', 
 						  {'response': newValue}, 
 						  context_instance=RequestContext(request))
@@ -220,7 +222,7 @@ def questionnaireEditParam(request):
 	
 	# Load the component from the DB
 	component = Component.objects.get(id=comId)
-
+	
 	# Unpickle, update, and repickle the question set
 	qSet = pickle.loads(component.parameters)
 	exec("qSet.questions[qNum]." + paramName + " = newValue")	

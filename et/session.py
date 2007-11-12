@@ -105,7 +105,7 @@ def wait(request):
 @login_required
 def startSession(request):
 	"""Initiates the experiment session"""	
-
+	
 	sid = request.GET.get('sid')
 	
 	# Get the session object
@@ -114,18 +114,57 @@ def startSession(request):
 	if(sessionObj.status.statusText == "Ready"):
 		# Get a list of the components
 		componentsList = ExperimentComponents.objects.filter(experiment_id__exact=sessionObj.experiment_id.id)
-
+		
 		# Get a list of the participants
 		participantsList = Participant.objects.filter(experimentSession__exact=sid)
-
+		
 		# Clean out the SessionVar table rows
 		SessionVar.objects.filter(experimentSession=sessionObj).delete()
-	
+		
 		# Make a sessionVariables object, pickle it, store it in SessionVar table
 		# TODO Don't need current component and current iteration in sessionVaiables object
 		sesVars = sessionVariables(componentsList, 0, 0, participantsList)
 		sv = SessionVar(experimentSession=sessionObj, key="sesVars", value=pickle.dumps(sesVars))
 		sv.save()
+		
+		# Write to the log table
+		log_session(sid=sid,
+					eid=sessionObj.experiment_id.id,
+					experimentName=sessionObj.experiment_id.name,
+					experimentDescription=sessionObj.experiment_id.description,
+					minPlayers=sessionObj.experiment_id.minPlayers,
+					maxPlayers=sessionObj.experiment_id.maxPlayers,
+					playerCount=len(participantsList)					
+					).save()
+		for c in componentsList:
+			log_components(	sid=sid,
+							cid=c.component_id.id,
+							componentType=c.component_id.componentType.componentType,
+							componentName=c.component_id.name,
+							componentDescription=c.component_id.description,
+							componentIndex=c.order,
+							componentParameters=c.component_id.parameters
+						).save()
+			# If c is a matcher, grab the exchange component within
+			if(c.component_id.componentType.componentType == "Matcher"):
+				matcherParams = pickle.loads(c.component_id.parameters)
+				for pairing in matcherParams.pairings:
+					for exchangeComponentId in pairing['choices']:
+						ec = Component.objects.get(id=exchangeComponentId)	
+						log_components(	sid=sid,
+										cid=ec.id,
+										componentType=ec.componentType.componentType,
+										componentName=ec.name,
+										componentDescription=ec.description,
+										componentParameters=ec.parameters
+									).save()
+		for p in participantsList:
+			log_participants(	sid=sid,
+								participantName=p.name,
+								participantNumber=p.number,
+								participantLetter=p.identityLetter
+							).save()
+		
 		
 		# Change status to Running
 		sesStatus = experimentSessionStatus.objects.get(statusText="Running")
@@ -133,6 +172,7 @@ def startSession(request):
 		sessionObj.save()
 	
 	return HttpResponseRedirect('/sessions/monitor/?sid=' + sid)
+
 
 @login_required
 def stopSession(request):

@@ -146,7 +146,7 @@ def rexDisplay(request):
 	sid = request.GET.get('sid')
 	pname = request.GET.get('pname')
 	opponentName = request.GET.get('opponentName')
-	exchangeComponentID = request.GET.get('exchangeComponentID')
+	request.session['exchangeComponentID'] = request.GET.get('exchangeComponentID')
 	
 	# get the current Participant object, session vars, and matcher params
 	request.session['p'] = Participant.objects.get(name=pname)
@@ -160,7 +160,7 @@ def rexDisplay(request):
 	request.session['c'] = sesVars.componentsList[int(request.session['p'].currentComponent)].component_id
 
 	# get the current exchange component parameters
-	request.session['exchangeParameters'] = pickle.loads(Component.objects.get(id=exchangeComponentID).parameters)
+	request.session['exchangeParameters'] = pickle.loads(Component.objects.get(id=request.session['exchangeComponentID']).parameters)
 	
 	# Serialize the rex object into a dictionary that can be passed as JSON
 	exchangeParametersJSON = {}
@@ -195,7 +195,7 @@ def rexDisplay(request):
 
 	# Set up a key prefix for reading and writing to the sessionvar table
 	# The form is <currentComponentID>_<keyPrefix>_<pairingIndex>_<currentRound>
-	request.session['keyPrefix'] = str(request.session['c'].id) + "_" + exchangeComponentID + "_" + str(request.session['currentPairingIndex']) + "_0" 
+	request.session['keyPrefix'] = str(request.session['c'].id) + "_" + request.session['exchangeComponentID'] + "_" + str(request.session['currentPairingIndex']) + "_0" 
 
 	# Register current player as being ready
 	key = request.session['keyPrefix'] + "_playerReadyMessageTo_" + request.session['opponent'].name
@@ -285,8 +285,8 @@ def checkForOpponentPollProcess(request):
 		response['continuePolling'] = False
 		response['showScreen'] = "makeOfferButton"
 		response['initBank'] = request.session['p'].cumulativePoints
-		response['setX'] = request.session['startingX']
-		response['setY'] = request.session['startingY']
+		response['setX'] = str(request.session['startingX'])
+		response['setY'] = str(request.session['startingY'])
 
 				
 	
@@ -342,11 +342,14 @@ def offerFormulation(request):
 	offerInsertKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['p'].name
 	offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
 	
+	request.session['xLoss'] = int(offerObj.offeredX)
+	request.session['yLoss'] = int(offerObj.offeredY)
+	
 	# Update the players X and Y
 	request.session['currentX'] -= int(offerObj.offeredX)
-	response['setX'] = request.session['currentX']	
+	response['setX'] = str(request.session['currentX'])	
 	request.session['currentY'] -= int(offerObj.offeredY)
-	response['setY'] = request.session['currentY']
+	response['setY'] = str(request.session['currentY'])
 	
 	response['continuePolling'] = False
 	response['resetFormulationForms'] = True
@@ -354,7 +357,6 @@ def offerFormulation(request):
 	response['poll'] = True
 	response['url'] = "/rex/waitingScreenPollProcess/"
 	response['interval'] = 2000
-
 		
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
@@ -384,10 +386,13 @@ def waitingScreenPollProcess(request):
 		
 		# Add the X and Y from the other player to the player's X and Y stash
 		request.session['currentX'] += int(offerObj.offeredX)
-		response['setX'] = request.session['currentX']	
+		response['setX'] = str(request.session['currentX'])
 		request.session['currentY'] += int(offerObj.offeredY)
-		response['setY'] = request.session['currentY']
-				
+		response['setY'] = str(request.session['currentY'])
+		
+		request.session['xGain'] = int(offerObj.offeredX)
+		request.session['yGain'] = int(offerObj.offeredY)
+		
 		response['updateBank'] = request.session['p'].cumulativePoints
 		
 		# Serialize the offer object into a dictionary that can be passed as JSON
@@ -408,16 +413,37 @@ def waitingScreenPollProcess(request):
 def transactionSummary(request):
 	"""Handles the transactionSummary screen's continue button"""
 	
-	earnedPoints = request.POST.get("transactionSummaryPoints")
+	request.session['earnedPoints'] = request.POST.get("transactionSummaryPoints")
+	request.session['xValue'] = request.POST.get("transactionSummaryXValue")
+	request.session['yValue'] = request.POST.get("transactionSummaryYValue")
 	
 	# Save the participant's points in the database
 	participantObj = Participant.objects.get(name=request.session['p'].name)
-	participantObj.cumulativePoints += int(earnedPoints)
+	participantObj.cumulativePoints += int(request.session['earnedPoints'])
 	participantObj.save()
 	
 	# Save the participant points in request.session
-	request.session['p'].cumulativePoints += int(earnedPoints) 
+	request.session['p'].cumulativePoints += int(request.session['earnedPoints']) 
 	request.session.modified = True
+	
+	# Write the transaction to the log
+	log_rex(sid=request.session['s'].id,
+			cid=request.session['exchangeComponentID'],
+			componentIndex=request.session['p'].currentComponent+1,
+			roundIndex=request.session['currentRound'],
+			participantName=request.session['p'].name,
+			participantPartner=request.session['opponent'].name,
+			startingX=request.session['startingX'],
+			startingY=request.session['startingY'],
+			xLoss=request.session['xLoss'],
+			xGain=request.session['xGain'],
+			yLoss=request.session['yLoss'],
+			yGain=request.session['yGain'],
+			xValue=request.session['xValue'],
+			yValue=request.session['yValue'],
+			requiredGift=request.session['requiredGift'],
+			pointChange=request.session['earnedPoints']
+			).save()
 	
 	response = {}
 	response['processor'] = "transactionSummary"
@@ -480,13 +506,14 @@ def nextRoundCountdownPollProcess(request):
 		if(request.session['clearing'] == "End of exchange opportunity"):
 			request.session['currentX'] = request.session['replenishX']
 			request.session['currentY'] = request.session['replenishY']
-			response['setX'] = request.session['currentX']
-			response['setY'] = request.session['currentY']
 		elif(request.session['clearing'] == "End of pairing"):
 			request.session['currentX'] += request.session['replenishX']
 			request.session['currentY'] += request.session['replenishY']
-			response['setX'] = request.session['currentX']
-			response['setY'] = request.session['currentY']
+
+		response['setX'] = str(request.session['currentX'])
+		response['setY'] = str(request.session['currentY'])
+		request.session['startingX'] = request.session['replenishX']
+		request.session['startingY'] = request.session['replenishY']
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 

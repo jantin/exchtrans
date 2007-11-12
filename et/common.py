@@ -13,21 +13,3 @@ def loadSessionVars(sid):
 	sv = SessionVar.objects.get(experimentSession=expSes,key="sesVars")
 	sesVars = pickle.loads(sv.value)
 	return sesVars
-
-def logWrite(	participant, 
-				component, 
-				session, 
-				messageType,
-				messageText
-				):
-	"""Writes a message to the log"""
-	
-	log = SessionLog(	id = None,
-						participant = participant, 
-						component = component, 
-						session = session, 
-						messageType = messageType, 
-						messageText = messageText
-						)
-	log.save()
-	return True
