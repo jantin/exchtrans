@@ -4,24 +4,20 @@
 <script src="/site_media/scripts/disableRightClick.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="/site_media/css/questionnaire.css" type="text/css" media="screen" />
 <script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
-
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.ui-1.0/jquery.dimensions.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.ui-1.0/ui.mouse.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.ui-1.0/ui.slider.js"></script>
 <script type="text/javascript">
-	$(document).ready(
-		function()
-		{
-			$('.slider').Slider(
-				{
-					accept : '.indicator',
-					restricted: true,
-					fractions : 50,
-					values: [
-						[0,0]
-					]
-				}
-			);
-		}
-	);
+	$(document).ready(function(){
+		$('.slider').slider({
+			handle : '.indicator',
+			change:function(e,ui){
+				$(this).children('.indicator').css('background-color','#000');
+				$(this).siblings('input').val(ui.slider.curValue);
+			}
+		});
+		
+	});
 </script>
 
 {% endblock %}
@@ -31,52 +27,55 @@
 
 
 {% block bodycontent %}
-<div id="questionSet">
-	{% for q in parameters.questions %}
-	<div id="question___{{forloop.counter}}" class="questionContainer">
-		<div id="questionText___{{forloop.counter}}___{{ component.id }}" class="questionText">
-			{{q.questionText}}
-		</div>
-	
-		{% ifequal q.questionType "Free Text" %}
-			<textarea name="Name" rows="{{q.textAreaRows}}" cols="{{q.textAreaCols}}" ></textarea>
-		{% endifequal %}
-	
-		{% ifequal q.questionType "Radio Button" %}
-			<ul class="questionChoices">
-				{% for qc in q.questionChoices %}
-					<li>
-						<input type="radio" name="buttons{{forloop.parentloop.counter}}" />
-						<span id="{{forloop.counter}}___{{forloop.parentloop.counter}}___{{ component.id }}">{{qc}}</span> 
-					</li>
-				{% endfor %}
-			</ul>
-		{% endifequal %}
-	
-		{% ifequal q.questionType "Slider" %}
-		<div id="name">
-			<div class="slider">
-				<div class="indicator">&nbsp;</div>
+<form action="/questionnaire/participantSubmit/" method="post" accept-charset="utf-8">
+	<div id="questionSet">
+		{% for q in parameters.questions %}
+		<div class="questionContainer">
+			<div class="questionText">
+				{{q.questionText}}
 			</div>
-			<div id="leftScale___{{forloop.counter}}___{{ component.id }}" class="leftScale">{{q.leftScale}}</div><div id="rightScale___{{forloop.counter}}___{{ component.id }}" class="rightScale">{{q.rightScale}}</div>				
-		</div>
-		{% endifequal %}
 	
+			{% ifequal q.questionType "Free Text" %}
+				<textarea name="question_{{forloop.counter}}" rows="{{q.textAreaRows}}" cols="{{q.textAreaCols}}"></textarea>
+			{% endifequal %}
+	
+			{% ifequal q.questionType "Radio Button" %}
+				<ul class="questionChoices">
+					{% for qc in q.questionChoices %}
+						<li>
+							<input type="radio" name="question_{{forloop.parentloop.counter}}" value="{{qc}}"/>{{qc}}
+						</li>
+					{% endfor %}
+				</ul>
+			{% endifequal %}
+	
+			{% ifequal q.questionType "Slider" %}
+			<div>
+				<div class="slider">
+					<div class="indicator"></div>
+				</div>
+				<div class="leftScale">{{q.leftScale}}</div><div class="rightScale">{{q.rightScale}}</div>
+				<input type="hidden" name="question_{{forloop.counter}}" value="null"/>
+			</div>
+			{% endifequal %}
+	
+		</div>
+		{% endfor %}
+		<input type="hidden" name="sid" value="{{sid}}"/>
+		<input type="hidden" name="pname" value="{{pname}}"/>
+		<input type="submit" name="continueButton" value="Continue" class="buttonBig"/>
 	</div>
-	{% endfor %}
-</div>
+</form>
 <div id="continueButton">
-	<form action="/session/drive/" method="get" accept-charset="utf-8">
-		<input type="hidden" name="sid" value="{{sid}}" id="sid">
-		<input type="hidden" name="pname" value="{{pname}}" id="pname">
-		<input type="submit" name="continueButton" value="Continue" class="buttonBig">
-	</form>
+
 	{% if parameters.enableBack %}
 		<form action="/session/drive/" method="get" accept-charset="utf-8">
-			<input type="hidden" name="sid" value="{{sid}}" id="sid">
-			<input type="hidden" name="pname" value="{{pname}}" id="pname">
-			<input type="hidden" name="goback" value="true">
-			<input type="submit" name="buttonLabel" value="Go Back" class="buttonBig">
+			<div>
+				<input type="hidden" name="sid" value="{{sid}}"/>
+				<input type="hidden" name="pname" value="{{pname}}"/>
+				<input type="hidden" name="goback" value="true"/>
+				<input type="submit" name="buttonLabel" value="Go Back" class="buttonBig"/>
+			</div>
 		</form>
 	{% endif %}
 </div>

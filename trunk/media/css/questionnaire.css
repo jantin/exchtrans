@@ -57,9 +57,9 @@
 
 .indicator
 {
-	width: 16px;
-	height: 16px;
-	background-color: #000;
+	width: 10px;
+	height: 15px;
+	background-color: #FFF;
 	position: absolute;
 	overflow: hidden;
 	border: none;

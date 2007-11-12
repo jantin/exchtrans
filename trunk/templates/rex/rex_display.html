@@ -263,6 +263,9 @@
 		points = (options['xValue'] * options['availableX']) + (options['yValue'] * options['availableY'])
 		$(".currentPoints").html(String(points));
 		$("#transactionSummaryPoints").val(points);
+		$("#transactionSummaryXValue").val(options['xValue']);
+		$("#transactionSummaryYValue").val(options['yValue']);
+		
 		return points;
 	}
 	
@@ -375,6 +378,8 @@
 		<form action="/rex/transactionSummary/" method="post" accept-charset="utf-8">
 			<input type="submit" name="transactionSummarySubmit" value="Continue" class="buttonBig"/>
 			<input type="hidden" name="transactionSummaryPoints" value="-" id="transactionSummaryPoints">
+			<input type="hidden" name="transactionSummaryXValue" value="-" id="transactionSummaryXValue">
+			<input type="hidden" name="transactionSummaryYValue" value="-" id="transactionSummaryYValue">
 		</form>
 	</p>
 </div>

@@ -85,6 +85,7 @@ urlpatterns = patterns('',
 	
 	# Questionnaire
 	(r'^questionnaire/display/$', 'exchtran.et.questionnaire.questionnaireDisplay'),
+	(r'^questionnaire/participantSubmit/$', 'exchtran.et.questionnaire.participantSubmit'),
 	(r'^questionnaire/editParam/$', 'exchtran.et.questionnaire.questionnaireEditParam'),
 	(r'^questionnaire/addQuestion/$', 'exchtran.et.questionnaire.questionnaireAddQ'),
 	(r'^questionnaire/deleteQuestion/$', 'exchtran.et.questionnaire.questionnaireDeleteQ'),

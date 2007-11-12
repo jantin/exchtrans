@@ -133,26 +133,106 @@ class ExperimentComponents(models.Model):
 		pass
 	
 
-class SessionLog(models.Model):
-	participant = models.ForeignKey(Participant)
-	component = models.ForeignKey(Component)
-	session = models.ForeignKey(ExperimentSession)
+class log_session(models.Model):
+	sid = models.IntegerField()
+	eid = models.IntegerField()
+	experimentName = models.TextField()
+	experimentDescription = models.TextField(null=True, default="")
+	minPlayers = models.IntegerField()
+	maxPlayers = models.IntegerField()
+	playerCount = models.IntegerField()
+	startTime = models.DateTimeField(auto_now_add=True)
+	endTime = models.DateTimeField(null=True)
+	exitMessage = models.TextField(null=True)
 	timestamp = models.DateTimeField(auto_now_add=True)
-	messageType = models.TextField()
-	messageText = models.TextField()
-	
-	def __str__(self):
-		return self.messageText
 	
 	class Admin:
 		pass
+
+class log_components(models.Model):
+	sid = models.IntegerField()
+	cid = models.IntegerField()
+	componentType = models.TextField()
+	componentName = models.TextField()
+	componentDescription = models.TextField(null=True, default="")
+	componentParameters = models.TextField()
+	componentIndex = models.IntegerField(null=True)
+	timestamp = models.DateTimeField(auto_now_add=True)
 	
-	'''
-	TYPE 				DESCRIPTION
-	timestamp			Used at the start and end of components {start, end}
-	questionnaire		Hold questionnaire responses {questionnaireResponse object}
-	rexOffer			Holds an offer object {offer object}
-	'''
+	class Admin:
+		pass
+
+class log_participants(models.Model):
+	sid = models.IntegerField()
+	participantName = models.TextField()
+	participantNumber = models.IntegerField()
+	participantLetter = models.TextField()
+	cumulativePoints = models.IntegerField(null=True)
+	timestamp = models.DateTimeField(auto_now_add=True)
+	
+	class Admin:
+		pass
+
+class log_questionnaire(models.Model):
+	sid = models.IntegerField()
+	cid = models.IntegerField()
+	componentIndex = models.IntegerField()
+	participantName = models.TextField()
+	questionType = models.TextField()
+	questionText = models.TextField()
+	questionResponse = models.TextField(null=True)
+	timestamp = models.DateTimeField(auto_now_add=True)
+	
+	class Admin:
+		pass
+
+class log_nex(models.Model):
+	sid = models.IntegerField()
+	cid = models.IntegerField()
+	componentIndex = models.IntegerField()
+	roundIndex = models.IntegerField()
+	offerIndex = models.IntegerField()
+	participantName = models.TextField()
+	participantPartner = models.TextField()
+	startingX = models.IntegerField()
+	startingY = models.IntegerField()
+	initiatedOffer = models.TextField()
+	xLoss = models.IntegerField()
+	xGain = models.IntegerField()
+	yLoss = models.IntegerField()
+	yGain = models.IntegerField()
+	xValue = models.IntegerField()
+	yValue = models.IntegerField()
+	outcome = models.TextField()
+	binding = models.TextField()
+	followedThrough = models.TextField()
+	pointChange = models.IntegerField()
+	timestamp = models.DateTimeField(auto_now_add=True)
+	
+	class Admin:
+		pass
+
+class log_rex(models.Model):
+	sid = models.IntegerField()
+	cid = models.IntegerField()
+	componentIndex = models.IntegerField()
+	roundIndex = models.IntegerField()
+	participantName = models.TextField()
+	participantPartner = models.TextField()
+	startingX = models.IntegerField()
+	startingY = models.IntegerField()
+	xLoss = models.IntegerField()
+	xGain = models.IntegerField()
+	yLoss = models.IntegerField()
+	yGain = models.IntegerField()
+	xValue = models.IntegerField()
+	yValue = models.IntegerField()
+	requiredGift = models.TextField()
+	pointChange = models.IntegerField()
+	timestamp = models.DateTimeField(auto_now_add=True)
+	
+	class Admin:
+		pass
 
 class SessionVar(models.Model):
 	experimentSession = models.ForeignKey(ExperimentSession)
