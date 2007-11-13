@@ -77,9 +77,9 @@ def matcherDisplay(request):
 			
 			# Write the random pairings to the log.
 			log = log_components.objects.get(sid=sid, componentIndex=p.currentComponent+1)
-			logParams = pickle.loads(log.parameters)
+			logParams = pickle.loads(log.componentParameters)
 			logParams.pairings = pairings
-			log.parameters = pickle.dumps(logParams)
+			log.componentParameters = pickle.dumps(logParams)
 			log.save()
 	else:
 		pairings = parameters.pairings
