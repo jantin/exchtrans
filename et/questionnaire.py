@@ -241,7 +241,7 @@ def handleBackCheckbox(request):
 	elementList = request.POST.get('elementId').split("___")
 	comId = elementList[1]
 	checked = request.POST.get('checked')
-	
+
 	# Load the component from the DB
 	component = Component.objects.get(id=comId)
 	
@@ -249,8 +249,10 @@ def handleBackCheckbox(request):
 	qSet = pickle.loads(component.parameters)
 	if(checked == "true"):
 		qSet.enableBack = True
+		print "***********************************************: " + str(qSet.enableBack)
 	else:
 		qSet.enableBack = False
+		print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^: " + str(qSet.enableBack)
 	component.parameters = pickle.dumps(qSet)
 	component.save()
 	

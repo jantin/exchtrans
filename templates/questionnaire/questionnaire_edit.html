@@ -88,9 +88,9 @@
 		<div class="floatContent editComDescription" id="description___{{ component.id }}___Component">{{ component.description }}</div>
 	</div>
 	<div class="floatRow">
-		<div class="floatLabel">Enable Back button</div>
+		<div class="floatLabel">Enable back button</div>
 		<div class="floatContent">
-			{% if parameters.back %}
+			{% if parameters.enableBack %}
 				<input type="checkbox" name="back" class="backCheckBox" id="backCheckBox___{{ component.id }}" checked="checked" />
 			{% else %}
 				<input type="checkbox" name="back" class="backCheckBox" id="backCheckBox___{{ component.id }}" />

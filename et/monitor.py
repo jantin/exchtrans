@@ -23,10 +23,6 @@ def monitor(request):
 	participants = Participant.objects.filter(experimentSession=sid)
 	experimentComponents = Component.objects.filter(experimentcomponents__experiment_id__experimentsession__id=sid).extra(select={'order_col': "et_component__experimentcomponents.order"}).order_by('order_col')
 	
-	if(monitorSession.status.statusText == "Running"):
-		running = True
-	else:
-		running = False
 	
 	if(len(participants) > 0):
 		noParticipants = False
@@ -38,7 +34,7 @@ def monitor(request):
 								'monitorSession':monitorSession,
 								'participants':participants,
 								'noParticipants':noParticipants,
-								'running':running,
+								'status':monitorSession.status.statusText,
 								'experimentComponents':experimentComponents
 							},
 							  context_instance=RequestContext(request))

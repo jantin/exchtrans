@@ -74,6 +74,13 @@ def matcherDisplay(request):
 			pairings += roundRobin( units = players, decider = 2, rounds = parameters.randomRounds, choices = parameters.randomChoices )
 			RandomPairsSessionVar = SessionVar(experimentSession=s, key=RandomPairsKey, value=pickle.dumps(pairings))
 			RandomPairsSessionVar.save()
+			
+			# Write the random pairings to the log.
+			log = log_components.objects.get(sid=sid, componentIndex=p.currentComponent+1)
+			logParams = pickle.loads(log.parameters)
+			logParams.pairings = pairings
+			log.parameters = pickle.dumps(logParams)
+			log.save()
 	else:
 		pairings = parameters.pairings
 
@@ -191,6 +198,15 @@ def deciderSubmit(request):
 	
 	# Determine the kick off function for the chosen component
 	kickOffFunction = chosenComponent.componentType.kickoffFunction
+	
+	#Write the decider's choice to the log
+	log_matcher(sid=sid,
+				cid=c.id,
+				componentIndex=p.currentComponent+1,
+				deciderName=p.name,
+				deciderPartner=opponentName,
+				deciderChoice=choiceID
+				).save()
 	
 	# redirect to the kickoff function of the chosen component
 	return HttpResponseRedirect('/' + kickOffFunction + '/?pname=' + pname + '&sid=' + sid + '&opponentName=' + opponentName + '&exchangeComponentID=' + choiceID)		

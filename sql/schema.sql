@@ -30,9 +30,9 @@ CREATE TABLE `et_log_nex` (
     `xValue` integer NOT NULL,
     `yValue` integer NOT NULL,
     `outcome` longtext NOT NULL,
-    `binding` longtext NOT NULL,
-    `followedThrough` longtext NOT NULL,
-    `pointChange` integer NOT NULL,
+    `nonBinding` longtext NOT NULL,
+    `followedThrough` longtext NULL,
+    `pointChange` integer NULL,
     `timestamp` datetime NOT NULL
 );
 CREATE TABLE `et_log_rex` (
@@ -51,6 +51,7 @@ CREATE TABLE `et_log_rex` (
     `yGain` integer NOT NULL,
     `xValue` integer NOT NULL,
     `yValue` integer NOT NULL,
+    `requiredGift` longtext NOT NULL,
     `pointChange` integer NOT NULL,
     `timestamp` datetime NOT NULL
 );
@@ -79,7 +80,7 @@ CREATE TABLE `et_log_components` (
     `componentName` longtext NOT NULL,
     `componentDescription` longtext NULL,
     `componentParameters` longtext NOT NULL,
-    `componentIndex` integer NOT NULL,
+    `componentIndex` integer NULL,
     `timestamp` datetime NOT NULL
 );
 CREATE TABLE `et_log_session` (
@@ -92,8 +93,8 @@ CREATE TABLE `et_log_session` (
     `maxPlayers` integer NOT NULL,
     `playerCount` integer NOT NULL,
     `startTime` datetime NOT NULL,
-    `endTime` datetime NOT NULL,
-    `exitMessage` longtext NOT NULL,
+    `endTime` datetime NULL,
+    `exitMessage` longtext NULL,
     `timestamp` datetime NOT NULL
 );
 CREATE TABLE `et_experimentcomponents` (
@@ -118,6 +119,16 @@ CREATE TABLE `et_experiment` (
     `maxPlayers` integer NOT NULL
 );
 ALTER TABLE `et_experimentcomponents` ADD CONSTRAINT experiment_id_id_refs_id_ddebe0f FOREIGN KEY (`experiment_id_id`) REFERENCES `et_experiment` (`id`);
+CREATE TABLE `et_log_matcher` (
+    `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `sid` integer NOT NULL,
+    `cid` integer NOT NULL,
+    `componentIndex` integer NOT NULL,
+    `deciderName` longtext NOT NULL,
+    `deciderPartner` longtext NOT NULL,
+    `deciderChoice` longtext NOT NULL,
+    `timestamp` datetime NOT NULL
+);
 CREATE TABLE `et_experimentsession` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `experiment_id_id` integer NOT NULL REFERENCES `et_experiment` (`id`),
@@ -139,7 +150,7 @@ CREATE TABLE `et_log_participants` (
     `participantName` longtext NOT NULL,
     `participantNumber` integer NOT NULL,
     `participantLetter` longtext NOT NULL,
-    `cumulativePoints` integer NOT NULL,
+    `cumulativePoints` integer NULL,
     `timestamp` datetime NOT NULL
 );
 CREATE TABLE `et_participantstatus` (
@@ -155,7 +166,7 @@ CREATE TABLE `et_log_questionnaire` (
     `participantName` longtext NOT NULL,
     `questionType` longtext NOT NULL,
     `questionText` longtext NOT NULL,
-    `questionResponse` longtext NOT NULL,
+    `questionResponse` longtext NULL,
     `timestamp` datetime NOT NULL
 );
 CREATE TABLE `et_experimentstatus` (

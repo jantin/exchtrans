@@ -16,10 +16,11 @@ from monitor import *
 import pickle
 from time import time
 from time import sleep
+from datetime import datetime
 
 @login_required
 def sessions(request):
-	"""This page shows the 'Waiting for participants' and 'In progress' experiments."""
+	"""Shows a list of sessions."""
 	expSessions = ExperimentSession.objects.all()
 	experiments = Experiment.objects.all()
 	return render_to_response('adminInterface/sessions.html', 
@@ -177,8 +178,20 @@ def startSession(request):
 @login_required
 def stopSession(request):
 	"""Stops the session"""
-	sid = request.GET.get('sid')
+	stopMessage = request.POST.get('stopMessage')
+	sid = request.POST.get('sid')
 	expSes = ExperimentSession.objects.get(id=sid)
+	
+	# Change status from Running to canceled
+	sesStatus = experimentSessionStatus.objects.get(statusText="Canceled")
+	expSes.status = sesStatus
+	expSes.save()
+	
+	# Write to the log
+	log = log_session.objects.get(sid=sid)
+	log.exitMessage = stopMessage
+	log.endTime = datetime.now()
+	log.save()
 	
 	# Delete sesVars
 	SessionVar.objects.filter(experimentSession=expSes).delete()
@@ -186,18 +199,34 @@ def stopSession(request):
 	# Delete participants
 	Participant.objects.filter(experimentSession__exact=sid).delete()
 	
-	# Change status from Running to canceled
-	sesStatus = experimentSessionStatus.objects.get(statusText="Canceled")
-	expSes.status = sesStatus
-	expSes.save()
-	
 	return HttpResponseRedirect('/sessions/monitor/?sid=' + sid)
 
 @login_required
 def endSession(request):
 	"""This function handles what happens when the experiment is over."""
-
-	# TODO delete participant, if last participant, kill sesVars, add end date to session.
+	pname = request.GET.get('pname')
+	sid = request.GET.get('sid')
+	expSes = ExperimentSession.objects.get(id=sid)
+	
+	# Kill the participant
+	Participant.objects.get(name=pname).delete()
+	
+	# If that was the last participant, kill the session vars 
+	remainingParticipants = Participant.objects.filter(experimentSession=sid)
+	if(len(remainingParticipants) == 0):
+		SessionVar.objects.filter(experimentSession=expSes).delete()
+	
+		# Update the status of the session
+		sesStatus = experimentSessionStatus.objects.get(statusText="Completed")
+		expSes.status = sesStatus
+		expSes.save()
+	
+		# Write to the log
+		log = log_session.objects.get(sid=sid)
+		log.exitMessage = "Completed successfully"
+		log.endTime = datetime.now()
+		log.save()
+	
 	return render_to_response('session/end.html', 
 						  {'response': "Experiment finished"}, 
 						  context_instance=RequestContext(request))
@@ -245,7 +274,7 @@ def driveSession(request):
 		# If that was the last component, redirect to the end screen
 		if(len(sesVars.componentsList) == p.currentComponent):
 			p.save()
-			return HttpResponseRedirect('/session/end/?sid=' + sid)
+			return HttpResponseRedirect('/session/end/?sid=' + sid + "&pname=" + pname)
 	
 	# increment the current component iteration count and save participant vars to the DB.
 	p.currentIteration = p.currentIteration + 1

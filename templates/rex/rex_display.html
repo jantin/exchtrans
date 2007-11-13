@@ -44,8 +44,12 @@
 		
 	    // bind the submit event of all forms on the page. The server response will be
 		// delivered to the processFormResponse() function.
-		$('form').ajaxForm({success: processFormResponse}); 
-		
+		$('form').ajaxForm({
+			success: processFormResponse,
+			beforeSubmit: function(){
+				$(":submit").attr("disabled","disabled");
+			}			
+		});		
 		// When the player submits an offer, update the "offeredY" and "offeredX" spans.
 		// The value of these divs is used to calculate points when the transaction summary is shown
 		$('#offerFormulationOfferSubmit').bind("click", function(event){
@@ -68,6 +72,11 @@
 	// Each screen contains a form that submits the user's input to the server.
 	// This function processes the server's response and updates the page accordingly.
 	function processFormResponse(responseText){
+		// Reenable the submit buttons
+		$(":submit").removeAttr("disabled");
+		// but don't reenable the offer and counter offer submit buttons
+		$("#offerFormulationOfferSubmit").attr("disabled","disabled");
+		
 		// responseText the response returned by the server. It is JSON formatted.
 		// Note: parseJSON() is not jQuery, rather it's in json.js from json.org
 		responseJSON = responseText.parseJSON();
@@ -237,7 +246,14 @@
 				options['offerY'] = options['p2y'];
 				$("#offerYError").html("You only have " + options['p2y'] + " Y");
 			}
-		}	
+		}
+		
+		// enable the offer submit button if the offer is valid
+		if(options['offerX'].length  > 0 && options['offerY'].length > 0){
+			$("#offerFormulationOfferSubmit").removeAttr("disabled");
+		} else {
+			$("#offerFormulationOfferSubmit").attr("disabled","disabled");
+		}
 
 	}
 	
@@ -342,7 +358,7 @@
 				<input type="text" name="offerFormulationOfferY" id="offerFormulationOfferY" class="offerFormulationInputs" value="" size="4" maxlength="4"/> Y
 				<span id="offerYError" class="offerError"></span>
 			</p>
-			<input type="submit" name="offerFormulationOfferSubmit" id="offerFormulationOfferSubmit" value="Submit" class="buttonBig"/>
+			<input type="submit" name="offerFormulationOfferSubmit" id="offerFormulationOfferSubmit" value="Submit" class="buttonBig" id="offerFormulationOfferSubmit" disabled="disabled"/>
 		</div>
 		<div id="offerFormulationRequiredGift" style="display:none">
 			<p>Do you want to give player {{opponentIdentity}} 
@@ -395,7 +411,7 @@
 
 {% block bottomBar %}
 
-<div id="currentPointsBox">
+<div id="currentXBox">
 	<p>Total X</p>
 	<div id="availableX" class="largePoints">-</div>
 	{% if showXYValue %}
@@ -405,7 +421,7 @@
 	{% endif %}
 
 </div>
-<div id="cumulativePointsBox">
+<div id="currentYBox">
 	<p>Total Y</p>
 	<div id="availableY" class="largePoints">-</div>
 	{% if showXYValue %}
