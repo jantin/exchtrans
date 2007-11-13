@@ -204,9 +204,9 @@ class log_nex(models.Model):
 	xValue = models.IntegerField()
 	yValue = models.IntegerField()
 	outcome = models.TextField()
-	binding = models.TextField()
-	followedThrough = models.TextField()
-	pointChange = models.IntegerField()
+	nonBinding = models.TextField()
+	followedThrough = models.TextField(null=True)
+	pointChange = models.IntegerField(null=True)
 	timestamp = models.DateTimeField(auto_now_add=True)
 	
 	class Admin:
@@ -229,6 +229,18 @@ class log_rex(models.Model):
 	yValue = models.IntegerField()
 	requiredGift = models.TextField()
 	pointChange = models.IntegerField()
+	timestamp = models.DateTimeField(auto_now_add=True)
+	
+	class Admin:
+		pass
+
+class log_matcher(models.Model):
+	sid = models.IntegerField()
+	cid = models.IntegerField()
+	componentIndex = models.IntegerField()
+	deciderName = models.TextField()
+	deciderPartner = models.TextField()
+	deciderChoice = models.TextField()
 	timestamp = models.DateTimeField(auto_now_add=True)
 	
 	class Admin:

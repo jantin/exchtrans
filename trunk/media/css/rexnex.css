@@ -57,12 +57,12 @@
 	
 }
 
-#currentPointsBox{
+#currentXBox{
 	float:left;
 	margin:30px 60px 30px 180px;
 }
 
-#cumulativePointsBox{
+#currentYBox{
 	float:left;
 	margin:30px;
 }

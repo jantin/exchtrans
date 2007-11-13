@@ -52,6 +52,16 @@ Loading multiple firefox instances
 /Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test4"
 
 
+List of nex outcomes
+
+INITIATOR							NOT INITIATOR
+offerAccepted *			-- 			acceptedOffer *
+offerCountered *		--			counterOffered *
+canceledOffer *			--			offerCanceled *
+offerDeclined *			--			declinedOffer *
+roundEnded *			--			endedRound *
+
+
 
 
 
@@ -70,3 +80,4 @@ from et.common import *
 from et.views import *
 import pickle
 from time import time
+from datetime import datetime

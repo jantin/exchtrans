@@ -82,7 +82,15 @@ collected while running an experiment is stored with the session.</p>
 		<td>{{ e.id }}</td>
 		<td>{{ e.status.statusText }}</td>
 		<td>{{ e.experiment_id.name }}</td>
-		<td><a href='/session/join/?sid={{ e.id }}'>Join</a> | <a href='/sessions/monitor/?sid={{ e.id }}'>Monitor</a> | <a href="/session/delete/?sid={{ e.id }}" class="deleteLink" id="{{ e.id }}">Delete</a></td>
+		<td>
+			{% ifequal e.status.statusText "Ready" %}
+				<a href='/session/join/?sid={{ e.id }}'>Join</a> | 
+			{% endifequal %}
+			{% ifequal e.status.statusText "Not Ready" %}
+				<a href='/session/join/?sid={{ e.id }}'>Join</a> | 
+			{% endifequal %}
+			<a href='/sessions/monitor/?sid={{ e.id }}'>Monitor</a> | <a href="/session/delete/?sid={{ e.id }}" class="deleteLink" id="{{ e.id }}">Delete</a>
+		</td>
 	</tr>
 	{% endfor %}
 	</tbody>
