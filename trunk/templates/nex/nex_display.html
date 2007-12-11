@@ -537,7 +537,7 @@
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/><br/><br/>
 	<form action="/nex/makeOfferButton/" method="post" accept-charset="utf-8">
-		<input type="submit" name="makeOfferSubmit" value="Make Offer" class="buttonBig"/>
+		<input type="submit" name="makeOfferSubmit" value="Click to Begin" class="buttonBig"/>
 	</form>
 </div>
 <div id="offerFormulation" style="display:none;" class="exchangeScreen">
@@ -708,15 +708,15 @@
 		The other player canceled the offer before you responded.
 	</div>
 	<div id="transactionSummary_youAccepted" class="transactionSummaryMessages">
-		You accepted player {{opponentIdentity}}'s offer of <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>s 
-		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>s.
+		You accepted player {{opponentIdentity}}'s offer. Player {{opponentIdentity}} offered <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) 
+		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s).
 		<br/>
 		You received <strong><span class="currentPoints">-</span></strong>s 
 		points for this deal.
 	</div>
 	<div id="transactionSummary_opponentAccepted" class="transactionSummaryMessages">
-		Player {{opponentIdentity}} accepted your offer of <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>s 
-		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>s.
+		Player {{opponentIdentity}} accepted your offer. You offered <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s)  
+		in exchange for <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s).
 		<br/>
 		You received <strong><span class="currentPoints">-</span></strong>s 
 		points for this deal.
