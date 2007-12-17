@@ -228,6 +228,7 @@ class log_rex(models.Model):
 	xValue = models.IntegerField()
 	yValue = models.IntegerField()
 	requiredGift = models.TextField()
+	declinedToMakeOffer = models.TextField()
 	pointChange = models.IntegerField()
 	timestamp = models.DateTimeField(auto_now_add=True)
 	
