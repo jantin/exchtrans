@@ -202,6 +202,9 @@ def rexDisplay(request):
 	sv = SessionVar(key=key, value="True", experimentSession=request.session['s'])
 	sv.save()
 	
+	# Initialize "declined to offer" as False. Changed to true if the player declines to offer
+	request.session['declinedToMakeOffer'] = False
+	
 	# Determine if the current player is player 1 or player 2 of the pairing. Also grab the right starting X and Y quantities
 	if (int(request.session['currentPairing']["p1"]) == int(request.session['p'].number)):
 		request.session['playerNumber'] = 1
@@ -317,8 +320,13 @@ def offerFormulation(request):
 	response = {}
 	response['processor'] = "offerFormulation"
 	
+	# If this has a value, the player declined to make an offer
+	if(request.POST.get('makeOfferSubmit')):
+		offeredX = "0"
+		offeredY = "0"
+		request.session['declinedToMakeOffer'] = True
 	# If it's no, it was a required gift situation that the player declined.
-	if(request.POST.get('offerFormulationOfferSubmit') == "No"):
+	elif(request.POST.get('offerFormulationOfferSubmit') == "No"):
 		offeredX = "0"
 		offeredY = "0"
 		response['declinedToGiveRequiredGift'] = True
@@ -442,6 +450,7 @@ def transactionSummary(request):
 			xValue=request.session['xValue'],
 			yValue=request.session['yValue'],
 			requiredGift=request.session['requiredGift'],
+			declinedToMakeOffer = request.session['declinedToMakeOffer'],
 			pointChange=request.session['earnedPoints']
 			).save()
 	

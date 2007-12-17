@@ -342,12 +342,15 @@
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/><br/><br/>
 	<form action="/rex/makeOfferButton/" method="post" accept-charset="utf-8">
-		<input type="submit" name="makeOfferSubmit" value="Make Offer" class="buttonBig"/>
+		<input type="submit" name="makeOfferSubmit" value="Make Offer" class="buttonBig"/> 
+	</form>
+	<form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off" id="offerForulationForm">
+		<input type="submit" name="makeOfferSubmit" value="Don't Offer" class="buttonBig"/>
 	</form>
 </div>
 <div id="offerFormulation" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
-	<form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off">
+	<form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off" id="offerForulationForm">
 		<div id="offerFormulationFreeExchange">
 			<p>What do you want to give?</p>
 			<p>
@@ -368,6 +371,7 @@
 			<input type="submit" name="offerFormulationOfferSubmit" value="Yes" class="buttonBig"/> 
 			<input type="submit" name="offerFormulationOfferSubmit" value="No" class="buttonBig"/>
 		</div>
+		<input type="hidden" name="declinedToMakeOffer" value="false" id="declinedToMakeOfferField"/>
 	</form>
 </div>
 <div id="waitingScreen" style="display:none;" class="exchangeScreen">

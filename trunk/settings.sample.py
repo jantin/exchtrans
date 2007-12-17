@@ -24,7 +24,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Los_Angeles'
+TIME_ZONE = 'America/New_York'
 
 # Language code for this installation. All choices can be found here:
 # http://www.w3.org/TR/REC-html40/struct/dirlang.html#langcodes
@@ -76,12 +76,22 @@ ROOT_URLCONF = 'exchtran.urls'
 ## FILL ME IN!!!!!
 ##
 TEMPLATE_DIRS = (
-    '',
+    '/opt/local/lib/python2.5/site-packages/et/templates',
 )
 
+##
+## FILL ME IN!!!!!
+##
 # Custom setting for use with svn_version template tag
 # Set to the root directory of your checked out working copy
-SVN_DIR = '/opt/local/lib/python2.4/site-packages/exchtran'
+SVN_DIR = '/opt/local/lib/python2.5/site-packages/et'
+
+##
+## FILL ME IN!!!!!
+##
+# Custom setting
+# Path to upload directory (make sure there is a trailing slash)
+UPLOAD_DIR = SVN_DIR + '/media/uploads/'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
