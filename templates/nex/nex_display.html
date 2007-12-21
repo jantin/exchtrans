@@ -403,43 +403,17 @@
 			}
 		}
 		
-		// Calculate the loss from offering
-		if(options['offerUnit'] == "x"){
-			if(options['whichPlayer'] == "p1"){
-				p1Loss = options['offer'] * options['p1xValue'];
-				p2Loss = options['request'] * options['p2xValue'];
-				
-			} else {
-				p1Loss = options['request'] * options['p1xValue'];
-				p2Loss = options['offer'] * options['p2xValue'];
-			}
-		} else {
-			if(options['whichPlayer'] == "p1"){
-				p1Loss = options['offer'] * options['p1yValue'];
-				p2Loss = options['request'] * options['p2yValue'];
-			} else {
-				p1Loss = options['request'] * options['p1yValue'];
-				p2Loss = options['offer'] * options['p2yValue'];
-			}
-		}
-		
-		// Calculate the potential gain from the request
-		if(options['requestUnit'] == "x"){
-			if(options['whichPlayer'] == "p1"){
-				p1Gain = options['request'] * options['p1xValue'];
-				p2Gain = options['offer'] * options['p2xValue'];
-			} else {
-				p1Gain = options['offer'] * options['p1xValue'];
-				p2Gain = options['request'] * options['p2xValue'];
-			}
-		} else {
-			if(options['whichPlayer'] == "p1"){
-				p1Gain = options['request'] * options['p1yValue'];
-				p2Gain = options['offer'] * options['p2yValue'];
-			} else {
-				p1Gain = options['offer'] * options['p1yValue'];
-				p2Gain = options['request'] * options['p2yValue'];
-			}
+		// Calculate the Gain and Loss for each player
+		if(options['whichPlayer'] == "p1"){
+			p1Gain = options['request'] * options['p1'+options['requestUnit'].toLowerCase()+'Value'];
+			p2Gain = options['offer'] * options['p2'+options['offerUnit'].toLowerCase()+'Value'];
+			p1Loss = options['offer'] * options['p1'+options['offerUnit'].toLowerCase()+'Value'];
+			p2Loss = options['request'] * options['p2'+options['requestUnit'].toLowerCase()+'Value'];
+		} else if(options['whichPlayer'] == "p2") {
+			p1Gain = options['offer'] * options['p1'+options['offerUnit'].toLowerCase()+'Value'];
+			p2Gain = options['request'] * options['p2'+options['requestUnit'].toLowerCase()+'Value'];
+			p1Loss = options['request'] * options['p1'+options['requestUnit'].toLowerCase()+'Value'];
+			p2Loss = options['offer'] * options['p2'+options['offerUnit'].toLowerCase()+'Value'];
 		}
 
 		// calculate the potential points
@@ -447,12 +421,17 @@
 		p2Points = p2InitialPoints + (p2Gain - p2Loss);		
 		
 		p1Points_justExchange = p1Gain - p1Loss;
-		p2Points_justExchange = p2Gain - p2Loss;		
+		p2Points_justExchange = p2Gain - p2Loss;
+		
 		
 		// Update the points in the html
 		points = String(eval("p" + pNum + "Points"));
 		points_justExchange = String(eval("p" + pNum + "Points_justExchange"));
 		if(offerType == "newOffer"){
+			// alert("options['whichPlayer']: "+options['whichPlayer']);
+			// alert("options['offer']: "+options['offer']);
+			// alert("options['request']: "+options['request']);
+			//alert("p1InitialPoints: " + p1InitialPoints+"\np1Gain: " + p1Gain+"\np1Loss: " + p1Loss+"\np1Points: " + p1Points+"\np1Points_justExchange: "+p1Points_justExchange+"\n\np2InitialPoints: " + p2InitialPoints+"\np2Gain: " + p2Gain+"\np2Loss: " + p2Loss+"\n2Points: " + p2Points+"\np2Points_justExchange: "+p2Points_justExchange);
 			$(".currentPoints").html(points_justExchange);
 			$("#transactionSummaryPoints").val(points);
 		} else {
