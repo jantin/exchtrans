@@ -178,7 +178,8 @@ def nexDisplay(request):
 	return render_to_response("nex/nex_display.html", 
 							{	'opponentIdentity': request.session['opponent'].identityLetter,
 								'exchangeParametersJSON': exchangeParametersJSON,
-								'playerNumber': request.session['playerNumber'],
+								'playerNumber': request.session['p'].number,
+								'opponentNumber': request.session['opponent'].number,
 								'widgets': widgets,
 								'startingX': request.session['startingX'],
 								'startingY': request.session['startingY'],
@@ -296,6 +297,7 @@ def makeOfferButton(request):
 	"""Handles the makeOfferButton form screen"""
 	response = {}
 	response['processor'] = "makeOfferButton"
+	response['resetFormulationForms'] = True
 	response['showScreen'] = "offerFormulation"
 	setPollURL(request, "/nex/checkForOfferPollProcess/")
 	
@@ -415,9 +417,7 @@ def offerFormulation(request):
 	"""
 	setPollURL(request, "None")
 	response = {}
-	response['processor'] = "offerFormulation"	
-	
-	print request.POST
+	response['processor'] = "offerFormulation"
 	
 	# Lock the session var table while we check to see if there are any offers. Before removing
 	# the lock, add the current player's offer in the case that there aren't any existing offers.
@@ -1082,7 +1082,6 @@ def nextRoundCountdown(request):
 	"""Handles the nextRoundCountdown screen"""
 	response = {}
 	response['processor'] = "nextRoundCountdown"
-	
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 

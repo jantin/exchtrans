@@ -1,14 +1,14 @@
 {% extends "expBase.html" %}
 
 {% block extrahead %}
-<script src="/site_media/scripts/disableRightClick.js" type="text/currentGainUnit" charset="utf-8"></script>
+<script src="/site_media/scripts/disableRightClick.js" type="text/javascript" charset="utf-8"></script>
 <script src="/site_media/scripts/jquery/jquery.pack.js" type="text/javascript" charset="utf-8"></script>
 <script src="/site_media/scripts/jquery/jquery.form.js" type="text/javascript" charset="utf-8"></script>
 <script src="/site_media/scripts/jquery/jquery.alphanumeric.pack.js" type="text/javascript" ></script>
 <script src="/site_media/scripts/jquery/json.js" type="text/javascript" ></script>
 <script src="/site_media/scripts/jquery/jquery.color.js" type="text/javascript" ></script>
-<script type="text/javascript" src="/site_media/scripts/jquery/jquery.impromptu.1.0.js"></script>
-
+<script src="/site_media/scripts/jquery/jquery.impromptu.1.0.js" type="text/javascript"></script>
+<script src="/site_media/scripts/points.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 	// The toJSONString method is removed because otherwise, it shows up as a button with the
@@ -18,7 +18,16 @@
 	delete(Object.prototype.toJSONString);
 
 	// Code to run after the page is completely loaded.
-	$(document).ready(function() { 
+	$(document).ready(function() {
+		
+		// exchangeParametersJSON contains the contents of the Nex component object
+		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
+		
+		// These numbers are used to build strings e.g. p1x
+		playerNumber = {{playerNumber}} + 1;
+		opponentNumber = {{opponentNumber}} + 1;
+		
+		
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
 			clearTimeout(timeout);
@@ -29,6 +38,21 @@
 			showScreen("transactionSummary");
 		});
 		
+		//Init a points object
+		points = new et_points();
+		points.p1x = exchangeParametersJSON['p1x'];
+		points.p2x = exchangeParametersJSON['p2x'];
+		points.p1y = exchangeParametersJSON['p1y'];
+		points.p2y = exchangeParametersJSON['p2y'];
+		points.p1xMaxRequest = exchangeParametersJSON['p1xMaxRequest'];
+		points.p2xMaxRequest = exchangeParametersJSON['p2xMaxRequest'];
+		points.p1yMaxRequest = exchangeParametersJSON['p1yMaxRequest'];
+		points.p2yMaxRequest = exchangeParametersJSON['p2yMaxRequest'];
+		points.p1xValue_raw = exchangeParametersJSON['p1xValue'];
+		points.p2xValue_raw = exchangeParametersJSON['p2xValue'];
+		points.p1yValue_raw = exchangeParametersJSON['p1yValue'];
+		points.p2yValue_raw = exchangeParametersJSON['p2yValue'];		
+		
 	    // bind the submit event of all forms on the page. The server response will be
 		// delivered to the processFormResponse() function.
 		$('form').ajaxForm({
@@ -37,11 +61,7 @@
 				$(":submit").attr("disabled","disabled");
 			}			
 		});
-		
-		// pNum is either 1 or 2 indicating if, within the current pairing, the player is the 1st or 2nd player
-		// It's used when building keys to access nex parameters. e.g. exchangeParametersJSON['p' + pNum + 'x']
-		pNum = "{{playerNumber}}";
-		
+				
 		// The letter identity of the other player in the pairing. 
 		opponentIdentity = "{{opponentIdentity}}";
 		
@@ -49,32 +69,76 @@
 		// Updates the "This deal would get you" number on the offerFormulation screen
 		$('.offerFormulationInputs').numeric();
 		$(".offerFormulationInputs").keyup(function(){
-			calculatePoints("offerPreview");
+			offerPreview(false);
 		});		
 		$("#offerFormulationOfferUnit").change(function(){
-			calculatePoints("offerPreview");
+			offerPreview(false);
 		});
 		$("#offerFormulationRequestUnit").change(function(){
-			calculatePoints("offerPreview");
+			offerPreview(false);
 		});
 		
 		// counter offer screen fields
 		$('.counterOfferFormulationInputs').numeric();
 		$(".counterOfferFormulationInputs").keyup(function(){
-			calculatePoints("counterOfferPreview");
+			offerPreview(true);
 		});
 		$("#counterOfferFormulationOfferUnit").change(function(){
-			calculatePoints("counterOfferPreview");
+			offerPreview(true);
 		});
 		$("#counterOfferFormulationRequestUnit").change(function(){
-			calculatePoints("counterOfferPreview");
+			offerPreview(true);
 		});
 		
 		// Start polling server to check for opponents
 		pollServer();
 		
 	});
-
+	
+	function offerPreview(counterOffer){
+		points.offeredBy = "p" + playerNumber;
+		$(".offerError").html("");
+		$(".requestError").html("");		
+		if(counterOffer){
+			points.offer = $("#counterOfferFormulationOffer").val();
+			points.request = $("#counterOfferFormulationRequest").val();
+			points.offerUnit = $("#counterOfferFormulationOfferUnit").val();
+			points.requestUnit = $("#counterOfferFormulationRequestUnit").val();
+		} else {
+			points.offer = $("#offerFormulationOffer").val();
+			points.request = $("#offerFormulationRequest").val();
+			points.offerUnit = $("#offerFormulationOfferUnit").val();
+			points.requestUnit = $("#offerFormulationRequestUnit").val();
+		}
+		
+		// enable the offer and counter offer submit buttons if an offer is valid
+		if(points.offer.length > 0 && points.request.length > 0){
+			$("#offerFormulationOfferSubmit").removeAttr("disabled");
+			$("#counterOfferFormulationSubmit").removeAttr("disabled");
+		} else {
+			$("#offerFormulationOfferSubmit").attr("disabled","disabled");
+			$("#counterOfferFormulationSubmit").attr("disabled","disabled");
+		}
+		
+		response = points.calculatePoints();
+		if(!response.error){
+			$(".pointsPreview").html(String(response[points.offeredBy +'Points_justExchange']));
+		} else {
+			$(":submit").attr("disabled","disabled");
+			$(".pointsPreview").html("--");
+			switch(response.errorMsg){
+				case "Insufficient funds for offer":
+					$(".offerError").html("Insufficient " + points.offerUnit);
+					break;
+				case "Exceeded max request":
+					$(".requestError").html("Request less " + points.requestUnit);
+					break;
+				default:
+					alert(response.errorMsg);
+			}
+		}
+	}
+	
 	// Each screen contains a form that submits the user's input to the server.
 	// This function processes the server's response and updates the page accordingly.
 	function processFormResponse(responseText){
@@ -112,6 +176,34 @@
 				});
 	}
 	
+	function showOfferPoints(offer, direction) {
+		points.offer = offer['offer'];
+		points.request = offer['request'];
+		points.offerUnit = offer['offerUnit'];
+		points.requestUnit = offer['requestUnit'];
+		
+		if(direction == "incoming"){
+			$('.currentGain').html(String(offer['offer']));
+			$('.currentGainUnit').html(String(offer['offerUnit']).toUpperCase());
+			$('.currentLoss').html(String(offer['request']));
+			$('.currentLossUnit').html(String(offer['requestUnit']).toUpperCase());
+			points.offeredBy = "p" + opponentNumber;
+		} else {
+			$('.currentGain').html(String(offer['request']));
+			$('.currentGainUnit').html(String(offer['requestUnit']).toUpperCase());
+			$('.currentLoss').html(String(offer['offer']));
+			$('.currentLossUnit').html(String(offer['offerUnit']).toUpperCase());
+			points.offeredBy = "p" + playerNumber;
+		}
+		response = points.calculatePoints();
+		if(!response.error){
+			$(".currentPoints").html(String(response["p" + playerNumber +'Points_justExchange']));
+			$("#transactionSummaryPoints").val(String(response["p" + playerNumber +'Points']));
+		} else {
+			alert(response.errorMsg);
+		}
+	}
+	
 	function examineJSON(responseJSON){		
 		if(responseJSON['redirect']){
 			window.location = responseJSON['redirect'];
@@ -129,18 +221,10 @@
 			$("html").trigger("widget_timer_event_scheduleTimer", [responseJSON['showTime']]);
 		}
 		if(responseJSON['incomingOffer']){
-			$('.currentGain').html(String(responseJSON['incomingOffer']['offer']));
-			$('.currentGainUnit').html(String(responseJSON['incomingOffer']['offerUnit']).toUpperCase());
-			$('.currentLoss').html(String(responseJSON['incomingOffer']['request']));
-			$('.currentLossUnit').html(String(responseJSON['incomingOffer']['requestUnit']).toUpperCase());			
-			calculatePoints("newOffer");
+			showOfferPoints(responseJSON['incomingOffer'], "incoming");
 		}
 		if(responseJSON['outgoingOffer']){
-			$('.currentGain').html(String(responseJSON['outgoingOffer']['request']));
-			$('.currentGainUnit').html(String(responseJSON['outgoingOffer']['requestUnit']).toUpperCase());
-			$('.currentLoss').html(String(responseJSON['outgoingOffer']['offer']));
-			$('.currentLossUnit').html(String(responseJSON['outgoingOffer']['offerUnit']).toUpperCase());
-			calculatePoints("newOffer");
+			showOfferPoints(responseJSON['outgoingOffer'], "outgoing");
 		}
 		if(responseJSON['transactionType']){
 			$('.transactionSummaryMessages').css({display:"none"});
@@ -150,9 +234,6 @@
 			$('#nonBindingConfirmationOfferFromOpponent').css({display:"none"});
 			$('#nonBindingConfirmationOfferToOpponent').css({display:"none"});
 			$('#nonBindingConfirmation' + responseJSON['nonBindingOfferType']).css({display:"block"});
-		}
-		if(responseJSON['processor'] == "makeOfferButton"){
-			calculatePoints("offerPreview");
 		}
 		if(responseJSON['setX'] >= 0){
 			setTimeout('setXandY("X","' + responseJSON["setX"] + '")', 0);
@@ -165,7 +246,7 @@
 		}
 		if(responseJSON['updateBank'] >= 0){
 			oldPoints = responseJSON['updateBank'];
-			currentPoints = $(".currentPoints:first").html();
+			currentPoints = points.lastResponse["p" + playerNumber +'Points'];
 			updatedPoints = parseInt(oldPoints) + parseInt(currentPoints);
 			setTimeout('$("html").trigger("widget_bank_event_set", [updatedPoints])', 1000);
 		}
@@ -179,6 +260,7 @@
 		if(responseJSON['resetFormulationForms']){
 			$(".offerError").html("");
 			$(".requestError").html("");
+			$(".pointsPreview").html("--");
 			$("#counterOfferFormulationOffer").val("");
 			$("#counterOfferFormulationRequest").val("");
 			$("#counterOfferFormulationOfferUnit").val("x");
@@ -260,244 +342,6 @@
 	function offerDeclinedDialogAction(buttonValue, msg){
 		showScreen("offerFormulation");
 	}
-	
-	// Updates the "This deal would get you" number on the offerFormulation screen
-	// Called on keyup of the input fields of the offerFormulation screen
-	function calculatePoints(offerType){		
-		// Clear the error if present
-		$(".offerError").html("");
-		$(".requestError").html("");
-				
-		// exchangeParametersJSON contains the contents of the Nex component object
-		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
-		pNum = "{{playerNumber}}";
-		
-		if(offerType == "offerPreview"){
-			offer = $("#offerFormulationOffer").val();
-			request = $("#offerFormulationRequest").val();
-			offerUnit = $("#offerFormulationOfferUnit").val();
-			requestUnit = $("#offerFormulationRequestUnit").val();
-			divPrefix = "offer"; //used in the error checking
-		} else if(offerType == "counterOfferPreview"){
-			offer = $("#counterOfferFormulationOffer").val();
-			request = $("#counterOfferFormulationRequest").val();
-			offerUnit = $("#counterOfferFormulationOfferUnit").val();
-			requestUnit = $("#counterOfferFormulationRequestUnit").val();
-			divPrefix = "counterOffer"; //used in the error checking
-		} else if(offerType == "newOffer"){
-			offer = $(".currentLoss:first").html();
-			offerUnit = $(".currentLossUnit:first").html();
-			offerUnit.toLowerCase();
-			request = $(".currentGain:first").html();
-			requestUnit = $(".currentGainUnit:first").html();
-			requestUnit.toLowerCase();
-		}
-
-		// Set up all our working variables
-		options = {
-			offerType: offerType,
-			whichPlayer: ('p' + pNum),
-			offer: offer,
-			request: request,
-			offerUnit: offerUnit,
-			requestUnit: requestUnit,
-			p1x: exchangeParametersJSON['p1x'],
-			p2x: exchangeParametersJSON['p2x'],
-			p1y: exchangeParametersJSON['p1y'],
-			p2y: exchangeParametersJSON['p2y'],
-			p1xValue: exchangeParametersJSON['p1xValue'],
-			p2xValue: exchangeParametersJSON['p2xValue'],
-			p1yValue: exchangeParametersJSON['p1yValue'],
-			p2yValue: exchangeParametersJSON['p2yValue'],
-			p1xMaxRequest: exchangeParametersJSON['p1xMaxRequest'],
-			p1yMaxRequest: exchangeParametersJSON['p1yMaxRequest'],
-			p2xMaxRequest: exchangeParametersJSON['p2xMaxRequest'],
-			p2yMaxRequest: exchangeParametersJSON['p2yMaxRequest']
-		}
-		
-		// update available X and Y with what's currently displayed
-		if(pNum == 1){
-			options['p1x'] = $("#availableX").html();
-			options['p1y'] = $("#availableY").html();
-		} else {
-			options['p2x'] = $("#availableX").html();
-			options['p2y'] = $("#availableY").html();
-		}
-		
-		options['p1xValue'] = parseValueInput(options['p1xValue'], options);
-		options['p1yValue'] = parseValueInput(options['p1yValue'], options);
-		options['p2xValue'] = parseValueInput(options['p2xValue'], options);
-		options['p2yValue'] = parseValueInput(options['p2yValue'], options);
-		
-		// If any of the value fields have errors, update the point value table and return
-		if(options['p2yValue'] == "Error" || options['p2xValue'] == "Error" || options['p1yValue'] == "Error" || options['p1xValue'] == "Error"){
-			$("#offerFormulationP1Points").html("--");
-			$("#offerFormulationP2Points").html("--");
-			return false;
-		}
-		
-		// Calculate the current number of points held by the player this round
-		p1InitialPoints = (options['p1x'] * options['p1xValue']) + (options['p1y'] * options['p1yValue']);
-		p2InitialPoints = (options['p2x'] * options['p2xValue']) + (options['p2y'] * options['p2yValue']);
-
-		// Error Check Offer input field
-		if(options['offerUnit'] == "x"){
-			if(options['whichPlayer'] == "p1"){
-				if(parseInt(options['offer']) > parseInt(options['p1x'])) {
-					$("#"+divPrefix+"FormulationOffer").val(options['p1x']);
-					options['offer'] = options['p1x'];
-					$(".offerError").html("You only have " + options['p1x'] + " " + options['offerUnit']);
-				}
-			} else {
-				if(parseInt(options['offer']) > parseInt(options['p2x'])) {
-					$("#"+divPrefix+"FormulationOffer").val(options['p2x']);
-					options['offer'] = options['p2x'];
-					$(".offerError").html("You only have " + options['p2x'] + " " + options['offerUnit']);
-				}
-			}
-		} else {
-			if(options['whichPlayer'] == "p1"){
-				if(parseInt(options['offer']) > parseInt(options['p1y'])) {
-					$("#"+divPrefix+"FormulationOffer").val(options['p1y']);
-					options['offer'] = options['p1y'];
-					$(".offerError").html("You only have " + options['p1y'] + " " + options['offerUnit']);
-				}
-			} else {
-				if(parseInt(options['offer']) > parseInt(options['p2y'])) {
-					$("#"+divPrefix+"FormulationOffer").val(options['p2y']);
-					options['offer'] = options['p2y'];
-					$(".offerError").html("You only have " + options['p2y'] + " " + options['offerUnit']);
-				}
-			}
-		}
-
-		
-		// Error Check Request input field
-		if(options['requestUnit'] == "x"){
-			if(options['whichPlayer'] == "p1"){
-				if(parseInt(options['request']) > parseInt(options['p1xMaxRequest'])) {
-					$("#"+divPrefix+"FormulationRequest").val(options['p1xMaxRequest']);
-					options['request'] = options['p1xMaxRequest'];
-					$(".requestError").html("You can only request " + options['p1xMaxRequest'] + " " + options['requestUnit'] + " or less");
-				}
-			} else {
-				if(parseInt(options['request']) > parseInt(options['p2xMaxRequest'])) {
-					$("#"+divPrefix+"FormulationRequest").val(options['p2xMaxRequest']);
-					options['request'] = options['p2xMaxRequest'];
-					$(".requestError").html("You can only request " + options['p2xMaxRequest'] + " " + options['requestUnit'] + " or less");
-				}
-			}
-		} else {
-			if(options['whichPlayer'] == "p1"){
-				if(parseInt(options['request']) > parseInt(options['p1yMaxRequest'])) {
-					$("#"+divPrefix+"FormulationRequest").val(options['p1yMaxRequest']);
-					options['request'] = options['p1yMaxRequest'];
-					$(".requestError").html("You can only request " + options['p1yMaxRequest'] + " " + options['requestUnit'] + " or less");
-				}
-			} else {
-				if(parseInt(options['request']) > parseInt(options['p2yMaxRequest'])) {
-					$("#"+divPrefix+"FormulationRequest").val(options['p2yMaxRequest']);
-					options['request'] = options['p2yMaxRequest'];
-					$(".requestError").html("You can only request " + options['p2yMaxRequest'] + " " + options['requestUnit'] + " or less");
-				}
-			}
-		}
-		
-		// Calculate the Gain and Loss for each player
-		if(options['whichPlayer'] == "p1"){
-			p1Gain = options['request'] * options['p1'+options['requestUnit'].toLowerCase()+'Value'];
-			p2Gain = options['offer'] * options['p2'+options['offerUnit'].toLowerCase()+'Value'];
-			p1Loss = options['offer'] * options['p1'+options['offerUnit'].toLowerCase()+'Value'];
-			p2Loss = options['request'] * options['p2'+options['requestUnit'].toLowerCase()+'Value'];
-		} else if(options['whichPlayer'] == "p2") {
-			p1Gain = options['offer'] * options['p1'+options['offerUnit'].toLowerCase()+'Value'];
-			p2Gain = options['request'] * options['p2'+options['requestUnit'].toLowerCase()+'Value'];
-			p1Loss = options['request'] * options['p1'+options['requestUnit'].toLowerCase()+'Value'];
-			p2Loss = options['offer'] * options['p2'+options['offerUnit'].toLowerCase()+'Value'];
-		}
-
-		// calculate the potential points
-		p1Points = p1InitialPoints + (p1Gain - p1Loss);
-		p2Points = p2InitialPoints + (p2Gain - p2Loss);		
-		
-		p1Points_justExchange = p1Gain - p1Loss;
-		p2Points_justExchange = p2Gain - p2Loss;
-		
-		
-		// Update the points in the html
-		points = String(eval("p" + pNum + "Points"));
-		points_justExchange = String(eval("p" + pNum + "Points_justExchange"));
-		if(offerType == "newOffer"){
-			// alert("options['whichPlayer']: "+options['whichPlayer']);
-			// alert("options['offer']: "+options['offer']);
-			// alert("options['request']: "+options['request']);
-			//alert("p1InitialPoints: " + p1InitialPoints+"\np1Gain: " + p1Gain+"\np1Loss: " + p1Loss+"\np1Points: " + p1Points+"\np1Points_justExchange: "+p1Points_justExchange+"\n\np2InitialPoints: " + p2InitialPoints+"\np2Gain: " + p2Gain+"\np2Loss: " + p2Loss+"\n2Points: " + p2Points+"\np2Points_justExchange: "+p2Points_justExchange);
-			$(".currentPoints").html(points_justExchange);
-			$("#transactionSummaryPoints").val(points);
-		} else {
-			$(".pointsPreview").html(points_justExchange);
-		}
-		
-		// enable the offer and counter offer submit buttons if an offer is valid
-		if(options['offer'].length  > 0 && options['request'].length > 0){
-			$("#offerFormulationOfferSubmit").removeAttr("disabled");
-			$("#counterOfferFormulationSubmit").removeAttr("disabled");
-		} else {
-			$("#counterOfferFormulationSubmit").attr("disabled","disabled");
-			$("#offerFormulationOfferSubmit").attr("disabled","disabled");
-		}
-		
-		return points;
-	}
-	
-	function parseValueInput(valueInput, options){
-		
-		originalValueInput = valueInput;
-		
-		//Check if input is just digits, if so return value input right away
-		if(/^\d+$/.test(valueInput)){
-			return valueInput;	
-		}
-		//replace variables if present
-		if(options['offerUnit'] == "x"){
-			valueInput = valueInput.replace(/Ox/g, options['offer']);
-			valueInput = valueInput.replace(/Oy/g, "0");
-		} else {
-			valueInput = valueInput.replace(/Ox/g, "0");
-			valueInput = valueInput.replace(/Oy/g, options['offer']);
-		}
-		if(options['requestUnit'] == "x"){
-			valueInput = valueInput.replace(/Rx/g, options['request']);
-			valueInput = valueInput.replace(/Ry/g, "0");
-		} else {
-			valueInput = valueInput.replace(/Rx/g, "0");
-			valueInput = valueInput.replace(/Ry/g, options['request']);
-		}
-		if(options['whichPlayer'] == "p1"){
-			valueInput = valueInput.replace(/Axo/g, options['p1x']);
-			valueInput = valueInput.replace(/Ayo/g, options['p1y']);
-			valueInput = valueInput.replace(/Axr/g, options['p2x']);
-			valueInput = valueInput.replace(/Ayr/g, options['p2y']);
-		} else {
-			valueInput = valueInput.replace(/Axo/g, options['p2x']);
-			valueInput = valueInput.replace(/Ayo/g, options['p2y']);
-			valueInput = valueInput.replace(/Axr/g, options['p1x']);
-			valueInput = valueInput.replace(/Ayr/g, options['p1y']);
-		}
-
-		//evaluate value expression and return it
-		try{
-			value = eval(valueInput);
-			value = Math.round(value);
-		} catch(err){
-			msg = "There is an error in one of your value fields!\n\n";
-			msg += "Please report this to the experimenter RIGHT NOW!";
-			alert(msg);
-			value = "Error";
-		}
-		
-		return value;
-	}
 
 </script>
 
@@ -529,7 +373,7 @@
 				<option>x</option>
 				<option>y</option>
 			</select>
-			<span class="offerError"></span>
+			<span id="offerFormulationOfferError" class="offerError"></span>
 		</p>
 		<p>What do you want in return?</p>
 		<p>
@@ -538,10 +382,10 @@
 				<option>y</option>
 				<option>x</option>
 			</select>
-			<span class="requestError"></span>
+			<span id="offerFormulationRequestError" class="requestError"></span>
 		</p>
 		<br/>
-		<p>This deal would get you: <b><span class="pointsPreview">-</span></b> points</p>
+		<p>This deal would get you: <b><span class="pointsPreview">--</span></b> points</p>
 		<input type="submit" name="offerFormulationOfferSubmit" value="Offer" class="buttonBig" id="offerFormulationOfferSubmit" disabled="disabled"/>
 	</form>
 </div>
@@ -563,7 +407,7 @@
 				<option>x</option>
 				<option>y</option>
 			</select>
-			<span class="offerError"></span>
+			<span id="counterOfferFormulationOfferError" class="offerError"></span>
 		</p>
 		<p>What do you want in return?</p>
 		<p>
@@ -572,10 +416,10 @@
 				<option>y</option>
 				<option>x</option>
 			</select>
-			<span class="requestError"></span>
+			<span id="counterOfferFormulationRequestError" class="requestError"></span>
 		</p>
 		<br/>
-		<p>This deal would get you: <b><span class="pointsPreview">-</span></b> points</p>
+		<p>This deal would get you: <b><span class="pointsPreview">--</span></b> points</p>
 		<input type="submit" name="counterOfferFormulationSubmit" value="Cancel" class="buttonBig"/>
 		<input type="submit" name="counterOfferFormulationSubmit" value="Counter Offer" class="buttonBig" id="counterOfferFormulationSubmit" disabled="disabled"/>
 	</form>
