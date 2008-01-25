@@ -1,0 +1,14 @@
+#summary Meeting notes from 1/25/08
+
+= Comments =
+
+Question about the word "offer".
+Have to put something in both fields during reciprocal exchange for it to submit.  Should allow the user to submit without any value in the offer form.
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
