@@ -14,10 +14,3 @@
 
 = Questions =
  * Is there an preference where you can set the starting value of the bank?
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
