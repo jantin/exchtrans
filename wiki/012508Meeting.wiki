@@ -2,9 +2,10 @@
 
 = Comments =
 
-Question about the word "offer".
-Have to put something in both fields during reciprocal exchange for it to submit.  Should allow the user to submit without any value in the offer form.
-
+ * Question about the word "offer".
+ * Have to put something in both fields during reciprocal exchange for it to submit.  Should allow the user to submit without any value in the offer form.
+ * "Don't offer" remembers what you had in the last round but doesn't preform an incorrect calculation.
+ * 
 
 = Details =
 
