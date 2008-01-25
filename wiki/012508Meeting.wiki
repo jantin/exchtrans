@@ -12,5 +12,8 @@
  * "Insufficient X" is a poor message, and should not adjust the value.
  * Two buttons are grayed out; Coye made an offer, viewed the offer, counter offered, "Round" and "Counter" are grayed out.
 
+ * Never force someone to have to exchange.
+ * Tell the user how many points they will have if they cheat
+
 = Questions =
  * Is there an preference where you can set the starting value of the bank?
