@@ -1,11 +1,16 @@
 #summary Meeting notes from 1/25/08
 
-= Comments =
+= Notes =
 
  * Question about the word "offer".
  * Have to put something in both fields during reciprocal exchange for it to submit.  Should allow the user to submit without any value in the offer form.
  * "Don't offer" remembers what you had in the last round but doesn't preform an incorrect calculation.
- * 
+ * Practice rounds might need to be a new experiment type.  Decided that practice types can just be regular explanations.
+ * Forms should have some percentage of completion.
+ * Add a note to the experiment page asking users to answer questions.
+
+= Questions =
+ * Is there an preference where you can set the starting value of the bank?
 
 = Details =
 
