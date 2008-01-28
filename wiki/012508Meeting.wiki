@@ -17,8 +17,8 @@
 
 = Judd's Notes =
 
- * variables in instruction pages for a later version
- * If you try to enter more than the maximum value, it should revert to blank instead of default to maximum
+ * in later version, static text pages should allow for inclusion of variables, for example the player name assigned to you
+ * In reciprocal exchange, if you try to enter more than the maximum X or Y allowed to give in a single round, it should revert to blank instead of defaulting to the maximum. (e.g. if you put in 99Xs, it shows an error message and auto. switches the value to 50Xs)
  * bug: displays old offer from last trial, even though the calculated points are correct
  * Practice trials? Naming convention: PRAC - 
  * Include practice questionnaire as well.
