@@ -15,5 +15,19 @@
  * Never force someone to have to exchange.
  * Tell the user how many points they will have if they cheat
 
+= Judd's Notes =
+
+ * variables in instruction pages for a later version
+ * If you try to enter more than the maximum value, it should revert to blank instead of default to maximum
+ * bug: displays old offer from last trial, even though the calculated points are correct
+ * Practice trials? Naming convention: PRAC - 
+ * Include practice questionnaire as well.
+ * Can we put text at the top of the questionnaire?
+ * Can we put a practice round in between two real rounds in which we'd like to carry over the bank?
+ * Instead of 'insufficent X', 'You don't have enough X.'
+ * state issue: Coye made an offer, I viewed it, counter and end round are greyed out, accept is only option.
+ * in experimenter view, last element of the experiment did not flip its status to 'Done.', even though the experiment completed.
+
+
 = Questions =
  * Is there an preference where you can set the starting value of the bank?
