@@ -128,10 +128,10 @@
 			$(".pointsPreview").html("--");
 			switch(response.errorMsg){
 				case "Insufficient funds for offer":
-					$(".offerError").html("Insufficient " + points.offerUnit);
+					$(".offerError").html("You don't have enough " + points.offerUnit + ".");
 					break;
 				case "Exceeded max request":
-					$(".requestError").html("Request less " + points.requestUnit);
+					$(".requestError").html("You cannot request that many " + points.requestUnit + ".");
 					break;
 				default:
 					alert(response.errorMsg);
