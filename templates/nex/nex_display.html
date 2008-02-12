@@ -21,7 +21,7 @@
 	$(document).ready(function() {
 		
 		// exchangeParametersJSON contains the contents of the Nex component object
-		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
+		exchangeParametersJSON = '{{exchangeParametersJSON|safe}}'.parseJSON();
 		
 		// These numbers are used to build strings e.g. p1x
 		playerNumber = {{playerNumber}} + 1;
@@ -323,10 +323,10 @@
 	}
 	
 	function incomingOfferDialogAction(buttonValue, msg){
-		if(buttonValue == "View Offer"){
+		if (buttonValue == "View Offer") {
 			// Check if the transactionSummary screen is showing. If so
 			// the other player must have canceled the offer while waiting.
-			if($("#transactionSummary").css("display") != "block"){
+			if ($("#transactionSummary").css("display") != "block") {
 				showScreen("incomingOffer");
 			}
 		} else {
@@ -397,7 +397,7 @@
 			<strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>s 
 			 for 
 			<strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>s. 
-			<br/>This deal would get you: <b><span class="currentPoints">-</span></b> points.
+			<br/>This deal would get you: <b><span class="currentPoints">-</span></b> point(s).
 		</p>
 		<p>Enter your counter offer below.</p>
 		<p>What will you give?</p>
@@ -582,7 +582,7 @@
 {% endblock %}
 
 {% block rightCol %}
-	{{widgets}}
+	{{widgets|safe}}
 {% endblock %}
 
 {% block bottomBar %}

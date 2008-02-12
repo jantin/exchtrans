@@ -1,0 +1,7 @@
+Installation woes:
+Setup DB
+urls.py has specific local settings that need to be adjusted
+experimentStatus requires the following predefined values:
+  Waiting for participants
+  Archived
+  In progress
