@@ -18,7 +18,7 @@
 	var timeout;
 
 	// exchangeParametersJSON contains the contents of the Rex component object
-	var exchangeParametersJSON = '{{exchangeParametersJSON|safe}}'.parseJSON();
+	var exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
 	var pNum = "{{playerNumber}}";
 	var pollURL = "";
 	var pollInterval = "";
@@ -436,7 +436,7 @@ responseJSON = responseText.parseJSON();
 {% endblock %}
 
 {% block rightCol %}
-	{{widgets|safe}}
+	{{widgets}}
 {% endblock %}
 
 {% block bottomBar %}
