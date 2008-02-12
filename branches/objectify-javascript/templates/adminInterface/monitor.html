@@ -1,0 +1,195 @@
+{% extends "adminBase.html" %}
+
+{% block bodyid %}tab1{% endblock %}
+
+{% block sectionDivID %}dashboard{% endblock %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="/site_media/css/monitor.css" type="text/css" media="screen" />
+<script src="/site_media/scripts/jquery/jquery.pack.js" type="text/javascript" charset="utf-8"></script>
+<script src="/site_media/scripts/jquery/json.js" type="text/javascript" ></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.impromptu.1.0.js"></script>
+
+{% endblock %}
+
+{% block adminContent %}
+<script type="text/javascript" charset="utf-8">
+var participants = new Array();
+var componentCount = {{experimentComponents.count}};
+var sid = {{monitorSession.id}};
+var participantCount = 0;
+
+delete(Object.prototype.toJSONString);
+
+$(document).ready(function() {
+	updateMonitor();
+	refreshInterval = setInterval("updateMonitor()", 3000);
+	
+	//Require a confirm step for deleting
+	$("#stopSessionButton").click(function(){
+		msg  = 'Why are you stopping the session?<br/>';
+		msg += '<input type="text" value="" name="stopMessageInput" id="stopMessageInputID"/>';
+		$.prompt(msg, { buttons: { OK: "OK", Cancel: "Cancel" }, 
+						callback: function(buttonValue, msg){
+							if(buttonValue == "Cancel"){
+								return;
+							} else {
+								$("#stopMessageID").val(msg.children('#stopMessageInputID').val());
+								$("#stopSessionForm").submit();
+							}
+						}, 
+						show:"fadeIn",
+						container: "html",
+						opacity: 0.8,
+						overlayspeed: "fast"
+						});
+		return false;
+	});
+
+});
+
+function updateMonitor(){
+	var options = 	{ url: "/sessions/monitor/updatePollProcess?sid={{monitorSession.id}}", 
+						dataType: "json", 
+						success: function(pollResponseJSON){
+							// Set the experiment status
+							$('#expStatus').html(pollResponseJSON['experimentStatus']);
+							
+							if(pollResponseJSON['experimentStatus'] == "Ready"){
+								$(":submit").removeAttr("disabled");
+							}
+							
+							// pollResponseJSON is an array of participant objects
+							participantsJSON = pollResponseJSON['participants'];
+
+							for(var i=0; i < participantsJSON.length; i++){
+								//If we don't already know about the participant, add them
+								if(!participants[participantsJSON[i].name]){
+									addParticipant(participantsJSON[i]);
+								}
+								//update the participant's column
+								updateParticipantStatus(participantsJSON[i]);
+							}
+							if(pollResponseJSON['experimentStatus'] == "Completed" || pollResponseJSON['experimentStatus'] == "Canceled"){
+								$(":submit").remove();
+							}
+						}
+					}
+
+	$.ajax(options);
+}
+
+function addParticipant(pObject){
+
+	if(participantCount > 0 && participantCount % 4 == 0){
+		$('#monitorTable').append('<div class="rowSeparator"></div>');
+		$('.componentsCol:first').clone().appendTo('#monitorTable');
+	}
+
+	// Add the participant to local participants array
+	participants[pObject.name] = pObject;
+	participantCount++;
+	
+	// Concat HTML div
+	var pDiv = "";
+	pDiv += '<div class="participantCol monitorTableCol" id="' + pObject.name + '_col">';
+	pDiv += '	<div class="monitorHeadBlock participantHeadBlock">';
+	pDiv += '	<div class="participantNumber">' + (pObject.number+1) + '</div>';
+	// pDiv += '		<img src="/site_media/images/icons/'+ (pObject.number+1) +'.png" alt="Participant Icon">';
+	pDiv += '		<div class="participantInfo">';
+	pDiv += '			Name: ' + pObject.name + '<br/>';
+	pDiv += '			Identity Letter: ' + pObject.identityLetter + '<br/>';
+	pDiv += '			Player Number: ' + (pObject.number+1) + '<br/>';
+	pDiv += '			<a href="/sessions/monitor/bootParticipant/?pid='+ pObject.id +'&sid=' + sid + '" class="deleteLink">Remove Participant</a>';	
+	pDiv += '		</div>';
+	pDiv += '	</div>';
+	for(var i=0; i < componentCount; i++){
+		pDiv += '<div class="monitorTableBlock participantBlock" id="' + pObject.name + '_'+ i +'"></div>';
+	}
+	pDiv += "</div>";
+	
+	// Append the new div to the Status Table
+	$('#monitorTable').append(pDiv);
+	
+}
+
+function updateParticipantStatus(pObject){
+	// update current component block
+	$('#'+ pObject.name + '_'+ pObject.currentComponent).text("Working...");
+	
+	// update the component blocks before the current component
+	if(pObject.currentComponent > 0){
+		for(var i=0;i<pObject.currentComponent;i++){
+			$('#'+ pObject.name + '_'+ i).text("Done.");
+		}
+	}
+
+}
+
+</script>
+
+<div id="breadCrumbs">
+	<a href="/sessions">Sessions</a> » Monitoring {{ monitorSession.experiment_id.name }} (session {{ monitorSession.id }})
+</div>
+<h1>Monitor</h1>
+<div id="changeSession">
+	<form name="changeSession" action="/sessions/monitor/" method="get" id="changeSession">
+		<p><label for="id">Change Session:<br>
+		<select name="sid">
+			{% for s in expSessions %}
+			<option value="{{ s.id }}">
+				{{ s.experiment_id.name }} (Session {{ s.id }})
+			</option>
+			{% endfor %}
+		</select>
+		</label><input class="buttonSmall" type="submit" value="Change »"></p>
+	</form>
+</div>
+	<div id="sessionInfo">
+		<p>
+			<strong>Experiment Name:</strong> {{ monitorSession.experiment_id.name }}<br/>
+			<strong>Session ID:</strong> {{ monitorSession.id }}<br/>
+			<strong>Status:</strong> <span id="expStatus">{{ monitorSession.status.statusText }}</span>
+		</p>
+	</div>
+	{% ifequal status "Running" %}
+	<form action="/session/stop/" method="POST" accept-charset="utf-8" id="stopSessionForm">
+		<input type="submit" value="Stop Session" class="buttonBig" id="stopSessionButton"/>
+		<input type="hidden" name="sid" value="{{ monitorSession.id }}"/>
+		<input type="hidden" name="stopMessage" value="" id="stopMessageID"/>
+	</form>
+	{% endifequal %}
+	
+	{% ifequal status "Ready" %}
+	<form action="/session/start/" method="get" accept-charset="utf-8">
+		<input type="submit" value="Start Session" class="buttonBig"/>
+		<input type="hidden" name="sid" value="{{ monitorSession.id }}"/>
+	</form>
+	{% endifequal %}
+	
+	{% ifequal status "Not Ready" %}
+	<form action="/session/start/" method="get" accept-charset="utf-8">
+		<input type="submit" value="Start Session" class="buttonBig" disabled="disabled"/>
+		<input type="hidden" name="sid" value="{{ monitorSession.id }}"/>
+	</form>
+	{% endifequal %}
+	
+	
+	<h2>Status Table</h2>
+	<div id="monitorTable">
+		<div class="componentsCol monitorTableCol">
+			<div class="monitorHeadBlock componentsHeadBlock">
+				<div id="componentColHeadingText">
+					Components
+				</div>
+			</div>
+			{% for c in experimentComponents %}
+			<div class="monitorTableBlock componentBlock">
+				{{c.name}}<br/>
+				({{c.componentType}})
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+
+{% endblock %}

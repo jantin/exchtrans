@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script src="/site_media/scripts/disableRightClick.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/site_media/css/matcher.css" type="text/css" media="screen" />
+
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	// Does a check to make sure that at least one option is selected.
+	$("form").submit(function() {
+		var n = $("input:checked").length;
+		if(n == 0){
+			$(".error").show();		
+			return false;
+		}
+	});
+});
+</script>
+
+{% endblock %}
+
+
+{% block bodyid %}waiting{% endblock %}
+
+
+{% block bodycontent %}
+
+<div id="verticalCenter">
+	<h2>You are about to exchange with player {{opponentIdentity}}</h2>
+	<p>You get to choose the form of exchange</p>
+	<div id="deciderForm">
+		<form action="/matcher/deciderSubmit/" method="POST" accept-charset="utf-8">
+			{% comment %}
+				{% if forloop.first %}selected="selected"{% endif %}
+			{% endcomment %}
+			{% for c in choices %}
+				<input type="radio" name="deciderChoice" value="{{c.id}}" id="{{c.id}}" class="required" title="You must select an option."/>{{c.displayName}}<br/>
+			{% endfor %}
+			<br/>
+			<input type="hidden" name="pname" value="{{pname}}"/>
+			<input type="hidden" name="sid" value="{{sid}}"/>
+			<input type="hidden" name="opponentName" value="{{opponentName}}"/>
+			<input type="submit" value="Select" class="buttonSmall"/>
+			<p class="error" style="display:none;">You must select an option</p>
+			
+		</form>
+	</div>
+</div>
+
+{% endblock %}

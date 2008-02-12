@@ -1,0 +1,403 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	margin:0;
+	margin-top:10px;
+	padding:0;
+	background-color:#DDD;
+	font-size:.9em;
+}
+
+#adminBox {
+	width:90%;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:40px;
+}
+
+#adminBoxContent{
+	border-right:1px solid #CCC;
+	border-left:1px solid #CCC;
+	border-bottom:1px solid #CCC;
+	margin-top:-17px;
+	padding-top:10px;
+	padding-left:20px;
+	padding-right:20px;
+	overflow: hidden;
+
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:500px;
+	height:auto !important;
+	height:500px;
+}
+
+#versionNumber{
+	clear:both;
+	margin-top:60px;
+	text-align: center;
+	font-size: .8em;
+}
+
+.logged_in_as{
+	text-align:right;
+	font-size:.9em;
+	margin-top:-20px;
+	font-style: italic;
+}
+
+#editor, 
+#waiting, 
+#components, 
+#experimentView, 
+#users, 
+#dashboard, 
+#archive,
+#experiments,
+#sessions,
+#monitor,
+#mainContent {
+	width:970px;
+	border: 1px solid #CCC;
+	margin-left:auto;
+	margin-right:auto;
+	background-color:#EEE;
+	padding-bottom:60px;
+	margin-bottom:10px;
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:560px;
+	height:auto !important;
+	height:560px;
+}
+
+#waiting #verticalCenter{
+	text-align:center;
+	margin-top:200px;
+	margin-bottom:200px;
+}
+
+#waiting h1 {
+	margin-bottom:80px;
+}
+
+#login {
+	position: relative;
+	width: 325px;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+#login .input {
+	font-size: 2em;
+	margin-top: 6px;
+	width: 250px;
+	padding:6px;
+}
+
+label {
+	font-size:.8em;
+}
+
+.inputBig {
+	font-size: 1.5em;
+	margin-top: 6px;
+	padding:6px;
+}
+
+input {
+	font-size: 1em;
+	margin-top: 6px;
+	padding:2px;
+}
+
+
+select {
+	margin-top:6px;
+}
+
+textarea{
+	font-family: Helvetica, Arial, sans-serif;
+	padding:3px;
+}
+
+.buttonBig {
+	border: 1px solid #999999;
+	border-top-color: #CCCCCC;
+	border-left-color: #CCCCCC;
+	background-color: #FFFFFF;
+	font-weight: bold;
+	font-family: Helvetica, Arial, sans-serif;
+	padding-left:2em;
+	padding-right:2em;
+	height:2.5em;
+}
+
+.buttonBig:active, .buttonSmall:active {
+	border: 2px solid #CCCCCC;
+	border-top-color: #999999;
+	border-left-color: #999999;
+}
+
+.buttonSmall {
+	border: 1px solid #999999;
+	border-top-color: #CCCCCC;
+	border-left-color: #CCCCCC;
+	background-color: #FFFFFF;
+	font-weight: bold;
+	font-family: Helvetica, Arial, sans-serif;
+	height:2em;
+	font-size: .8em;
+}
+
+/* This class is applied to <p> tags be the JS validation */
+.error{
+	color:#F00;
+	font-size: .9em;
+}
+
+/* This class is applied to <input> tags be the JS validation */
+.fieldError{
+	background-color:#FBEC5D;
+}
+
+#breadCrumbs{
+	font-size:.9em;
+	border-bottom:1px dashed #CCC;
+	width:100%;
+	padding: 0px 5px 5px 5px;
+}
+
+.helpText{
+	width:500px;
+}
+
+.createNewThing{
+	display:none;
+}
+
+.clearBoth{
+	clear:both;
+}
+
+.displayNone {
+	display:none;
+}
+
+/* Monitor Experiments */
+
+#changeSession{
+	margin-top:-70px;
+	margin-left:275px;
+}
+
+/* Experiment List */
+
+.experimentTable{
+	width:80%;
+}
+
+
+
+/* Sessions */
+
+#expSessions{
+	width:25em;
+	padding: 20px;
+}
+
+#sessionName{
+	font-weight:bold;
+	font-size:20px;
+}
+
+#sessionInfo{
+	margin:5px 0px 5px 30px;
+	font-size:.9em;
+}
+
+
+/* Edit Components  */
+
+.sortHelper{
+	border: 3px dashed #666;
+	width: 400px !important;
+}
+
+.components{
+}
+
+.component{
+	width:400px;
+	border:2px solid #999;
+	margin-bottom:15px;
+}
+
+.componentTopPane{
+	padding-left:6px;
+	padding-right:6px;
+	background-color:#FFF;
+	
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:40px;
+	height:auto !important;
+	height:40px;
+}
+
+.componentOrderField{
+	float: left;
+	width:10%;	
+}
+
+.componentName{
+	float: left;
+	margin-top:6px;
+	margin-bottom:10px;
+	font-weight: bold;
+	font-size: 16px;
+
+}
+
+.componentDelete{
+	float: right;
+	text-align:right;
+	margin-top:6px;
+	width:20%;
+}
+
+.componentDetails{
+	clear:both;
+	margin-top:6px;
+	padding-bottom:10px;
+}
+
+.componentBottomPane{
+	padding:6px;
+	background-color:#FFF;
+	width:688px;
+	border-top: 1px solid #999;
+	display:none;
+	clear: both;
+}
+
+.floatForm{
+
+}
+
+.floatRow{
+	float:left;
+	padding-bottom:10px;
+	clear:both;
+}
+
+.floatLabel{
+	float:left;
+	width:170px;
+	font-weight: bold;
+	margin-right:10px;
+}
+
+.floatContent{
+	float:left;
+
+}
+
+/* Dialogs by the jquery Impromptu plugin */
+
+div.jqifade{
+      background-color: #000;
+}
+div.jqi{
+      background-color: #ccc;
+      padding: 2px;
+      width: 300px;
+}
+div.jqi .jqicontainer{
+      padding: 5px;
+      color: #000;
+}
+div.jqi .jqimessage{
+      background-color: #fff;
+      padding: 15px;
+}
+div.jqi .jqibuttons{
+      text-align: center;
+      padding: 5px 0 0 0;
+}
+div.jqi button{
+	border: 1px solid #999999;
+	border-top-color: #CCCCCC;
+	border-left-color: #CCCCCC;
+	background-color: #FFFFFF;
+	font-weight: bold;
+	height:2em;
+	font-size: .8em;
+	margin: 0 10px;
+}
+
+
+/* Tabs  */
+
+ul#tabnav { /* general settings */
+	text-align: left; /* set to left, right or center */
+	margin: 1em 0 1em 0; /* set margins as desired */
+	font: 16px Helvetica, arial, sans-serif; /* set font as desired */
+	border-bottom: 1px solid #ccc; /* set border COLOR as desired */
+	list-style-type: none;
+	padding: 3px 0px 3px 0px; /* THIRD number must change with respect to padding-top (X) below */
+}
+
+ul#tabnav li { /* do not change */
+	display: inline;
+}
+
+body#tab1 li.tab1, body#tab2 li.tab2, body#tab3 li.tab3, body#tab4 li.tab4, body#tab5 li.tab5 { /* settings for selected tab */
+	border-bottom: 1px solid #eee; /* set border color to page background color */
+	background-color: #eee; /* set background color to match above border color */
+}
+
+body#tab1 li.tab1 a, body#tab2 li.tab2 a, body#tab3 li.tab3 a, body#tab4 li.tab4 a, body#tab5 li.tab5 a{ /* settings for selected tab link */
+	background-color: #EEE; /* set selected tab background color as desired */
+	color: #000; /* set selected tab link color as desired */
+	position: relative;
+	top: 1px;
+	padding-top: 4px; /* must change with respect to padding (X) above and below */
+}
+
+ul#tabnav li a { /* settings for all tab links */
+	padding: 3px 4px; /* set padding (tab size) as desired; FIRST number must change with respect to padding-top (X) above */
+	border: 1px solid #ccc; /* set border COLOR as desired; usually matches border color specified in #tabnav */
+	background-color: #ddd; /* set unselected tab background color as desired */
+	color: #000; /* set unselected tab link color as desired */
+	margin-right: 0px; /* set additional spacing between tabs as desired */
+	text-decoration: none;
+	border-bottom: none;
+}
+
+ul#tabnav a:hover { /* settings for hover effect */
+background: #fff; /* set desired hover color */
+}
+
+/* end css tabs */
+
+/* Tables (From django admin) */
+table { border-collapse:collapse; border-color:#ccc; }
+td, th { border-bottom:1px solid #eee; vertical-align:top; padding:5px; }
+th { text-align:left; font-weight:bold; }
+thead th, 
+tfoot td { padding:2px 5px; background:#e1e1e1 url(../images/nav-bg.gif) top left repeat-x; border-left:1px solid #ddd; border-bottom:1px solid #ddd; }
+tfoot td { border-bottom:none; border-top:1px solid #ddd; }
+thead th:first-child, 
+tfoot td:first-child { border-left:none !important; }
+thead th.optional { font-weight:normal !important; }
+fieldset table { border-right:1px solid #eee; }
+tr.row-label td { font-size:9px; padding-top:2px; padding-bottom:0; border-bottom:none; color:#666; margin-top:-1px; }
+tr.alt { background:#f6f6f6; }
+.row1, .even { background:#EDF3FE; }
+.row2, .odd { background:white; }
+
+/* SORTABLE TABLES */
+thead th a:link, thead th a:visited { color:#666; display:block; }
+table thead th.sorted { background-position:bottom left !important; }
+table thead th.sorted a { padding-right:13px; }
+table thead th.ascending a { background:url(/site_media/images/arrow-down.gif) right .4em no-repeat; }
+table thead th.descending a { background:url(/site_media/images/arrow-up.gif) right .4em no-repeat; }

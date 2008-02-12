@@ -1,0 +1,115 @@
+{% extends "adminBase.html" %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/interface_1.2/interface.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.inplace.js"></script>
+
+{% endblock %}
+
+{% block bodyid %}tab2{% endblock %}
+
+{% block sectionDivID %}editor{% endblock %}
+
+{% block adminContent %}
+
+<script type="text/javascript">
+$(document).ready(
+	function () {
+		$('div.components').Sortable(
+			{
+				accept: 'component',
+				helperclass: 'sortHelper',
+				activeclass : 'sortableactive',
+				hoverclass : 'sortablehover',
+				handle: 'div.componentTopPane',
+				tolerance: 'pointer'
+
+			}
+		);
+		$(".editExpInput").editInPlace({
+			url: "/api/updateField/",
+			params: "ajax=yes"
+		});
+		$(".editExpDescription").editInPlace({
+			url: "/api/updateField/",
+			params: "ajax=yes",
+			field_type: "textarea",
+		    textarea_rows: "5",
+		    textarea_cols: "35"
+		});
+
+	}
+);
+
+function saveComponentOrder (){
+	list = $.SortSerialize("componentsList");
+	$.post("/api/saveComponentChanges/", list);
+	$("#orderSaveConfirm").html("Order Saved");
+	$('#orderSaveConfirm').fadeIn('3000');
+	setTimeout("$('#orderSaveConfirm').fadeOut('3000');", 2000)
+}
+
+
+</script>
+<div id="breadCrumbs">
+<a href="/experiments">Experiments</a> <!-- » <a href="/experiments/view/?id={{ expDetails.id }}">{{ expDetails.name }}</a> --> » Editing {{ expDetails.name }}
+</div>
+<h2>Details</h2>
+<div class="floatForm">
+	<div class="floatRow">
+		<div class="floatLabel">Experiment Name</div>
+		<div class="floatContent editExpInput" id="name___{{ expDetails.id }}___Experiment">{{ expDetails.name }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Experiment Description</div>
+		<div class="floatContent editExpDescription" id="description___{{ expDetails.id }}___Experiment">{{ expDetails.description }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Minimum Players</div>
+		<div class="floatContent editExpInput" id="minPlayers___{{ expDetails.id }}___Experiment">{{ expDetails.minPlayers }}</div>
+	</div>
+	<div class="floatRow">
+		<div class="floatLabel">Maximum Players</div>
+		<div class="floatContent editExpInput" id="maxPlayers___{{ expDetails.id }}___Experiment">{{ expDetails.maxPlayers }}</div>
+	</div>	
+</div>
+<br clear="both">
+<h2>Components</h2>
+	<form action="/experiments/edit/addComponent/" method="post" accept-charset="utf-8"><p>
+		<select name="addComponentID">
+			{% for c in componentList %}
+			<option value="{{ c.id }}">
+				{{ c.name }} ({{ c.componentType }})
+			</option>
+			{% endfor %}
+		</select>
+		<input type="hidden" name="expID" value="{{ expID }}" id="expID">
+		<input class="buttonSmall" type="submit" value="Add Component"></p>
+	</form>
+	<!--
+		TODO Add ability to repeat a component multiple times
+	-->
+	<form action="/experiments/edit/updateExperiment/" method="post" accept-charset="utf-8">
+	<div class="components" id="componentsList">
+		{% for ec in experimentComponentsList %}
+		<div id="component___{{ ec.id }}" class="component">
+			<div class="componentTopPane">
+				<div class="componentName">
+					{{ ec.component_id.name }}
+				</div>
+				<div class="componentDelete">
+					<a href="/experiments/edit/removeComponent/?expCompID={{ ec.id }}&expID={{ ec.experiment_id.id }}">Delete</a>
+				</div>
+				<div class="componentDetails">
+					Type: {{ ec.component_id.componentType }}<br>
+					<!-- Iterations: <span class="editExpInput">3</span> -->
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	<p><input class="buttonSmall" type="submit" value="Save Order" onclick="saveComponentOrder(); return false;"></p>
+	<div id="orderSaveConfirm"></div>
+</form>
+{% endblock %}

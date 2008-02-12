@@ -1,0 +1,66 @@
+#questionSet{
+	width:500px;
+}
+
+.questionContainer{
+	border: 2px solid #999;
+	padding:15px;
+	width:100%;
+	margin-bottom:10px;
+	background-color:#FFF;
+	position:relative;
+
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:75px;
+	height:auto !important;
+	height:75px;
+}
+
+.questionText{
+	font-size: 1.2em;
+	margin-bottom:5px;
+	width:450px;
+}
+
+.questionChoices{
+	margin-top:0px;
+	list-style: none;
+}
+
+.leftScale{
+	float:left;
+	margin-bottom:10px;
+}
+
+.rightScale{
+	float:right;
+	margin-bottom:10px;
+}
+
+.questionDelete{
+	position:absolute;
+	right:5px;
+	top:5px;
+	font-size:.9em;
+}
+
+.slider
+{
+	background-color: #FFF;
+	width: 500px;
+	height: 15px;
+	position:relative;
+	border: 1px solid #000;
+	margin-bottom:5px;
+	clear:both;
+}
+
+.indicator
+{
+	width: 10px;
+	height: 15px;
+	background-color: #FFF;
+	position: absolute;
+	overflow: hidden;
+	border: none;
+}

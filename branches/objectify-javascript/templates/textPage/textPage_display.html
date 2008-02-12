@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+<script src="/site_media/scripts/disableRightClick.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/site_media/css/textPage.css" type="text/css" media="screen" />
+
+{% endblock %}
+
+
+{% block bodyid %}waiting{% endblock %}
+
+
+{% block bodycontent %}
+
+<div class="tp_Box">
+	<div class="tp_Heading">
+		{{ parameters.heading }}		
+	</div>
+	<div class="tp_Body">
+		{{ parameters.body|safe }}
+	</div>
+	<br/><br/>
+
+	<form action="/session/drive/" method="get" accept-charset="utf-8">
+		<input type="hidden" name="sid" value="{{sid}}" id="sid">
+		<input type="hidden" name="pname" value="{{pname}}" id="pname">
+		<input type="submit" name="buttonLabel" value="{{ parameters.buttonLabel }}" class="buttonBig">
+	</form>
+	{% if parameters.enableBack %}
+		<form action="/session/drive/" method="get" accept-charset="utf-8">
+			<input type="hidden" name="sid" value="{{sid}}" id="sid">
+			<input type="hidden" name="pname" value="{{pname}}" id="pname">
+			<input type="hidden" name="goback" value="true">
+			<input type="submit" name="buttonLabel" value="<- Go Back" class="buttonBig">
+		</form>
+	{% endif %}
+</div>
+
+
+
+
+{% endblock %}

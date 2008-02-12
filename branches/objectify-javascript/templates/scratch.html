@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<link rel="stylesheet" href="/site_media/css/style.css" />
+	
+	
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script src="/site_media/scripts/disableRightClick.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/site_media/css/matcher.css" type="text/css" media="screen" />
+
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	// Does a check to make sure that at least one option is selected.
+	$("form").submit(function() {
+		var n = $("input:checked").length;
+		if(n == 0){
+			$(".error").show();		
+			return false;
+		}
+	});
+});
+</script>
+
+
+</head>
+
+<body id="waiting">
+	
+
+<div id="verticalCenter">
+	<h2>You are about to exchange with player D</h2>
+
+	<p>You get to choose the form of exchange</p>
+	<div id="deciderForm">
+		<form action="#" method="POST" accept-charset="utf-8" id="theForm">
+			
+			
+			<input type="radio" name="deciderChoice" value="114" id="114" class="required" title="You must select an option."/>rex apple<br/>
+			<input type="radio" name="deciderChoice" value="115" id="115" class="required" title="You must select an option."/>rex apple<br/>
+			<input type="radio" name="deciderChoice" value="116" id="116" class="required" title="You must select an option."/>rex apple<br/>
+			<input type="radio" name="deciderChoice" value="117" id="117" class="required" title="You must select an option."/>rex apple<br/>
+			<br/>
+			<input type="hidden" name="pname" value="2007-11-03_000865"/>
+			<input type="hidden" name="sid" value="73"/>
+			<input type="hidden" name="opponentName" value="2007-11-03_000866"/>
+
+			<input type="submit" value="Select" class="buttonSmall"/>
+		</form>
+	</div>
+</div>
+
+
+</body>
+</html>

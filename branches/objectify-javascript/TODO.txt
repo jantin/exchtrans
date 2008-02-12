@@ -1,0 +1,83 @@
+To do between 4/16 and 5/15
+- Finish Text Page component type
+	-with back button
+- Finish Questionnaire component type
+	-Re-ordering of questions
+- Reexamine identity
+	-Clean up participant representation
+	-T D K M F G R
+	-Giving to more than one person
+- Data logging
+
+- Disable right click.
+
+
+To do between 5/16 and 6/30
+- Participant monitoring
+- Data export
+- History widget
+- Network widget
+- Recip: What happens to the excess points
+- Recip: What happens to points given (doubled?)
+- Negotiated exchange component
+- Ability for participants to choose the form of exchange
+- Migrate from my laptop to iSchool server (Harbinger)
+	-Document install procedure
+- Review and document code
+	-Document how to write components
+
+Session vars
+	-min/max players
+Monitor window
+
+* Make experiment title and description text into form fields on experiment edit page.
+
+
+
+
+Agenda:
+- Back button, Logging model, 
+- Serving from cowper.homeip.net. Where next?
+- Code hosted on Google Code. Open source OK?
+- Full screen options. (disabled right click)
+- QA person?
+
+-Email Judd about demo session
+
+
+Loading multiple firefox instances
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test1"
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test2"
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test3"
+/Applications/browsers/Firefox.app/Contents/MacOS/firefox -P "Test4"
+
+
+List of nex outcomes
+
+INITIATOR							NOT INITIATOR
+offerAccepted *			-- 			acceptedOffer *
+offerCountered *		--			counterOffered *
+canceledOffer *			--			offerCanceled *
+offerDeclined *			--			declinedOffer *
+roundEnded *			--			endedRound *
+
+
+
+
+
+
+
+
+Debug shell commands
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import login_required
+from django.template import Context, Template, RequestContext
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+from et.models import *
+from et.common import *
+from et.views import *
+import pickle
+from time import time
+from datetime import datetime

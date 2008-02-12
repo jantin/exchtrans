@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block sectionDivID %}experiment{% endblock %}
+
+{% block bodycontent %}
+<div id="login">
+	<h1 id="exchtrans">ExchTrans Login</h1>
+	
+	{% if form.has_errors %}
+	<div id="alert">
+	    <p>Your username and password didn't match. Please try again.</p>
+	</div>  
+	{% endif %}
+
+	{% if user.is_authenticated %}
+	<div id="alert">
+	    <p>You are already logged in as "{{ user }}". <br/>Do you want to <a href='/logout'>Logout?</a></p>
+	</div>  
+	{% endif %}
+	
+	<form name="loginform" id="loginform" method="POST" action="./?next=">
+		<p><label for="id_username">Username:<br />
+		<input type="text" name="username" id="id_username" class="input" value="" size="20" tabindex="10" /></label></p>
+		<p><label for="id_password">Password:<br />
+		<input type="password" name="password" id="id_password" class="input" value="" size="20" tabindex="20" /></label></p>
+		<p class="submit"><input type="submit" name="submit" id="submit" value="Login »" tabindex="100" class="buttonBig"/></p>
+		<input type="hidden" name="next" value="{{ next }}" />
+	</form>
+</div>
+
+{% endblock %}

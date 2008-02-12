@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="/site_media/css/rexnex.css" />
+<link rel="stylesheet" href="/site_media/css/widgets.css" />
+{% endblock %}
+{% block extrahead %}
+{% endblock %}
+{% block sectionDivID %}mainContent{% endblock %}
+
+{% block bodycontent %}
+<div id="actionArea">
+	{% block actionArea %}{% endblock %}
+</div>
+
+<div id="rightCol">
+	{% block rightCol %}{% endblock %}
+</div>
+
+<div id="bottomBar">
+	{% block bottomBar %}{% endblock %}
+</div>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends "adminBase.html" %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="/site_media/css/rexnex.css" />
+
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.alphanumeric.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.dimensions.pack.js"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+
+		$("#componentForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after",
+			onOk: function(){
+				$('#componentForm').ajaxSubmit({target: '#message' });
+				$('#message').fadeIn('3000');
+				setTimeout("$('#message').fadeOut('3000');", 2000)
+				return false; 
+			}
+			
+		},{
+			inputclasserror: "fieldError",
+		});
+		
+		$('.offerFormulationInputs').numeric();
+		$('#refreshValues').click(function(){
+			offerFormulationProcessInput();
+		});
+		$("#variableListToggle").click(function() {
+			$("#possibleVariables").slideToggle(300);
+			return false;
+		});
+
+		// When page loads, make sure we're showing the right options
+		toggleRequiredGiftFields()
+		
+		// When the required gift checkbox is toggled, show the right options
+		$("#p1RequireGift").click( function() {
+			toggleRequiredGiftFields();
+		});
+		$("#p2RequireGift").click( function() {
+			toggleRequiredGiftFields();
+		});
+	});
+	
+	function toggleRequiredGiftFields(){
+		var p1RequireGift = $("#p1RequireGift").attr("checked");
+		var p2RequireGift = $("#p2RequireGift").attr("checked");
+		if(p1RequireGift == true || p2RequireGift == true ){
+			$(".requiredGiftRows").show();
+			if(p1RequireGift == true){
+				$("#p1xRequiredGift").show();
+				$("#p1yRequiredGift").show();
+			} else {
+				$("#p1xRequiredGift").hide();
+				$("#p1yRequiredGift").hide();
+			}
+			if(p2RequireGift == true){
+				$("#p2xRequiredGift").show();
+				$("#p2yRequiredGift").show();
+			} else {
+				$("#p2xRequiredGift").hide();
+				$("#p2yRequiredGift").hide();
+			}
+		} else {
+			$(".requiredGiftRows").hide();
+		}
+	}
+
+
+</script>
+{% endblock %}
+
+{% block bodyid %}tab3{% endblock %}
+
+{% block sectionDivID %}components{% endblock %}
+
+{% block adminContent %}
+<div id="breadCrumbs">
+<a href="/components">Components</a> » {{ component.name }}
+</div>
+
+<h1>Editing {{ component.name }}</h1>
+<form action="/rex/component/submit/" method="post" accept-charset="utf-8" id="componentForm">
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr>
+		<th>Component Name: </th>
+		<td><input type="text" name="componentName" id="componentName" value="{{ component.name }}" size="40" maxlength="200" class="required" title="You must enter a component name."/></td>
+	</tr>
+	<tr>
+		<th>Component Description: </th>
+		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
+	</tr>
+</table>
+<h2>Points</h2>
+<table>
+	<tr>
+		<td></td>
+		<th>Player 1</th>
+		<th>Player 2</th>
+	</tr>
+	<tr>
+		<th>Initial X</th>
+		<td><input type="text" name="p1x" value="{{parameters.p1x}}" size="3" id="p1x" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2x" value="{{parameters.p2x}}" size="3" id="p2x" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Initial Y</th>
+		<td><input type="text" name="p1y" value="{{parameters.p1y}}" size="3" id="p1y" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2y" value="{{parameters.p2y}}" size="3" id="p2y" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>X Value</th>
+		<td><input type="text" name="p1xValue" value="{{parameters.p1xValue}}" size="20" id="p1xValue" class="required" title="You must enter a value."/></td>
+		<td><input type="text" name="p2xValue" value="{{parameters.p2xValue}}" size="20" id="p2xValue" class="required" title="You must enter a value."/></td>
+	</tr>
+	<tr>
+		<th>Y Value</th>
+		<td><input type="text" name="p1yValue" value="{{parameters.p1yValue}}" size="20" id="p1yValue" class="required" title="You must enter a value."/></td>
+		<td><input type="text" name="p2yValue" value="{{parameters.p2yValue}}" size="20" id="p2yValue" class="required" title="You must enter a value."/></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td colspan="2"><a href="#" id="variableListToggle">Toggle Variable List</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td colspan="2">
+			<div id="possibleVariables">
+				Use these variables when constructing value formulas. You can also use JavaScript <a href="http://www.google.com/search?q=javascript%20math%20functions">math functions</a>. 
+				<br/> <code>Example: Gx * 2</code>
+				<br/> <code>Example: 2 + (Axg / 2)</code>
+				<br/> <code>Example: Math.pow(Gx,2)</code>
+				<table>
+					<tr>
+						<th>Variable</th>
+						<th>Description</th>
+					</tr>
+					<tr>
+						<td>Gx</td>
+						<td>The number of X's given</td>
+					</tr>
+					<tr>
+						<td>Gy</td>
+						<td>The number of Y's given</td>
+					</tr>
+					<tr>
+						<td>Axg</td>
+						<td>The number of X's available to the giver</td>
+					</tr>
+					<tr>
+						<td>Ayg</td>
+						<td>The number of Y's available to the giver</td>
+					</tr>
+					<tr>
+						<td>Axr</td>
+						<td>The number of X's available to the receiver</td>
+					</tr>
+					<tr>
+						<td>Ayr</td>
+						<td>The number of Y's available to the receiver</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	<tr>
+		<th>Replenish X</th>
+		<td><input type="text" name="p1xReplenish" value="{{parameters.p1xReplenish}}" size="3" id="p1xReplenish" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2xReplenish" value="{{parameters.p2xReplenish}}" size="3" id="p2xReplenish" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Replenish Y</th>
+		<td><input type="text" name="p1yReplenish" value="{{parameters.p1yReplenish}}" size="3" id="p1yReplenish" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2yReplenish" value="{{parameters.p2yReplenish}}" size="3" id="p2yReplenish" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr>
+		<th>Clear X and Y</th>
+		<td>
+			<select name="p1Clearing">
+				<option {% ifequal parameters.p1Clearing "End of exchange opportunity" %}selected="selected"{% endifequal %} >End of exchange opportunity</option>
+				<option {% ifequal parameters.p1Clearing "End of pairing" %}selected="selected"{% endifequal %}>End of pairing</option>
+			</select>
+		</td>
+		<td>
+			<select name="p2Clearing">
+				<option {% ifequal parameters.p2Clearing "End of exchange opportunity" %}selected="selected"{% endifequal %} >End of exchange opportunity</option>
+				<option {% ifequal parameters.p2Clearing "End of pairing" %}selected="selected"{% endifequal %}>End of pairing</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<th>Required gift</th>
+		<td><input type="checkbox" name="p1RequireGift" id="p1RequireGift" {% if parameters.p1RequireGift %}checked="checked"{% endif %}/></td>
+		<td><input type="checkbox" name="p2RequireGift" id="p2RequireGift" {% if parameters.p2RequireGift %}checked="checked"{% endif %}/></td>
+	</tr>
+	<tr class="requiredGiftRows">
+		<th>Required X gift</th>
+		<td><input type="text" name="p1xRequiredGift" value="{{parameters.p1xRequiredGift}}" size="3" id="p1xRequiredGift" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2xRequiredGift" value="{{parameters.p2xRequiredGift}}" size="3" id="p2xRequiredGift" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+	<tr class="requiredGiftRows">
+		<th>Required Y gift</th>
+		<td><input type="text" name="p1yRequiredGift" value="{{parameters.p1yRequiredGift}}" size="3" id="p1yRequiredGift" class="required integer" title="You must enter an integer value."/></td>
+		<td><input type="text" name="p2yRequiredGift" value="{{parameters.p2yRequiredGift}}" size="3" id="p2yRequiredGift" class="required integer" title="You must enter an integer value."/></td>
+	</tr>
+</table>
+{% include "widgets/addWidgets.html" %}
+<h2>Options</h2>
+<p><input type="checkbox" name="showPoints" {% if parameters.showPoints %}checked="checked"{% endif %}/> Show point value</p>
+<p>Display Name (Shown to Deciders)<br/><input type="text" name="displayName"  value="{{component.displayName}}" size="25"  id="displayName"  class="required" title="You must enter a display name"/></p>
+
+	<p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>
+	<div id="message">
+
+	</div>
+</form>
+{% endblock %}

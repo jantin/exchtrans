@@ -1,0 +1,99 @@
+{% extends "adminBase.html" %}
+
+{% block bodyid %}tab1{% endblock %}
+
+{% block sectionDivID %}sessions{% endblock %}
+
+{% block adminContent %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.tablesorter.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.impromptu.1.0.js"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+		
+		$(".slideToggler").bind("click", function(){
+			$('.createNewThing').slideToggle(500);
+		});
+		
+		$("#sessionTable").tablesorter({widgets: ['zebra']}); 
+		
+		//Require a confirm step for deleting
+		$(".deleteLink").click(function(){
+			msg  = 'Are you sure you want to delete this session?';
+			msg += '<input type="hidden" value="'+this.id+'" id="itemID"/>';
+			msg += '<input type="hidden" value="'+this.href+'" id="itemHref"/>';
+			$.prompt(msg, { buttons: { Yes: "Yes", No: "No" }, 
+							callback: deleteItem, 
+							show:"fadeIn",
+							container: "html",
+							opacity: 0.8,
+							overlayspeed: "fast"
+							});
+			return false;
+		});
+		
+		function deleteItem(buttonValue, msg){
+			if(buttonValue == "No"){
+				return;
+			} else {
+				itemID = msg.children('#itemID').val();
+				itemHref = msg.children('#itemHref').val();
+				$.ajax({url: itemHref, success:function(){
+					location.reload();
+				}});
+			}
+		}
+	});
+
+</script>
+
+
+<h1>Sessions</h1>
+<div class="helpText"> 
+<p>A session is a running instance of an experiment. When you are ready to run an
+experiment with participants, you should create a new session with that experiment.
+Participants can join sessions and experimenters can monitor sessions. Data
+collected while running an experiment is stored with the session.</p>
+</div>
+<p><a href="#" class="slideToggler">Create a new session</a></p>
+<div class="createNewThing">
+	<form action="/experiments/newSession/" method="get" accept-charset="utf-8">
+		<p><label for="id">Select an experiment:<br/>
+		<select name="id">
+			{% for e in experiments %}
+				<option value="{{ e.id }}">{{ e.name }}</option>
+			{% endfor %}
+		</select></label></p>
+		<p><input type="button" value="Cancel" class="buttonSmall" onclick="$('.createNewThing').slideToggle(500);"/> <input type="submit" value="Start Session" class="buttonSmall"/></p>
+	</form>
+</div>
+<br/><br/>
+<h3>Existing sessions table</h3>
+<table class="experimentTable" id="sessionTable">
+	<thead>
+	<tr><th>ID</th><th>Status</th><th>Experiment Name</th><th>Actions</th></tr>
+	</thead>
+	<tbody>
+	{% for e in expSessions %}
+	<tr id="row_{{ e.id }}">
+		<td>{{ e.id }}</td>
+		<td>{{ e.status.statusText }}</td>
+		<td>{{ e.experiment_id.name }}</td>
+		<td>
+			{% ifequal e.status.statusText "Ready" %}
+				<a href='/session/join/?sid={{ e.id }}'>Join</a> | 
+			{% endifequal %}
+			{% ifequal e.status.statusText "Not Ready" %}
+				<a href='/session/join/?sid={{ e.id }}'>Join</a> | 
+			{% endifequal %}
+			<a href='/sessions/monitor/?sid={{ e.id }}'>Monitor</a> | <a href="/session/delete/?sid={{ e.id }}" class="deleteLink" id="{{ e.id }}">Delete</a>
+		</td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+<!-- Start Bank Widget -->
+{% comment %}
+	
+	There can only be one bank on a page.
+	
+	To update the bank, use the following javascript:
+	
+	$("html").trigger("widget_bank_event_set", [currentPoints]);
+	
+	where `currentPoints` is a variable containing the new point value to display
+	
+	This widget requires:
+	<script src="/site_media/scripts/jquery/jquery.pack.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/site_media/scripts/jquery/jquery.color.js" type="text/javascript" ></script>
+	
+{% endcomment %}
+
+<script type="text/javascript" charset="utf-8">
+
+
+// Code to run after the page is completely loaded.
+$(document).ready(function() { 
+	// Bind widget callbacks
+	$("html").bind("widget_bank_event_set", function (event, newPointVal) {
+		widget_bank_set(newPointVal);
+	});
+	
+});
+
+function widget_bank_set(newPointVal){
+	$('#widget_bank_points').html(String(newPointVal));
+	$("#widget_bank_points").css("backgroundColor","yellow");
+	$("#widget_bank_points").animate({ backgroundColor: "#FFF" }, {queue:false, duration:2000});
+	return true;
+}
+
+function widget_bank_get(){
+	return $('#widget_bank_points').text();
+}
+
+</script>
+<div class="widget">
+	<div class="widget_bank">
+		<div class="widget_bank_label widget_label">
+			{{widgetParams.topLabel}}
+		</div>
+		<div id="widget_bank_points">-</div>
+	</div>
+</div>
+<!-- End Bank Widget -->

@@ -1,0 +1,126 @@
+<!-- Start Timer Widget -->
+
+{% comment %}
+	
+	There can only be one timer on a page.
+	
+	When the timer reaches zero, widget_timer_event_timeout is fired on the html element.
+	
+	This widget requires:
+	<script src="/site_media/scripts/jquery/jquery.pack.js" type="text/javascript" charset="utf-8"></script>
+	
+	
+{% endcomment %}
+
+<script type="text/javascript" charset="utf-8">
+
+
+
+var widget_timerTime;
+var widget_timerElapsed;
+var widget_timerTimeout;
+
+// Code to run after the page is completely loaded.
+$(document).ready(function() { 
+	// Bind widget callbacks
+	$("html").bind("widget_timer_event_startTimer", function (event) {
+		widget_timerStartTimer();
+	});
+	$("html").bind("widget_timer_event_stopTimer", function (event) {
+		widget_timerStopTimer();
+	});
+	$("html").bind("widget_timer_event_resetTimer", function (event) {
+		widget_timerResetAndStartTimer();
+	});
+	$("html").bind("widget_timer_event_scheduleTimer", function (event, showTime) {
+		widget_timerSchedule(showTime);
+	});
+	
+});
+
+/**
+* Configures the timer according to the widget's parameters
+* 
+*/
+function widget_timerInit(){
+	widget_timerTime = new Date();
+	widget_timerTime.setMinutes({{widgetParams.mins}});
+	widget_timerTime.setSeconds({{widgetParams.secs}});
+	widget_timerElapsed = widget_timerTime.getTime();
+}
+
+
+/**
+* These functions fire when the associated events fire
+* 
+*/
+function widget_timerStartTimer(){
+	widget_timerLoop();
+}
+
+function widget_timerStopTimer(){
+	clearTimeout(widget_timerTimeout);
+	$('#widget_timer_minutes').text("--");
+	$('#widget_timer_seconds').text("--");
+}
+
+function widget_timerResetAndStartTimer(){
+	clearTimeout(widget_timerTimeout);
+	widget_timerInit();
+	widget_timerLoop();
+}
+
+function widget_timerSchedule(showTime){
+	var nowTime = new Date().valueOf();
+	var delay = showTime - nowTime;
+	widget_timerInit();
+	setTimeout('widget_timerLoop();', delay);
+}
+
+/**
+* Decrements timer. If the timer reaches zero, the "widget_timer_event_timeout"
+* event is triggered and the loop stops.
+* 
+*/
+function widget_timerLoop(){
+	
+	// Get the mins and secs and convert them to strings
+	widget_timerMins = widget_timerTime.getMinutes().toString();
+	widget_timerSecs = widget_timerTime.getSeconds().toString();
+
+	// Pad seconds with a 0 if neeeded
+	if(widget_timerSecs.length < 2){
+		widget_timerSecs = "0" + widget_timerSecs;
+	}	
+
+	$('#widget_timer_minutes').text( widget_timerMins );
+	$('#widget_timer_seconds').text( widget_timerSecs );
+
+	if(widget_timerMins == "0" && widget_timerSecs == "00"){
+		clearTimeout(widget_timerTimeout);
+		//$("html").trigger("widget_timer_event_timeout");
+		return;
+	}
+
+	widget_timerElapsed -= 1000;
+	widget_timerTime.setTime(widget_timerElapsed);
+	widget_timerTimeout = setTimeout("widget_timerLoop()", 1000);
+	
+	return;
+}
+
+</script>
+
+<div class="widget">
+	<div class="widget_timer">
+		<div class="widget_timer_text widget_label">
+			{{widgetParams.label}}
+		</div>
+		<div class="widget_timer_numbers">
+			<span id="widget_timer_minutes"></span>:<span id="widget_timer_seconds"></span>
+		</div>
+	</div>
+</div>
+
+
+<!-- End Timer Widget -->

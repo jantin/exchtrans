@@ -1,0 +1,62 @@
+{% extends "adminBase.html" %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.pack.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/site_media/scripts/yav.js"></script>
+<script type="text/javascript" src="/site_media/scripts/jquery/jquery.yav.pack.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+	// prepare the form when the DOM is ready 
+	$(document).ready(function() { 
+
+		$("#componentForm").yav({
+			errorClass:"error",
+			errorTag:"p",
+			errorPosition:"after",
+			onOk: function(){
+				$('#componentForm').ajaxSubmit({target: '#message' });
+				$('#message').fadeIn('3000');
+				setTimeout("$('#message').fadeOut('3000');", 2000)
+				return false; 
+			}
+			
+		},{
+			inputclasserror: "fieldError",
+		});
+	});
+
+</script>
+{% endblock %}
+
+{% block bodyid %}tab3{% endblock %}
+
+{% block sectionDivID %}components{% endblock %}
+
+{% block adminContent %}
+<div id="breadCrumbs">
+<a href="/components">Components</a> » {{ component.name }}
+</div>
+
+<h1>Editing {{ component.name }}</h1>
+<form action="/widgets/bank/editSubmit/" method="post" accept-charset="utf-8" id="componentForm">
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr>
+		<th>Component Name: </th>
+		<td><input type="text" name="componentName" id="componentName" value="{{ component.name }}" size="40" maxlength="200" class="required" title="You must enter a component name."/></td>
+	</tr>
+	<tr>
+		<th>Component Description: </th>
+		<td><textarea name="componentDescription" rows="2" cols="43">{{ component.description }}</textarea></td>
+	</tr>
+	<tr>
+		<th>Display Label: </th>
+		<td><input type="text" name="topLabel" value="{{ parameters.topLabel }}" size="20" maxlength="100" id="topLabel"/></td>
+	</tr>
+</table>
+<p><input type="hidden" name="comIM" value="{{ component.id }}"/><input type="submit" value="Save Changes" class="buttonSmall"/></p>
+<div id="message">
+
+</div>
+</form>
+{% endblock %}

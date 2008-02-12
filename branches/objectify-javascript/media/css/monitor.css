@@ -1,0 +1,108 @@
+/* Generic Monitor Table */
+
+#monitorTable{
+	float:left;
+	width:825px;
+	padding:0;
+	margin-bottom:50px;
+
+
+}
+
+.monitorTableCol{
+	float:left;
+	width:163px;
+	border-bottom:1px solid #000;
+	border-right:1px solid #000;
+
+	
+}
+
+.monitorHeadBlock{
+	position:relative;
+	border-bottom:1px solid #000;
+	text-align:center;
+	border-top:1px solid #000;
+	
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:120px;
+	height:auto !important;
+	height:120px;
+}
+
+.monitorTableBlock{
+	position:relative;
+	border-top:1px solid #000;
+	text-align:center;
+	padding:5px;
+
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:50px;
+	height:auto !important;
+	height:50px;
+
+}
+
+.rowSeparator{
+	clear:both;
+	/*Min Height Hack - http://www.dustindiaz.com/min-height-fast-hack */
+	min-height:20px;
+	height:auto !important;
+	height:20px;
+}
+
+
+/* Component Cols */
+
+.componentsCol{
+	border-left:1px solid #000;
+	border-right:2px solid #000;
+	
+}
+
+.componentHeadBlock{
+	
+}
+
+#componentColHeadingText{
+	position:absolute;
+	bottom:5px;
+	left:20px;
+	font-size:1.5em;
+}
+
+.componentBlock{
+	
+}
+
+/* Participant Cols */
+.participantCol{
+}
+
+.participantHeadBlock{
+	
+}
+
+.participantHeadBlock img{
+
+}
+
+.participantNumber{
+	font-size:3em;
+	position:absolute;
+	left:70px;
+	bottom:50px;
+}
+
+.participantBlock{
+	background-color:#FFF;
+	
+}
+
+.participantInfo{
+	position:absolute;
+	left:22px;
+	bottom:5px;
+	font-size:.8em;
+
+}

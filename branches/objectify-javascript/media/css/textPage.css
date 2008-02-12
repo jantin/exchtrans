@@ -1,0 +1,18 @@
+.tp_Box{
+padding:100px 200px 100px 200px;
+}
+
+.tp_Heading{
+	font-size:2em;
+	margin-bottom:1em;
+}
+
+.tp_Body{
+	
+}
+
+.tp_continueButton{
+	position:absolute;
+	top:520px;
+	left:840px;
+}

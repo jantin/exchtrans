@@ -1,0 +1,23 @@
+.matcher_Box{
+	width:800px;
+	margin:100px auto 0px auto;
+}
+
+.matcher_Heading{
+	font-size:2em;
+}
+
+.matcher_continueButton{
+	position:absolute;
+	top:520px;
+	left:840px;
+}
+
+#deciderForm{
+	padding:10px;
+	margin-left:auto;
+	margin-right:auto;
+	width:200px;
+	text-align:left;
+	border: 1px solid #ccc;
+}

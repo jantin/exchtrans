@@ -1,0 +1,37 @@
+Drive Session:
+
+I know what component the experiment is on.
+I know how many iterations there should be and how many have been completed.
+I know when the session is over
+
+
+Participant:
+I know what component I'm currently working on
+I know what iteration I'm currently in
+
+
+
+Drive Session to Participant:
+Let's start the this session! I'm going to increment your iterationCount. 
+Here is the name of the first component, go do it.
+
+Participant to Drive Session:
+Thanks.
+
+Component to Participant:
+Hey, here is the first part. But then we need to wait for the other participants before we proceed.
+
+Participant to Component:
+OK. 
+
+Component to Participant:
+You're all done. I'm sending you back to the Drive Session.
+
+Drive Session to Participant:
+Welcome back. I'm going to increment your iterationCount and see if you need to move to the next component.
+Looks like you are ready to move onto the next component, Peace out. OR Looks like you're done, Peace out!
+
+
+
+When do I increment the current session component?
+When all the participants have 

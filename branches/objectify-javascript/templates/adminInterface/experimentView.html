@@ -1,0 +1,57 @@
+{% extends "adminBase.html" %}
+
+{% block bodyid %}tab2{% endblock %}
+
+{% block sectionDivID %}experimentView{% endblock %}
+
+{% block adminContent %}
+<div id="breadCrumbs">
+<a href="/experiments">Experiments</a> » {{ experiment.name }}	
+</div>
+<h1>{{ experiment.name }}</h1>
+<p>{{ experiment.description }}</p>
+<p><a href="/experiments/edit/?id={{ experiment.id }}">Edit Experiment</a></p>
+<h3>Statistics</h3>
+Total Sessions: 4<br/>
+Last Session: Feb. 2, 2007
+<br/><br/>
+Created on: Jan. 1, 2007<br/>
+Created by: Coye Cheshire
+<br/><br/>
+Last modified on: Jan. 3, 2007<br/>
+Last modified by: Jon Lesser
+<h3>Components</h3>
+<ol>
+{% for ec in experimentComponentsList %}
+<li>{{ ec.component_id.name }}</li>
+{% endfor %}
+</ol>
+<h3>Open Sessions</h3>
+<table>
+	<thead>
+	<tr><th>ID</th><th>Date started</th><th>Actions</th></tr>
+	</thead>
+	{% for e in experimentSessions %}
+	<tr class="{% cycle row1,row2 %}">
+		<td>{{ e.id }}</td>
+		<td>{{ e.dateStarted }}</td>
+		<td><a href="/session/join/?sid={{ e.id }}">Join</a> | <a href="/dashboard/monitor/?sid={{ e.id }}">Monitor</a> | <a href="/dashboard/monitor/?sid={{ e.id }}">Stop</a></td>
+	</tr>
+	{% endfor %}
+</table>
+<p><a href="/experiments/newSession/?id={{ experiment.id }}">Create new session</a></p>
+
+<h3>Completed Sessions</h3>
+<table>
+	<thead>
+	<tr><th>ID</th><th>Date Started</th><th>Data</th></tr>
+	</thead>
+	{% for e in experimentComponentsList %}
+	<tr class="{% cycle row1,row2 %}">
+		<td>1</td>
+		<td>2007-10-03</td>
+		<td><a href="/experiments/view/?id=1">Download Session Data</a></td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

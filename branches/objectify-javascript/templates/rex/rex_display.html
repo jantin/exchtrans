@@ -1,0 +1,464 @@
+{% extends "expBase.html" %}
+
+{% block extrahead %}
+<script src="/site_media/scripts/disableRightClick.js" type="text/javascript" charset="utf-8"></script>
+<script src="/site_media/scripts/jquery/jquery.pack.js" type="text/javascript" charset="utf-8"></script>
+<script src="/site_media/scripts/jquery/jquery.form.js" type="text/javascript" charset="utf-8"></script>
+<script src="/site_media/scripts/jquery/jquery.alphanumeric.pack.js" type="text/javascript" ></script>
+<script src="/site_media/scripts/jquery/json.js" type="text/javascript" ></script>
+<script src="/site_media/scripts/jquery/jquery.color.js" type="text/javascript" ></script>
+
+
+<script type="text/javascript" charset="utf-8">
+	// killPolling is defined as a global because polling can be stopped either by either 
+	// the poll process itself or a submitted form action
+	var killPolling = false;
+
+	// timeout is used for polling
+	var timeout;
+
+	// exchangeParametersJSON contains the contents of the Rex component object
+	var exchangeParametersJSON = '{{exchangeParametersJSON|safe}}'.parseJSON();
+	var pNum = "{{playerNumber}}";
+	var pollURL = "";
+	var pollInterval = "";
+	
+  // I hate to do this, but here is the ugly global
+	var responseJSON = null;
+
+	// Code to run after the page is completely loaded.
+	$(document).ready(function() { 
+		// Bind widget callbacks
+		$("html").bind("widget_timer_event_timeout", function (event) {
+			clearTimeout(timeout);
+			$("#transactionSummaryMessage").html("You ran out of time.");
+			$('#transactionSummaryOfferFromOpponent').css({display:"none"});
+			$('#transactionSummaryOfferToOpponent').css({display:"none"});
+			$("#transactionSummaryMessage").css({display:"block"});
+			showScreen("transactionSummary");
+		});
+		
+		// Bind the input fields of the offerFormulation screen
+		// Updates the "This deal would get you" number on the offerFormulation screen
+		$('.offerFormulationInputs').numeric();
+		$(".offerFormulationInputs").keyup(function(){
+			checkOfferInput();
+		});
+		
+	    // bind the submit event of all forms on the page. The server response will be
+		// delivered to the processFormResponse() function.
+		$('form').ajaxForm({
+			success: processFormResponse,
+			beforeSubmit: function(){
+				$(":submit").attr("disabled","disabled");
+			}			
+		});		
+		// When the player submits an offer, update the "offeredY" and "offeredX" spans.
+		// The value of these divs is used to calculate points when the transaction summary is shown
+		$('#offerFormulationOfferSubmit').bind("click", function(event){
+			var offeredX = $("#offerFormulationOfferX").val();
+			var offeredY = $("#offerFormulationOfferY").val();
+			if(offeredX.length > 0 && !isNaN(offeredX)){
+				$('.offeredX').html(offeredX);
+			}
+			if(offeredY.length > 0 && !isNaN(offeredY)){
+				$('.offeredY').html(offeredY);
+			}
+		});
+		
+		// Start polling server to check for opponents
+		pollServer("/rex/checkForOpponentPollProcess/", 2000);
+		
+	});
+
+	// Each screen contains a form that submits the user's input to the server.
+	// This function processes the server's response and updates the page accordingly.
+	function processFormResponse(responseText){
+		// Reenable the submit buttons
+		$(":submit").removeAttr("disabled");
+		// but don't reenable the offer and counter offer submit buttons
+		$("#offerFormulationOfferSubmit").attr("disabled","disabled");
+		
+		// responseText the response returned by the server. It is JSON formatted.
+		// Note: parseJSON() is not jQuery, rather it's in json.js from json.org
+		
+// SETTING RESPONSEJSON AS A GLOBAL HERE, NOT HAPPY ABOUT IT -N8
+responseJSON = responseText.parseJSON();
+// SETTING RESPONSEJSON AS A GLOBAL HERE, NOT HAPPY ABOUT IT -N8
+		
+		examineJSON(responseJSON);
+		return;
+	}
+
+
+	// This function polls the server
+	function pollServer(pollURL, interval){
+		clearTimeout(timeout);
+		if(!killPolling){
+			$.ajax({url: pollURL, dataType: "json", success: function(responseJSON){
+					if(responseJSON['continuePolling'] != true){
+						clearTimeout(timeout);
+						killPolling = true;
+						examineJSON(responseJSON);
+					} else {
+						timeout = setTimeout("pollServer('" + pollURL + "', " + interval + ")", interval);
+					}
+				}
+			});
+		}
+		return;
+	}
+	
+	function examineJSON(responseJSON){
+		// Processor is a reference to the django view that processed the form.
+		if(responseJSON['continuePolling'] != true){
+			clearTimeout(timeout);
+			killPolling = true;
+		}
+		if(responseJSON['redirect']){
+			window.location = responseJSON['redirect'];
+		}
+		if(responseJSON['startTimer']){
+			$("html").trigger("widget_timer_event_startTimer");
+		}
+		if(responseJSON['stopTimer']){
+			$("html").trigger("widget_timer_event_stopTimer");
+		}
+		if(responseJSON['restartTimer']){
+			$("html").trigger("widget_timer_event_resetTimer");
+		}
+		if(responseJSON['showTime']){
+			$("html").trigger("widget_timer_event_scheduleTimer", [responseJSON['showTime']]);
+		}
+
+		// If the server set poll to true, start polling on the given url and interval
+		if(responseJSON['poll']){
+			killPolling = false;
+			pollServer(responseJSON['url'],responseJSON['interval']);
+		}
+		if(responseJSON['transactionType']){
+			$('.transactionSummaryMessages').css({display:"none"});
+			$('#transactionSummary_' + responseJSON['transactionType']).css({display:"block"});
+		}
+		if(responseJSON['setX'] >= 0){
+			setXandY("X", responseJSON["setX"]);
+		}
+		if(responseJSON['setY'] >= 0){
+			setXandY("Y", responseJSON["setY"]);
+		}
+		if(responseJSON['initBank'] >= 0){
+			$("html").trigger("widget_bank_event_set", [responseJSON['initBank']]);
+		}
+		if(responseJSON['resetFormulationForms']){
+			$("#offerXError").html("");
+			$("#offerYError").html("");
+			$("#offerFormulationOfferX").val("");
+			$("#offerFormulationOfferY").val("");
+			$("#offerFormulationFreeExchange").show();
+			$("#offerFormulationRequiredGift").hide();
+		}
+		if(responseJSON['incomingOffer']){
+			$('.incomingX').html(String(responseJSON['incomingOffer']['offeredX']));
+			$('.incomingY').html(String(responseJSON['incomingOffer']['offeredY']));
+		}
+		if(responseJSON['updateBank'] >= 0){
+			oldPoints = responseJSON['updateBank'];
+			newPoints = calculatePoints();
+			updatedPoints = parseInt(oldPoints) + parseInt(newPoints);
+			setTimeout('$("html").trigger("widget_bank_event_set", [updatedPoints])', 1000);
+		}
+		if(responseJSON['requiredGift']){
+			$('.offeredX').html(String(responseJSON['xRequiredGift']));
+			$('.offeredY').html(String(responseJSON['yRequiredGift']));
+			$("#offerFormulationOfferX").val(String(responseJSON['xRequiredGift']));
+			$("#offerFormulationOfferY").val(String(responseJSON['yRequiredGift']));
+			$("#offerFormulationFreeExchange").hide();
+			$("#offerFormulationRequiredGift").show();
+		}
+		if(responseJSON['declinedToGiveRequiredGift']){
+			$('.offeredX').html("0");
+			$('.offeredY').html("0");
+		}
+		if(responseJSON['showScreen']){
+			showScreen(responseJSON['showScreen']);
+		}
+	}
+	
+	function setXandY(letter, amount){
+		letter = letter.toUpperCase();
+		$('#available' + letter).html(amount);
+		$("#available" + letter).css("backgroundColor","yellow");
+		$("#available" + letter).animate({ backgroundColor: "#FFF" }, {queue:false, duration:2000});
+	}
+	
+	// This function displays only the specified screen. screenName should be the the div ID
+	// of the desired screen.
+	function showScreen(screenName){
+		// Turn off all the screens
+		$(".exchangeScreen").css("display", "none");
+		// turn on the specified screen
+		$("#" + screenName).css("display", "block");
+		return;
+	}
+
+	
+	// As players type in offer, this function makes sure they haven't offered
+	// more X or Y than they have.
+	function checkOfferInput(){		
+		// Clear the error if present
+		$("#offerXError").html("");
+		$("#offerYError").html("");
+		
+
+		// Set up all our working variables
+		options = {
+			whichPlayer: ('p' + pNum),
+			offerX: $("#offerFormulationOfferX").val(),
+			offerY: $("#offerFormulationOfferY").val(),
+			p1x: exchangeParametersJSON['p1x'],
+			p2x: exchangeParametersJSON['p2x'],
+			p1y: exchangeParametersJSON['p1y'],
+			p2y: exchangeParametersJSON['p2y']
+		}
+		
+		// update available X and Y with what's currently displayed
+		if(pNum == 1){
+			options['p1x'] = $("#availableX").html();
+			options['p1y'] = $("#availableY").html();
+		} else {
+			options['p2x'] = $("#availableX").html();
+			options['p2y'] = $("#availableY").html();
+		}
+		// Error Check Offer input fields
+		if(options['whichPlayer'] == "p1"){
+			if(parseInt(options['offerX']) > parseInt(options['p1x'])) {
+        $("#offerFormulationOfferX").val(options['p1x']);
+        options['offerX'] = options['p1x'];
+				$("#offerXError").html("You only have " + options['p1x'] + " X");
+			}
+			if(parseInt(options['offerY']) > parseInt(options['p1y'])) {
+        $("#offerFormulationOfferY").val(options['p1y']);
+        options['offerY'] = options['p1y'];
+				$("#offerYError").html("You only have " + options['p1y'] + " Y");
+			}
+			// enable the offer submit button if the offer is valid
+  		if((options['offerX'].length  > 0 && options['offerY'].length > 0)
+  		   && (parseInt(options['offerY']) <= parseInt(options['p1y']))
+  		   && (parseInt(options['offerX']) <= parseInt(options['p1x']))){
+  			$("#offerFormulationOfferSubmit").removeAttr("disabled");
+  		} else {
+  			$("#offerFormulationOfferSubmit").attr("disabled","disabled");
+  		}
+		} else {
+			if(parseInt(options['offerX']) > parseInt(options['p2x'])) {
+        $("#offerFormulationOfferX").val(options['p2x']);
+        options['offerX'] = options['p2x'];
+				$("#offerXError").html("You only have " + options['p2x'] + " X");
+			}
+			if(parseInt(options['offerY']) > parseInt(options['p2y'])) {
+        $("#offerFormulationOfferY").val(options['p2y']);
+        options['offerY'] = options['p2y'];
+				$("#offerYError").html("You only have " + options['p2y'] + " Y");
+			}
+			// enable the offer submit button if the offer is valid
+  		if((options['offerX'].length  > 0 && options['offerY'].length > 0)
+  		   && (parseInt(options['offerY']) <= parseInt(options['p2y']))
+  		   && (parseInt(options['offerX']) <= parseInt(options['p2x']))){
+  			$("#offerFormulationOfferSubmit").removeAttr("disabled");
+  		} else {
+  			$("#offerFormulationOfferSubmit").attr("disabled","disabled");
+  		}
+		}
+
+	}
+	
+	function calculatePoints(){
+		// Set up all our working variables
+
+		var options = {
+			whichPlayer: ('p' + pNum),
+			offerX: $('.offeredX:first').html(),
+			offerY: $('.offeredY:first').html(),
+			incomingX: $('.incomingX').html(),
+			incomingY: $('.incomingY').html(),
+			availableX: $("#availableX").html(),
+			availableY: $("#availableY").html()
+		}
+
+		if(options['whichPlayer'] == "p1"){
+			options['xValue'] = parseValueField(exchangeParametersJSON['p1xValue'], options);
+			options['yValue'] = parseValueField(exchangeParametersJSON['p1yValue'], options);
+		} else {
+			options['availableX'] = $("#availableX").html();
+			options['availableY'] = $("#availableY").html();
+			options['xValue'] = parseValueField(exchangeParametersJSON['p2xValue'], options);
+			options['yValue'] = parseValueField(exchangeParametersJSON['p2yValue'], options);
+		}
+		
+		var totalPoints = (options['xValue'] * options['availableX']) + (options['yValue'] * options['availableY']);
+		var incomingPoints = (options['incomingX'] * options['xValue']) + (options['incomingY'] * options['yValue']);
+		var remainingX = exchangeParametersJSON[options['whichPlayer']+'xReplenish'] - Number(options['offerX']);
+		var remainingY = exchangeParametersJSON[options['whichPlayer']+'yReplenish'] - Number(options['offerY']);
+    var remainingPoints = (Number(options['xValue']) * Number(remainingX)) + (Number(options['yValue']) * Number(remainingY));
+    var offeredPoints = (options['offerX'] * options['xValue']) + (options['offerY'] * options['yValue']);
+
+    $(".remainingX").html(String(remainingX));
+    $(".remainingY").html(String(remainingY));
+    $(".totalRemaining").html(String(remainingPoints));
+    $(".totalOffered").html(String(offeredPoints));
+		$(".totalIncoming").html(String(incomingPoints));
+		$(".currentPoints").html(String(totalPoints));
+		$("#transactionSummaryPoints").val(totalPoints);
+		$("#transactionSummaryXValue").val(options['xValue']);
+		$("#transactionSummaryYValue").val(options['yValue']);
+		
+		return totalPoints;
+	}
+	
+	function parseValueField(valueInput, options){
+		originalValueInput = valueInput;
+
+		//Check if input is just digits, if so return value input right away
+		if(/^\d+$/.test(valueInput)){
+			return valueInput;	
+		}
+
+		//replace variables if present
+		valueInput = valueInput.replace(/Gx/g, options['offerX']);
+		valueInput = valueInput.replace(/Gy/g, options['offerY']);
+
+		if(options['whichPlayer'] == "p1"){
+			valueInput = valueInput.replace(/Axg/g, exchangeParametersJSON['p1x']);
+			valueInput = valueInput.replace(/Ayg/g, exchangeParametersJSON['p1y']);
+			valueInput = valueInput.replace(/Axr/g, exchangeParametersJSON['p2x']);
+			valueInput = valueInput.replace(/Ayr/g, exchangeParametersJSON['p2y']);
+		} else {
+			valueInput = valueInput.replace(/Axg/g, exchangeParametersJSON['p2x']);
+			valueInput = valueInput.replace(/Ayg/g, exchangeParametersJSON['p2y']);
+			valueInput = valueInput.replace(/Axr/g, exchangeParametersJSON['p1x']);
+			valueInput = valueInput.replace(/Ayr/g, exchangeParametersJSON['p1y']);
+		}
+
+		//evaluate value expression and return it
+		try{
+			value = eval(valueInput);
+			value = Math.round(value);
+		} catch(err){
+			msg = "There is an error in one of your value fields!\n\n";
+			msg += "Please report this to the experimenter RIGHT NOW!";
+			alert(msg);
+			value = "Error";
+		}
+
+		return value;		
+	}
+		
+
+
+</script>
+
+{% endblock %}
+
+{% block actionArea %}
+<div id="checkForOpponent" class="exchangeScreen">
+	<br/><br/><br/><br/>
+	<h1>You are about to exchange with Player {{opponentIdentity}}</h1>
+	<br/><br/><br/><br/>
+	<h3>Please wait...</h3>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
+</div>
+<div id="makeOfferButton" style="display:none;" class="exchangeScreen">
+	<br/><br/><br/><br/>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
+	<br/><br/><br/><br/><br/>
+	<form action="/rex/makeOfferButton/" method="post" accept-charset="utf-8">
+		<input type="submit" name="makeOfferSubmit" value="Make Offer" class="buttonBig"/> 
+	</form>
+	<form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off" id="offerForulationForm">
+		<input type="submit" name="makeOfferSubmit" value="Don't Offer" class="buttonBig"/>
+	</form>
+</div>
+<div id="offerFormulation" style="display:none;" class="exchangeScreen">
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
+	<form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off" id="offerForulationForm">
+		<div id="offerFormulationFreeExchange">
+			<p>What do you want to give?</p>
+			<p>
+				<input type="text" name="offerFormulationOfferX" id="offerFormulationOfferX" class="offerFormulationInputs" value="" size="4" maxlength="4"/> X
+				<span id="offerXError" class="offerError"></span>
+			</p>
+			<p>
+				<input type="text" name="offerFormulationOfferY" id="offerFormulationOfferY" class="offerFormulationInputs" value="" size="4" maxlength="4"/> Y
+				<span id="offerYError" class="offerError"></span>
+			</p>
+			<input type="submit" name="offerFormulationOfferSubmit" id="offerFormulationOfferSubmit" value="Submit" class="buttonBig" id="offerFormulationOfferSubmit" disabled="disabled"/>
+		</div>
+		<div id="offerFormulationRequiredGift" style="display:none">
+			<p>Do you want to give player {{opponentIdentity}} 
+				<b><span class="offeredX">0</span> X</b> 
+				and <b><span class="offeredY">0</span> Y</b>?
+			</p>
+			<input type="submit" name="offerFormulationOfferSubmit" value="Yes" class="buttonBig"/> 
+			<input type="submit" name="offerFormulationOfferSubmit" value="No" class="buttonBig"/>
+		</div>
+		<input type="hidden" name="declinedToMakeOffer" value="false" id="declinedToMakeOfferField"/>
+	</form>
+</div>
+<div id="waitingScreen" style="display:none;" class="exchangeScreen">
+	<br/><br/><br/>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
+	<br/>
+	<h3>Please wait for player {{opponentIdentity}}</h3>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
+</div>
+
+<div id="transactionSummary" style="display:none;" class="exchangeScreen">
+	<br/><br/>
+	<h1>Exchanging with Player {{opponentIdentity}}</h1>
+	<br/>
+	<p>Player {{opponentIdentity}} gave you <b><span class="incomingX">0</span> X</b> and <b><span class="incomingY">0</span> Y</b> - worth a total of <b><span class="totalIncoming">0</span></b> point(s).</p>
+	<p>You gave Player {{opponentIdentity}} <b><span class="offeredX">0</span> X</b> and <b><span class="offeredY">0</span> Y</b> - worth a total of <b><span class="totalOffered">0</span></b> point(s).</p>
+	<p>You have <b><span class="remainingX">-</span> X</b> and <b><span class="remainingY">-</span> Y</b> that you chose not to give this round - worth a total of <b><span class="totalRemaining">0</span></b> point(s).</p>
+	<p>A total of <b><span class="currentPoints">-</span></b> point(s) will be added to your bank from this round.</p>
+	<p>
+		<form action="/rex/transactionSummary/" method="post" accept-charset="utf-8">
+			<input type="submit" name="transactionSummarySubmit" value="Continue" class="buttonBig"/>
+			<input type="hidden" name="transactionSummaryPoints" value="-" id="transactionSummaryPoints">
+			<input type="hidden" name="transactionSummaryXValue" value="-" id="transactionSummaryXValue">
+			<input type="hidden" name="transactionSummaryYValue" value="-" id="transactionSummaryYValue">
+		</form>
+	</p>
+</div>
+<div id="nextRoundCountdown" style="display:none;" class="exchangeScreen">
+	<h1>Starting next round shortly</h1>
+	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
+</div>
+{% endblock %}
+
+{% block rightCol %}
+	{{widgets|safe}}
+{% endblock %}
+
+{% block bottomBar %}
+
+<div id="currentXBox">
+	<p>Total X</p>
+	<div id="availableX" class="largePoints">-</div>
+	{% if showXYValue %}
+		<div id="valueOfEachX">
+			Each X is worth {{xValue}} point(s).
+		</div>	
+	{% endif %}
+
+</div>
+<div id="currentYBox">
+	<p>Total Y</p>
+	<div id="availableY" class="largePoints">-</div>
+	{% if showXYValue %}
+	<div id="valueOfEachX">
+		Each Y is worth {{yValue}} point(s).
+	</div>	
+	{% endif %}
+</div>
+
+{% endblock %}
