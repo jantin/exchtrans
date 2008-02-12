@@ -21,7 +21,7 @@
 	$(document).ready(function() {
 		
 		// exchangeParametersJSON contains the contents of the Nex component object
-		exchangeParametersJSON = '{{exchangeParametersJSON|safe}}'.parseJSON();
+		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
 		
 		// These numbers are used to build strings e.g. p1x
 		playerNumber = {{playerNumber}} + 1;
@@ -582,7 +582,7 @@
 {% endblock %}
 
 {% block rightCol %}
-	{{widgets|safe}}
+	{{widgets}}
 {% endblock %}
 
 {% block bottomBar %}
