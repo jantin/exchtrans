@@ -6,7 +6,6 @@ urlpatterns = patterns('',
 	# ET Admin Pages
 	(r'^$', 'exchtran.et.session.sessions'),
 	
-	
 	# Monitoring
 	(r'^sessions/monitor/$', 'exchtran.et.monitor.monitor'),
 	(r'^sessions/monitor/updatePollProcess/$', 'exchtran.et.monitor.updatePollProcess'),
@@ -120,7 +119,7 @@ urlpatterns = patterns('',
 	(r'^api/saveComponentChanges/$', 'exchtran.et.api.saveComponentChanges'),
 	
 	# Media Files
-	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/opt/local/lib/python2.5/site-packages/exchtran/media'}),
+	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/n8agrin/Sites/exchtran/media'}),
 	
 	# Admin pages
 	(r'^admin/', include('django.contrib.admin.urls')),
