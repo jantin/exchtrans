@@ -3,10 +3,10 @@
 = Nate's Issues =
 
 General:
-  Update the server to a newer version of Django.
-  Javascript should be refactored.
-  Having some sort of test server would be grand.
-  Having some sort of testing suite for the javascript / ui would be grander (like selenium).
+ * Update the server to a newer version of Django.
+ * Javascript should be refactored.
+ * Having some sort of test server would be grand.
+ * Having some sort of testing suite for the javascript / ui would be grander (like selenium).
 
 Issue #25 - Nex rewording.
 Issue #28 - Buttons grayed out incorrectly.  I couldn't replicate this, the only thing I can think of is that newer versions of the django framework somehow eliminate this bug, but I doubt it.
