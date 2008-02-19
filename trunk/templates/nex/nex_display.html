@@ -113,18 +113,19 @@
 		
 		// enable the offer and counter offer submit buttons if an offer is valid
 		if(points.offer.length > 0 && points.request.length > 0){
-			$("#offerFormulationOfferSubmit").removeAttr("disabled");
-			$("#counterOfferFormulationSubmit").removeAttr("disabled");
+			if (!counterOffer) $("#offerFormulationOfferSubmit").removeAttr("disabled");
+			if (counterOffer)  $("#counterOfferFormulationSubmit").removeAttr("disabled");
 		} else {
-			$("#offerFormulationOfferSubmit").attr("disabled","disabled");
-			$("#counterOfferFormulationSubmit").attr("disabled","disabled");
+			if (!counterOffer) $("#offerFormulationOfferSubmit").attr("disabled","disabled");
+			if (counterOffer)  $("#counterOfferFormulationSubmit").attr("disabled","disabled");
 		}
 		
 		response = points.calculatePoints();
 		if(!response.error){
 			$(".pointsPreview").html(String(response[points.offeredBy +'Points_justExchange']));
 		} else {
-			$(":submit").attr("disabled","disabled");
+		  // eliminates the 'greyed out bug' #28
+      // $(":submit").attr("disabled","disabled");
 			$(".pointsPreview").html("--");
 			switch(response.errorMsg){
 				case "Insufficient funds for offer":
@@ -531,6 +532,7 @@
 	<div id="transactionSummary_opponentCanceledOffer" class="transactionSummaryMessages">
 		The other player canceled the offer before you responded.
 	</div>
+	
 	<div id="transactionSummary_youAccepted" class="transactionSummaryMessages">
 		You accepted player {{opponentIdentity}}'s offer. <br/>
 		Player {{opponentIdentity}} offered <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) - worth a total of <span class="totalGain">-</span> point(s). <br/>
@@ -538,6 +540,7 @@
 		<br/>
 		You received <strong><span class="currentPoints">-</span></strong>(s) points for this deal.
 	</div>
+	
 	<div id="transactionSummary_opponentAccepted" class="transactionSummaryMessages">
 		Player {{opponentIdentity}} accepted your offer. <br/>
 		You offered <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s) - costing you a total of <span class="totalLoss">-</span> point(s). <br/>
@@ -545,6 +548,7 @@
 		<br/>
 		You received <strong><span class="currentPoints">-</span></strong>(s) points for this deal.
 	</div>
+	
 	<div id="transactionSummary_youRenegedOpponentReneged" class="transactionSummaryMessages">
 		<p>Player {{opponentIdentity}} chose not to follow through on the deal
 			and did NOT give you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>s.</p>
