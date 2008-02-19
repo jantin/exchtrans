@@ -21,7 +21,7 @@
 	$(document).ready(function() {
 		
 		// exchangeParametersJSON contains the contents of the Nex component object
-		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
+		exchangeParametersJSON = '{{exchangeParametersJSON|safe}}'.parseJSON();
 		
 		// These numbers are used to build strings e.g. p1x
 		playerNumber = {{playerNumber}} + 1;
@@ -185,14 +185,18 @@
 		if(direction == "incoming"){
 			$('.currentGain').html(String(offer['offer']));
 			$('.currentGainUnit').html(String(offer['offerUnit']).toUpperCase());
+      $('.totalGain').html(String(points.offer * points['p' + playerNumber + points.offerUnit +'Value_raw']));
 			$('.currentLoss').html(String(offer['request']));
 			$('.currentLossUnit').html(String(offer['requestUnit']).toUpperCase());
+      $('.totalLoss').html(String(points.request * points['p' + playerNumber + points.requestUnit +'Value_raw']));
 			points.offeredBy = "p" + opponentNumber;
 		} else {
 			$('.currentGain').html(String(offer['request']));
 			$('.currentGainUnit').html(String(offer['requestUnit']).toUpperCase());
+      $('.totalGain').html(String(points.request * points['p' + playerNumber + points.requestUnit +'Value_raw']));
 			$('.currentLoss').html(String(offer['offer']));
 			$('.currentLossUnit').html(String(offer['offerUnit']).toUpperCase());
+      $('.totalLoss').html(String(points.offer * points['p' + playerNumber + points.offerUnit +'Value_raw']));
 			points.offeredBy = "p" + playerNumber;
 		}
 		response = points.calculatePoints();
@@ -393,11 +397,9 @@
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<form action="/nex/counterOfferFormulation/" method="post" accept-charset="utf-8" autocomplete="off">
 		<p>
-			Player {{opponentIdentity}} offered you 
-			<strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>s 
-			 for 
-			<strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>s. 
-			<br/>This deal would get you: <b><span class="currentPoints">-</span></b> point(s).
+  		Player {{opponentIdentity}} offered you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) - worth a total of <span class="totalGain">-</span> point(s). <br/>
+      In return Player {{opponentIdentity}} wants <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s) - costing you a total of <span class="totalLoss">-</span> point(s). <br/>
+  		<br/>This deal would get you: <b><span class="currentPoints">-</span></b> point(s).
 		</p>
 		<p>Enter your counter offer below.</p>
 		<p>What will you give?</p>
@@ -452,12 +454,11 @@
 <div id="incomingOffer" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/>
-	<p>Player {{opponentIdentity}} offered you 
-		<strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>s 
-		 for 
-		<strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>s. 
+	<p>
+		Player {{opponentIdentity}} offered you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) - worth a total of <span class="totalGain">-</span> point(s). <br/>
+    In return Player {{opponentIdentity}} wants <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s) - costing you a total of <span class="totalLoss">-</span> point(s). <br/>
+		<br/>This deal would get you: <b><span class="currentPoints">-</span></b> point(s).
 	</p>
-	<p>This deal would get you: <b><span class="currentPoints">-</span></b> points</p>
 	<div id="incomingOfferInsufficientFunds" style="display:none;">You don't have enough to fulfill Player {{opponentIdentity}}'s request!</div>
 	<p>
 		<form action="/nex/incomingOffer/" method="post" accept-charset="utf-8">
@@ -531,18 +532,18 @@
 		The other player canceled the offer before you responded.
 	</div>
 	<div id="transactionSummary_youAccepted" class="transactionSummaryMessages">
-		You accepted player {{opponentIdentity}}'s offer. Player {{opponentIdentity}} offered <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) 
-		in exchange for <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s).
+		You accepted player {{opponentIdentity}}'s offer. <br/>
+		Player {{opponentIdentity}} offered <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) - worth a total of <span class="totalGain">-</span> point(s). <br/>
+		In return you gave <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s) - costing you a total of <span class="totalLoss">-</span> point(s). <br/>
 		<br/>
-		You received <strong><span class="currentPoints">-</span></strong>s 
-		points for this deal.
+		You received <strong><span class="currentPoints">-</span></strong>(s) points for this deal.
 	</div>
 	<div id="transactionSummary_opponentAccepted" class="transactionSummaryMessages">
-		Player {{opponentIdentity}} accepted your offer. You offered <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s)  
-		in exchange for <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s).
+		Player {{opponentIdentity}} accepted your offer. <br/>
+		You offered <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s) - costing you a total of <span class="totalLoss">-</span> point(s). <br/>
+		In return Player {{opponentIdentity}} gave you <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) - worth a total of <span class="totalGain">-</span> point(s). <br/>
 		<br/>
-		You received <strong><span class="currentPoints">-</span></strong>s 
-		points for this deal.
+		You received <strong><span class="currentPoints">-</span></strong>(s) points for this deal.
 	</div>
 	<div id="transactionSummary_youRenegedOpponentReneged" class="transactionSummaryMessages">
 		<p>Player {{opponentIdentity}} chose not to follow through on the deal
@@ -582,7 +583,7 @@
 {% endblock %}
 
 {% block rightCol %}
-	{{widgets}}
+	{{widgets|safe}}
 {% endblock %}
 
 {% block bottomBar %}
