@@ -119,7 +119,8 @@ urlpatterns = patterns('',
 	(r'^api/saveComponentChanges/$', 'exchtran.et.api.saveComponentChanges'),
 	
 	# Media Files
-	(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/n8agrin/Sites/exchtran/media'}),
+  # (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/n8agrin/Sites/exchtran/media'}),
+  (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/exchtrans/django_projects/exchtran/media'}),
 	
 	# Admin pages
 	(r'^admin/', include('django.contrib.admin.urls')),
