@@ -21,7 +21,8 @@
 	$(document).ready(function() {
 		
 		// exchangeParametersJSON contains the contents of the Nex component object
-		exchangeParametersJSON = '{{exchangeParametersJSON|safe}}'.parseJSON();
+		// had |safe
+		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
 		
 		// These numbers are used to build strings e.g. p1x
 		playerNumber = {{playerNumber}} + 1;
@@ -36,6 +37,11 @@
 			$('#transactionSummaryOfferToOpponent').css({display:"none"});
 			$("#transactionSummaryMessage").css({display:"block"});
 			showScreen("transactionSummary");
+		});
+		
+		$('#confirmEndRoundSubmit').click(function(event){
+		  // clear out the transaction data... DUH
+		  $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
 		});
 		
 		//Init a points object
@@ -360,6 +366,7 @@
 	<h3>Please wait...</h3>
 	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
 </div>
+
 <div id="makeOfferButton" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -368,6 +375,7 @@
 		<input type="submit" name="makeOfferSubmit" value="Click to Begin" class="buttonBig"/>
 	</form>
 </div>
+
 <div id="offerFormulation" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<form action="/nex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off">
@@ -394,6 +402,7 @@
 		<input type="submit" name="offerFormulationOfferSubmit" value="Offer" class="buttonBig" id="offerFormulationOfferSubmit" disabled="disabled"/>
 	</form>
 </div>
+
 <div id="counterOfferFormulation" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<form action="/nex/counterOfferFormulation/" method="post" accept-charset="utf-8" autocomplete="off">
@@ -427,6 +436,7 @@
 		<input type="submit" name="counterOfferFormulationSubmit" value="Counter Offer" class="buttonBig" id="counterOfferFormulationSubmit" disabled="disabled"/>
 	</form>
 </div>
+
 <div id="waitingScreen" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -440,6 +450,7 @@
 		</form>
 	</p> -->
 </div>
+
 <div id="confirmCancel" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -452,6 +463,7 @@
 		</form>
 	</p>
 </div>
+
 <div id="incomingOffer" style="display:none;" class="exchangeScreen">
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/><br/>
@@ -469,6 +481,7 @@
 		</form>	
 	</p>
 </div>
+
 <div id="confirmEndRound" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -477,10 +490,11 @@
 	<p>
 		<form action="/nex/confirmEndRound/" method="post" accept-charset="utf-8">
 			<input type="submit" name="confirmEndRoundSubmit" value="No" class="buttonBig"/> 
-			<input type="submit" name="confirmEndRoundSubmit" value="Yes" class="buttonBig"/>
+			<input type="submit" name="confirmEndRoundSubmit" value="Yes" class="buttonBig" id="confirmEndRoundSubmit"/>
 		</form>	
 	</p>
 </div>
+
 <div id="nonBindingConfirmation" style="display:none;" class="exchangeScreen">
 		<br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -509,6 +523,7 @@
 		</form>
 	</p>
 </div>
+
 <div id="nonBindingWaitingScreen" style="display:none;" class="exchangeScreen">
 	<br/><br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -516,6 +531,7 @@
 	<h3>Please wait for player {{opponentIdentity}}</h3>
 	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
 </div>
+
 <div id="transactionSummary" style="display:none;" class="exchangeScreen">
 	<br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
@@ -580,14 +596,16 @@
 		</form>
 	</p>
 </div>
+
 <div id="nextRoundCountdown" style="display:none;" class="exchangeScreen">
 	<h1>Starting next round shortly</h1>
 	<img src="/site_media/images/indicatorMed.gif" width="32" height="32" alt="IndicatorMed">
 </div>
 {% endblock %}
 
+<!-- had |safe -->
 {% block rightCol %}
-	{{widgets|safe}}
+	{{widgets}}
 {% endblock %}
 
 {% block bottomBar %}
