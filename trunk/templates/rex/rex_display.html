@@ -66,6 +66,12 @@
 			}
 		});
 		
+		// try to clear out the offeredX and Y values
+		$('#dontOffer').bind("click", function(event) {
+		  $('.offeredX').html("0");
+		  $('.offeredY').html("0");
+		})
+		
 		// Start polling server to check for opponents
 		pollServer("/rex/checkForOpponentPollProcess/", 2000);
 		
@@ -375,7 +381,7 @@ responseJSON = responseText.parseJSON();
 		<input type="submit" name="makeOfferSubmit" value="Make Offer" class="buttonBig"/> 
 	</form>
 	<form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off" id="offerForulationForm">
-		<input type="submit" name="makeOfferSubmit" value="Don't Offer" class="buttonBig"/>
+		<input type="submit" name="makeOfferSubmit" value="Don't Offer" class="buttonBig" id="dontOffer"/>
 	</form>
 </div>
 <div id="offerFormulation" style="display:none;" class="exchangeScreen">
