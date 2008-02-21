@@ -39,10 +39,10 @@
 			showScreen("transactionSummary");
 		});
 		
-		$('#confirmEndRoundSubmit').click(function(event){
-		  // clear out the transaction data... DUH
-		  $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
-		});
+    // $('#confirmEndRoundSubmit').click(function(event){
+    //   // clear out the transaction data... DUH
+    //   $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
+    // });
 		
 		//Init a points object
 		points = new et_points();
@@ -240,6 +240,17 @@
 		if(responseJSON['transactionType']){
 			$('.transactionSummaryMessages').css({display:"none"});
 			$('#transactionSummary_' + responseJSON['transactionType']).css({display:"block"});
+			
+			// These two if statements should reset the point value to the 
+			// default number of points you had before you started trading in the
+			// round.
+			if (responseJSON['transactionType'] == 'youEndedTheRound') {
+        $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
+		  }
+		  
+		  if (responseJSON['transactionType'] == 'opponentEndedRound') {
+        $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
+		  }
 		}
 		if(responseJSON['nonBindingOfferType']){
 			$('#nonBindingConfirmationOfferFromOpponent').css({display:"none"});
