@@ -36,3 +36,6 @@ log_nex
 
  * ANYTIME SOMETHING PASSES THROUGH THE SERVER IT SHOULD BE RECORDED
  * offerIndex records the counteroffers as one index ID, but when the participant clicks 'Accept' it records it in the current index ID.  The participant to then receives the Accepted Offer message (the one who made the last counter offer) then gets a message whose outcome is recorded as the next offerIndex id.
+
+log_rex
+ * declinedToMakeOffer - recorded a 1 (true) when in fact both users had made an offer.
