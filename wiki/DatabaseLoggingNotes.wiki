@@ -11,3 +11,12 @@ log_participants
  * participantName - looks like date plus some unique identifier, unclear where the identifier comes from.
  * cumulativePoints - does not ever update
  * timestamp - unclear when this actually gets set
+
+log_component
+stores all the components for each session
+ * sid - session_id
+ * cid - component_id
+ * component index - unclear if the is the ordering of each component
+
+log_matcher
+We think this table handles recording who decides what type of exchange is going to occur when there is an option for the players to choose between two or more types of exchange.
