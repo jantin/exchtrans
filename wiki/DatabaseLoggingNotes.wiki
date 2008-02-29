@@ -1,1 +1,13 @@
 #What each table does
+
+log_session
+ * only logs the session when the moderator has explicitly started it.
+ * records start and end time plus timeStamp which is the same as startTime
+ * sid - session id
+ * eid - experiment id
+
+log_participants
+ * sid - session_id
+ * participantName - looks like date plus some unique identifier, unclear where the identifier comes from.
+ * cumulativePoints - does not ever update
+ * timestamp - unclear when this actually gets set
