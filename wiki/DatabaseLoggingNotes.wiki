@@ -19,4 +19,17 @@ stores all the components for each session
  * component index - unclear if the is the ordering of each component
 
 log_matcher
-We think this table handles recording who decides what type of exchange is going to occur when there is an option for the players to choose between two or more types of exchange.
+ * We think this table handles recording who decides what type of exchange is going to occur when there is an option for the players to choose between two or more types of exchange.
+
+log_nex
+ * no initial offer is recorded
+ * offer is recorded from the perspective of the receiver and they are not recorded until the offer is acted upon by the receiver.  For example, the receiver presses "counter offer"
+ * End round was clicked.
+  * 'outcome' recorded endedRound
+  * on the confirmatory page, participant clicked 'no'
+  * 'outcome' still showed endedRound
+  * participant clicked counteroffer and submitted it.
+  * 'outcome' erased endedRound and replaced it with counterOffer
+  * should have recorded 'considered_end_round'
+  * should have recorded 'canceled_end_round'
+  * then recorded 'counterOffer'
