@@ -170,7 +170,9 @@ def rexDisplay(request):
 		
 	# Get the player pairing map
 	playerPairMapKey = "matcher_" + str(request.session['c'].id) + "_" + str(request.session['p'].currentComponent) + "_playerPairMap"
-	playerPairMap = SessionVar.objects.get(key=playerPairMapKey).value
+	# playerPairMap = SessionVar.objects.extra(key__exact=playerPairMapKey, experimentSession_id__exact=sid)[0].value
+	# 'key' is a MySQL keyword, so if it's not in backticks it will wreck the constructed query.
+	playerPairMap = SessionVar.objects.extra(where=['`key`=%s', '`experimentSession_id`=%s'], params=[playerPairMapKey,sid])[0].value
 	request.session['playerPairMap'] = pickle.loads(playerPairMap)
 	
 	# Get the current pairing index. The -1 is because the PairingIndex is incremented by the matcher just before we get here
