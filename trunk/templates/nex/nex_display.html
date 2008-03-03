@@ -17,6 +17,10 @@
 	// point, but this may not be tennnable in the future.
 	delete(Object.prototype.toJSONString);
 
+  // This is used to dictate the state of the overlay used to deliver messages
+  // to the tester
+	var dialogeWindowOpened = false;
+
 	// Code to run after the page is completely loaded.
 	$(document).ready(function() {
 		
@@ -27,7 +31,6 @@
 		// These numbers are used to build strings e.g. p1x
 		playerNumber = {{playerNumber}} + 1;
 		opponentNumber = {{opponentNumber}} + 1;
-		
 		
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
@@ -322,20 +325,26 @@
 	// These functions set up and trigger the appropriate dialog screens
 	function showDialog(dialogName){
 		if(dialogName == "incomingOffer"){
-			msg  = "You've received an offer from player " + opponentIdentity;
+		  // if the 'offerDeclined' window is open close it, this is a dirty hack
+      if ($('#deniedbuttonOk').length > 0) $('#deniedbuttonOk')[0].click();
+		  msg  = "You've received an offer from player " + opponentIdentity;
 			$.prompt(msg, { buttons: { "View Offer": "View Offer", "Do Not View Offer": "Do Not View Offer" }, 
 							callback: incomingOfferDialogAction, 
 							container: "html",
+							zIndex: "600",
 							opacity: 0.8,
 							show:"fadeIn",
 							overlayspeed: 0,
 							promptspeed: 0
-							});	
+							});
 		}
 		if(dialogName == "offerDeclined"){
+		  dialogeWindowOpened = true;
 			msg  = "Player " + opponentIdentity + " chose not to look at your offer.";
 			$.prompt(msg, { callback: offerDeclinedDialogAction, 
 							container: "html",
+              prefix: "denied",
+							zIndex: "999",
 							opacity: 0.8,
 							show:"fadeIn",
 							overlayspeed: 0,
@@ -345,6 +354,7 @@
 	}
 	
 	function incomingOfferDialogAction(buttonValue, msg){
+	  dialogeWindowOpened = false; // set the window open status to false
 		if (buttonValue == "View Offer") {
 			// Check if the transactionSummary screen is showing. If so
 			// the other player must have canceled the offer while waiting.
@@ -362,6 +372,7 @@
 		}
 	}
 	function offerDeclinedDialogAction(buttonValue, msg){
+	  dialogeWindowOpened = false; // set the window open status to false
 		showScreen("offerFormulation");
 	}
 
