@@ -303,27 +303,27 @@ textarea{
 
 /* Dialogs by the jquery Impromptu plugin */
 
-div.jqifade{
+div.jqifade, div.deniedfade{
       background-color: #000;
 }
-div.jqi{
+div.jqi, div.denied{
       background-color: #ccc;
       padding: 2px;
       width: 300px;
 }
-div.jqi .jqicontainer{
+div.jqi .jqicontainer, div.denied .deniedcontainer{
       padding: 5px;
       color: #000;
 }
-div.jqi .jqimessage{
+div.jqi .jqimessage, div.denied .deniedmessage{
       background-color: #fff;
       padding: 15px;
 }
-div.jqi .jqibuttons{
+div.jqi .jqibuttons, div.denied .deniedbuttons{
       text-align: center;
       padding: 5px 0 0 0;
 }
-div.jqi button{
+div.jqi button, div.denied button{
 	border: 1px solid #999999;
 	border-top-color: #CCCCCC;
 	border-left-color: #CCCCCC;
@@ -333,6 +333,7 @@ div.jqi button{
 	font-size: .8em;
 	margin: 0 10px;
 }
+
 
 
 /* Tabs  */
