@@ -29,8 +29,10 @@
 		exchangeParametersJSON = '{{exchangeParametersJSON}}'.parseJSON();
 		
 		// These numbers are used to build strings e.g. p1x
-		playerNumber = {{playerNumber}} + 1;
-		opponentNumber = {{opponentNumber}} + 1;
+		//playerNumber = {{playerNumber}} + 1;
+		//opponentNumber = {{opponentNumber}} + 1;
+		playerNumber = 1;
+		opponentNumber = 2;
 		
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {

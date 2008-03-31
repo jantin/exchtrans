@@ -5,3 +5,42 @@ experimentStatus requires the following predefined values:
   Waiting for participants
   Archived
   In progress
+  
+  
+Poll process:
+  getPollURL
+  checkForOpponentPollProcess
+  getPollURL
+  checkForOpponentPollProcess
+  getPollURL
+  checkForOpponentPollProcess
+  getPollURL...
+  
+  "Click Begin"
+  makeOfferButton
+  getPollURL
+  checkForOfferPollProcess
+  getPollURL
+  checkForOfferPollProcess
+  ...
+  ...
+  
+  "Offer"
+  offerFormulation
+  getPollURL
+  waitingScreenPollProcess
+  getPollURL
+  ...
+  ...
+  
+  Player 2
+  "End Round"
+  incomingOffer
+  getPollURL
+  ...
+  confirmEndRound
+  --{"stopTimer": true, "transactionType": "youEndedTheRound", "processor": "confirmEndRound", "showScreen": "transactionSummary"}
+  
+  Player 1
+  --response to the end round button being pressed by player 2
+  {"stopTimer": true, "transactionType": "opponentEndedRound", "processor": "waitingScreenPollProcess", "showScreen": "transactionSummary"}
