@@ -36,7 +36,7 @@ function et_points(){
 
 	this.lastResponse;
 
-	this.calculatePoints = function(){
+	this.calculatePoints = function(){	  
 		// todo: Make sure all the variables we're going to use are present. 
 		if(!this.verifyObjectVariables()){
 			console.log("Error: verifyObjectVariables failed");
@@ -81,6 +81,8 @@ function et_points(){
 				p1Loss = this.request * eval('this.p1'+this.requestUnit.toLowerCase()+'Value');
 				p2Loss = this.offer * eval('this.p2'+this.offerUnit.toLowerCase()+'Value');
 			}
+			
+      
 
 			// calculate the potential points
 			p1Points = p1InitialPoints + (p1Gain - p1Loss);

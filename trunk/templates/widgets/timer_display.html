@@ -98,7 +98,7 @@ function widget_timerLoop(){
 
 	if(widget_timerMins == "0" && widget_timerSecs == "00"){
 		clearTimeout(widget_timerTimeout);
-		//$("html").trigger("widget_timer_event_timeout");
+    $("html").trigger("widget_timer_event_timeout");
 		return;
 	}
 

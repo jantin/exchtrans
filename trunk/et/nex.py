@@ -178,7 +178,8 @@ def nexDisplay(request):
 	return render_to_response("nex/nex_display.html", 
 							{	'opponentIdentity': request.session['opponent'].identityLetter,
 								'exchangeParametersJSON': exchangeParametersJSON,
-								'playerNumber': request.session['p'].number,
+                'playerNumber': request.session['p'].number,
+                # 'playerNumber': request.session['playerNumber'],
 								'opponentNumber': request.session['opponent'].number,
 								'widgets': widgets,
 								'startingX': request.session['startingX'],
@@ -354,7 +355,7 @@ def checkForOfferPollProcess(request):
 		
 		# set up a log_nex object. It will be completed and saved later depending on the outcome
 		request.session['logEntry'] = init_log_nex(request)
-		request.session['logEntry'].initiatedOffer = 0		
+		request.session['logEntry'].initiatedOffer = 0
 		
 		# Not checking for cancel while waiting because it's not fully implemented
 		# setPollURL(request, "/nex/checkForCancelWhileWaitingPollProcess/")
@@ -462,7 +463,7 @@ def offerFormulation(request):
 		
 		# set up a log_nex object. It will be completed and saved later depending on the outcome
 		request.session['logEntry'] = init_log_nex(request)
-		request.session['logEntry'].initiatedOffer = 1		
+		request.session['logEntry'].initiatedOffer = 1
 		
 		response['resetFormulationForms'] = True
 		response['showScreen'] = "waitingScreen"
@@ -485,7 +486,6 @@ def offerFormulation(request):
 		# set up a log_nex object. It will be completed and saved later depending on the outcome
 		request.session['logEntry'] = init_log_nex(request)
 		request.session['logEntry'].initiatedOffer = 0
-				
 		
 		setPollURL(request, "/nex/checkForCancelWhileWaitingPollProcess/")
 		response['showDialog'] = "incomingOffer"
@@ -852,6 +852,11 @@ def confirmEndRound(request):
 		response['stopTimer'] = True
 	elif(confirmed == 'No'):
 		response['showScreen'] = "incomingOffer"
+		# reset the session log object so that the 'endedRound' log doesn't get
+		# deleted
+		request.session['logEntry'] = init_log_nex(request)
+		request.session['logEntry'].initiatedOffer = 0
+		
 		
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 

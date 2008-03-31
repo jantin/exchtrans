@@ -30,12 +30,27 @@
 	$(document).ready(function() { 
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
-			clearTimeout(timeout);
-			$("#transactionSummaryMessage").html("You ran out of time.");
-			$('#transactionSummaryOfferFromOpponent').css({display:"none"});
-			$('#transactionSummaryOfferToOpponent').css({display:"none"});
-			$("#transactionSummaryMessage").css({display:"block"});
-			showScreen("transactionSummary");
+      // clearTimeout(timeout);
+			
+      // <form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off" id="offerForulationForm">
+      //        <input type="submit" name="makeOfferSubmit" value="Don't Offer" class="buttonBig" id="dontOffer"/>
+      //      </form>
+    	
+    	// simulate an ajax submission from the don't offer button
+    	$('.offeredX').html("0");
+		  $('.offeredY').html("0");
+    	
+			var url = '/rex/offerFormulation/';
+      $.ajax({url: url,
+              type: 'POST',
+              data: "makeOfferSubmit=Don't+Offer",
+              success: processFormResponse});
+
+      // $("#transactionSummaryMessage").html("You ran out of time.");
+      // $('#transactionSummaryOfferFromOpponent').css({display:"none"});
+      // $('#transactionSummaryOfferToOpponent').css({display:"none"});
+      // $("#transactionSummaryMessage").css({display:"block"});
+      // showScreen("transactionSummary");
 		});
 		
 		// Bind the input fields of the offerFormulation screen
@@ -56,6 +71,7 @@
 		// When the player submits an offer, update the "offeredY" and "offeredX" spans.
 		// The value of these divs is used to calculate points when the transaction summary is shown
 		$('#offerFormulationOfferSubmit').bind("click", function(event){
+		  offerSubmitted = true; // submitted the offer
 			var offeredX = $("#offerFormulationOfferX").val();
 			var offeredY = $("#offerFormulationOfferY").val();
 			if(offeredX.length > 0 && !isNaN(offeredX)){
@@ -95,7 +111,6 @@ responseJSON = responseText.parseJSON();
 		examineJSON(responseJSON);
 		return;
 	}
-
 
 	// This function polls the server
 	function pollServer(pollURL, interval){
@@ -194,7 +209,7 @@ responseJSON = responseText.parseJSON();
 		letter = letter.toUpperCase();
 		$('#available' + letter).html(amount);
 		$("#available" + letter).css("backgroundColor","yellow");
-		$("#available" + letter).animate({ backgroundColor: "#FFF" }, {queue:false, duration:2000});
+		$("#available" + letter).animate({backgroundColor: "#FFF"}, {queue:false, duration:2000});
 	}
 	
 	// This function displays only the specified screen. screenName should be the the div ID
@@ -228,7 +243,7 @@ responseJSON = responseText.parseJSON();
 		}
 		
 		// update available X and Y with what's currently displayed
-		if(pNum == 1){
+		if (pNum == 1) {
 			options['p1x'] = $("#availableX").html();
 			options['p1y'] = $("#availableY").html();
 		} else {
