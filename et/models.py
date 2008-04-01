@@ -231,6 +231,7 @@ class log_rex(models.Model):
 	declinedToMakeOffer = models.TextField()
 	pointChange = models.IntegerField()
 	timestamp = models.DateTimeField(auto_now_add=True)
+	note = models.TextField()
 	
 	class Admin:
 		pass

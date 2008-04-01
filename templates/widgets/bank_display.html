@@ -25,6 +25,10 @@ $(document).ready(function() {
 		widget_bank_set(newPointVal);
 	});
 	
+	$("html").bind("widget_bank_event_reset", function(event) {
+	  widget_bank_set(0);
+	});
+	
 });
 
 function widget_bank_set(newPointVal){
