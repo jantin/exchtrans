@@ -120,10 +120,14 @@
 	
 }
 
-.offerError, .requestError{
+.offerError, .requestError {
 	color: #F00;
 	position:absolute;
 	margin:.6em;
+}
+
+.generalErrorMessages {
+	color: #F00;
 }
 
 #incomingOfferInsufficientFunds{

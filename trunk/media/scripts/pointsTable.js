@@ -20,24 +20,14 @@ var PointsTable = window.PointsTable = new function() {
   // reset them, paint them, throw them out, you can't even iterate
   // over them.
   
-  // table is indexed by the amount of Y received.
-  // this confuses me but it's the way I was handed the data.
-  // so, for example, I was given this data:
+  // The table is indexed by the amount of X given.
+  // For example, I was given this data:
   // GIVE X	|| RECEIVE Y	|| OFFER TOTALS FOR P1	|| OFFER TOTALS FOR P2
   // 10	        1	          -19	                      80
   // 9	        1	          -18	                      79
   // 8	        1	          -17	                      78
   // 7	        1	          -16	                      77
   // 6	        1	          -15	                      76
-  //
-  // so the table is build like:
-  // [
-  //  [[10, 51], [9, 52], [8, 53], [], [], [], [], [], [], []]
-  //  [],
-  //  []
-  // ]
-  // in this way you look up the y points received first:
-  // table[1][2] would be equal to 1 y point received and 2 x points given
   var xytable = [
     // give 1x
     [[10,51], [15,46], [20,41], [25,36], [30,31], [60,1], [65,-4], [70,-9], [75,-14], [80,-19]],
@@ -66,7 +56,7 @@ var PointsTable = window.PointsTable = new function() {
   // yytable[1][4];
   // the returned [-2,4] are the points given to p1 and p2 respectively
   var xxtable = [
-    [[1,1], [0,2], [-1,3], [-2,4], [-3,5], [-4,6], [-5,7], [-6,8], [-7.9], [-8,10]]
+    [[1,1], [0,2], [-1,3], [-2,4], [-3,5], [-4,6], [-5,7], [-6,8], [-7,9], [-8,10]]
   ];
   
   // Give 1 Y and receive 4 y = [4,-2]
@@ -100,6 +90,13 @@ var PointsTable = window.PointsTable = new function() {
     }
     else {
       table = xytable;
+      // Handle the inversion, that is the user offers 1 y for 3 x instead
+      // of 3 x for 1 y
+      if (giveType == 'y') {
+        var tempIndex = giveIndex;
+        giveIndex = receiveIndex;
+        receiveIndex = tempIndex;
+      }
     }
     
     if ((giveIndex < 0 || giveIndex > table.length - 1) ||

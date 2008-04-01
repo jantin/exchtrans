@@ -14,7 +14,7 @@ from time import sleep
 
 class rexOfferObj(object):
 	"""A Data structure for holding participant offers"""
-	def __init__(	self, 
+	def __init__( self, 
 					offeredX = None, 
 					offeredY = None,
 					offeredBy = None
@@ -25,7 +25,7 @@ class rexOfferObj(object):
 
 class rexObj(object):
 	"""A Data structure for holding parameters"""
-	def __init__(	self, 
+	def __init__( self, 
 					p1x = 20, 
 					p1y = 10,
 					p1xValue = 5, 
@@ -47,6 +47,7 @@ class rexObj(object):
 					p2yRequiredGift = 5,
 					p2RequireGift = False,
 					showPoints = False,
+					resetPoints = False,
 					widgets = []
 				):
 		self.p1x = p1x
@@ -70,6 +71,7 @@ class rexObj(object):
 		self.p2yRequiredGift = p2yRequiredGift
 		self.p2RequireGift = p2RequireGift
 		self.showPoints = showPoints
+		self.resetPoints = resetPoints
 		self.widgets = widgets
 
 @login_required
@@ -91,6 +93,11 @@ def rexEdit(request):
 		p2RequireGift = True
 	else:
 		p2RequireGift = False
+	
+	if(request.POST.get("resetPoints") == "on"):
+		resetPoints = True
+	else:
+		resetPoints = False
 
 	widgetCount = request.POST.get("widgetCount")
 	widgets = []
@@ -123,6 +130,7 @@ def rexEdit(request):
 								p2yRequiredGift = request.POST.get("p2yRequiredGift"),
 								p2RequireGift = p2RequireGift,
 								showPoints = showPoints,
+								resetPoints = resetPoints,
 								widgets = widgets
 								)
 
@@ -135,8 +143,8 @@ def rexEdit(request):
 	
 	response = "Component Saved"
 	return render_to_response('api.html', 
-						  {'response': response}, 
-						  context_instance=RequestContext(request))
+							{'response': response}, 
+							context_instance=RequestContext(request))
 
 
 
@@ -244,7 +252,7 @@ def rexDisplay(request):
 	widgets = prepareWidgets(request.session['exchangeParameters'].widgets)
 	
 	return render_to_response("rex/rex_display.html", 
-							{	'opponentIdentity': request.session['opponent'].identityLetter,
+							{ 'opponentIdentity': request.session['opponent'].identityLetter,
 								'exchangeParametersJSON': exchangeParametersJSON,
 								'playerNumber': request.session['playerNumber'],
 								'widgets': widgets,
@@ -254,7 +262,7 @@ def rexDisplay(request):
 								'xValue': request.session['xValue'],
 								'yValue': request.session['yValue']
 							}, 
-						  	context_instance=RequestContext(request))
+								context_instance=RequestContext(request))
 
 
 def checkForOpponentPollProcess(request):
@@ -297,8 +305,8 @@ def checkForOpponentPollProcess(request):
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': jsonString}, 
-						  context_instance=RequestContext(request))
+							{'response': jsonString}, 
+							context_instance=RequestContext(request))
 
 def makeOfferButton(request):
 	"""Handles the makeOfferButton form screen"""
@@ -313,8 +321,8 @@ def makeOfferButton(request):
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': jsonString}, 
-						  context_instance=RequestContext(request))
+							{'response': jsonString}, 
+							context_instance=RequestContext(request))
 
 def offerFormulation(request):
 	"""Records the offer (gift) of the player and sends them to the waiting screen"""
@@ -345,10 +353,10 @@ def offerFormulation(request):
 			offeredY = int(request.POST.get('offerFormulationOfferY'))
 			offeredY = str(offeredY)
 		
-	offerObj = rexOfferObj(	offeredX = offeredX,
+	offerObj = rexOfferObj( offeredX = offeredX,
 							offeredY = offeredY,
 							offeredBy = request.session['p'].name
-						   )
+							 )
 	offerInsertKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['p'].name
 	offerInsert = SessionVar(experimentSession=request.session['s'], key=offerInsertKey, value=pickle.dumps(offerObj)).save()
 	
@@ -357,7 +365,7 @@ def offerFormulation(request):
 	
 	# Update the players X and Y
 	request.session['currentX'] -= int(offerObj.offeredX)
-	response['setX'] = str(request.session['currentX'])	
+	response['setX'] = str(request.session['currentX']) 
 	request.session['currentY'] -= int(offerObj.offeredY)
 	response['setY'] = str(request.session['currentY'])
 	
@@ -370,13 +378,13 @@ def offerFormulation(request):
 		
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': jsonString}, 
-						  context_instance=RequestContext(request))
+							{'response': jsonString}, 
+							context_instance=RequestContext(request))
 
 
 def waitingScreenPollProcess(request):
 	"""Polls to see if the other player has offered"""
-	response = {}	
+	response = {} 
 	response['processor'] = "waitingScreenPollProcess"
 	
 	# Try to get an offer from the other player
@@ -416,8 +424,8 @@ def waitingScreenPollProcess(request):
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': jsonString}, 
-						  context_instance=RequestContext(request))
+							{'response': jsonString}, 
+							context_instance=RequestContext(request))
 
 
 def transactionSummary(request):
@@ -453,7 +461,8 @@ def transactionSummary(request):
 			yValue=request.session['yValue'],
 			requiredGift=request.session['requiredGift'],
 			declinedToMakeOffer = request.session['declinedToMakeOffer'],
-			pointChange=request.session['earnedPoints']
+			pointChange=request.session['earnedPoints'],
+			note=''
 			).save()
 	
 	response = {}
@@ -463,6 +472,36 @@ def transactionSummary(request):
 	request.session['currentRound'] += 1
 	if(int(request.session['currentRound']) > int(request.session['currentPairing']['rounds'])):
 		# If going on to the next pairing, redirect to the matcher display function which will figure out what to do next
+		if (request.session['exchangeParameters'].resetPoints):
+			
+			# This is a hack to show that the practice round ended
+			log_rex(sid=request.session['s'].id,
+					cid=request.session['exchangeComponentID'],
+					componentIndex=request.session['p'].currentComponent+1,
+					roundIndex=request.session['currentRound'],
+					participantName=request.session['p'].name,
+					participantPartner=request.session['opponent'].name,
+					startingX=request.session['startingX'],
+					startingY=request.session['startingY'],
+					xLoss=request.session['xLoss'],
+					xGain=request.session['xGain'],
+					yLoss=request.session['yLoss'],
+					yGain=request.session['yGain'],
+					xValue=request.session['xValue'],
+					yValue=request.session['yValue'],
+					requiredGift=request.session['requiredGift'],
+					declinedToMakeOffer = request.session['declinedToMakeOffer'],
+					pointChange=0,
+					note='ended practice round'
+					).save()
+			
+			request.session['p'].cumulativePoints = 0
+		
+			# Save the participant's points in the database
+			participantObj = Participant.objects.get(name=request.session['p'].name)
+			participantObj.cumulativePoints = 0
+			participantObj.save()
+		
 		response['redirect'] = "/matcher/display/?sid=" + str(request.session['s'].id) + "&pname=" + request.session['p'].name + "&increment=1"
 	else:
 		# Moving on to the next round. Write a message that the player is ready
@@ -477,8 +516,8 @@ def transactionSummary(request):
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': jsonString}, 
-						  context_instance=RequestContext(request))
+							{'response': jsonString}, 
+							context_instance=RequestContext(request))
 
 def nextRoundCountdownPollProcess(request):
 	"""Waits for the other player to click continue after transaction summary screen."""
@@ -528,8 +567,8 @@ def nextRoundCountdownPollProcess(request):
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': jsonString}, 
-						  context_instance=RequestContext(request))
+							{'response': jsonString}, 
+							context_instance=RequestContext(request))
 
 
 def nextRoundCountdown(request):
@@ -540,8 +579,8 @@ def nextRoundCountdown(request):
 	
 	jsonString = simplejson.dumps(response)
 	return render_to_response('api.html', 
-						  {'response': jsonString}, 
-						  context_instance=RequestContext(request))
+							{'response': jsonString}, 
+							context_instance=RequestContext(request))
 
 		
 	
