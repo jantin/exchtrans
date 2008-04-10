@@ -25,32 +25,33 @@
 	
   // I hate to do this, but here is the ugly global
 	var responseJSON = null;
+	
+	// this is used by the timer so that it knows that if the player has
+	// made an offer, it shouldn't do anything.
+	var timerMadeOffer = false;
 
 	// Code to run after the page is completely loaded.
 	$(document).ready(function() { 
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
-      // clearTimeout(timeout);
-			
-      // <form action="/rex/offerFormulation/" method="post" accept-charset="utf-8" autocomplete="off" id="offerForulationForm">
-      //        <input type="submit" name="makeOfferSubmit" value="Don't Offer" class="buttonBig" id="dontOffer"/>
-      //      </form>
+      if (!timerMadeOffer) {
+        
+      	// simulate an ajax submission from the don't offer button
+      	$('.offeredX').html("0");
+  		  $('.offeredY').html("0");
     	
-    	// simulate an ajax submission from the don't offer button
-    	$('.offeredX').html("0");
-		  $('.offeredY').html("0");
-    	
-			var url = '/rex/offerFormulation/';
-      $.ajax({url: url,
-              type: 'POST',
-              data: "makeOfferSubmit=Don't+Offer",
-              success: processFormResponse});
+  			var url = '/rex/offerFormulation/';
+        $.ajax({url: url,
+                type: 'POST',
+                data: "makeOfferSubmit=Don't+Offer",
+                success: processFormResponse});
 
-      // $("#transactionSummaryMessage").html("You ran out of time.");
-      // $('#transactionSummaryOfferFromOpponent').css({display:"none"});
-      // $('#transactionSummaryOfferToOpponent').css({display:"none"});
-      // $("#transactionSummaryMessage").css({display:"block"});
-      // showScreen("transactionSummary");
+        // $("#transactionSummaryMessage").html("You ran out of time.");
+        // $('#transactionSummaryOfferFromOpponent').css({display:"none"});
+        // $('#transactionSummaryOfferToOpponent').css({display:"none"});
+        // $("#transactionSummaryMessage").css({display:"block"});
+        // showScreen("transactionSummary");
+      }
 		});
 		
 		// Bind the input fields of the offerFormulation screen
@@ -71,7 +72,7 @@
 		// When the player submits an offer, update the "offeredY" and "offeredX" spans.
 		// The value of these divs is used to calculate points when the transaction summary is shown
 		$('#offerFormulationOfferSubmit').bind("click", function(event){
-		  offerSubmitted = true; // submitted the offer
+		  timerMadeOffer = true; // submitted the offer
 			var offeredX = $("#offerFormulationOfferX").val();
 			var offeredY = $("#offerFormulationOfferY").val();
 			if(offeredX.length > 0 && !isNaN(offeredX)){

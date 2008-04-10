@@ -80,7 +80,7 @@ var PointsTable = window.PointsTable = new function() {
     // variables.
     var giveIndex = give - 1;
     var receiveIndex = receive -1;
-    var table; // holds the chosen table
+    var table; // holds the chosen table, that is xy, xx, or yytable
     
     if (giveType == 'x' && receiveType == 'x') {
       table = xxtable;

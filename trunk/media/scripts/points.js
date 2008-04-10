@@ -89,22 +89,26 @@ function et_points(){
 			var requestType = this.requestUnit.toLowerCase();
       var offerType = this.offerUnit.toLowerCase();
       var pointsExchange = PointsTable.findTotal(offerType, requestType, this.offer, this.request);
+      
+      // 
+      p1Gain = pointsExchange[0];
+      p2Gain = pointsExchange[1];
 			
-			if(this.offeredBy == "p1" && pointsExchange){
-        // p1Gain = this.request * eval('this.p1'+this.requestUnit.toLowerCase()+'Value');
-        // p2Gain = this.offer * eval('this.p2'+this.offerUnit.toLowerCase()+'Value');
-        // p1Loss = this.offer * eval('this.p1'+this.offerUnit.toLowerCase()+'Value');
-        // p2Loss = this.request * eval('this.p2'+this.requestUnit.toLowerCase()+'Value');
-        p1Gain = pointsExchange[0];
-        p2Gain = pointsExchange[1];
-			} else if(this.offeredBy == "p2" && pointsExchange) {
-        // p1Gain = this.offer * eval('this.p1'+this.offerUnit.toLowerCase()+'Value');
-        // p2Gain = this.request * eval('this.p2'+this.requestUnit.toLowerCase()+'Value');
-        // p1Loss = this.request * eval('this.p1'+this.requestUnit.toLowerCase()+'Value');
-        // p2Loss = this.offer * eval('this.p2'+this.offerUnit.toLowerCase()+'Value');
-        p1Gain = pointsExchange[1];
-        p2Gain = pointsExchange[0];
-			}
+      // if(this.offeredBy == "p1" && pointsExchange){
+      //         // p1Gain = this.request * eval('this.p1'+this.requestUnit.toLowerCase()+'Value');
+      //         // p2Gain = this.offer * eval('this.p2'+this.offerUnit.toLowerCase()+'Value');
+      //         // p1Loss = this.offer * eval('this.p1'+this.offerUnit.toLowerCase()+'Value');
+      //         // p2Loss = this.request * eval('this.p2'+this.requestUnit.toLowerCase()+'Value');
+      //         p1Gain = pointsExchange[0];
+      //         p2Gain = pointsExchange[1];
+      // } else if(this.offeredBy == "p2" && pointsExchange) {
+      //         // p1Gain = this.offer * eval('this.p1'+this.offerUnit.toLowerCase()+'Value');
+      //         // p2Gain = this.request * eval('this.p2'+this.requestUnit.toLowerCase()+'Value');
+      //         // p1Loss = this.request * eval('this.p1'+this.requestUnit.toLowerCase()+'Value');
+      //         // p2Loss = this.offer * eval('this.p2'+this.offerUnit.toLowerCase()+'Value');
+      //         p1Gain = pointsExchange[1];
+      //         p2Gain = pointsExchange[0];
+      // }
 
 			// calculate the potential points
 			// p1Points = p1InitialPoints + (p1Gain);
