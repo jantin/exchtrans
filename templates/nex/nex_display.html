@@ -25,6 +25,10 @@
 	// this is used by the timer so that it knows that if the player has
 	// made an offer, it shouldn't do anything.
 	var timerMadeOffer = false; 
+	
+	// n8: this holds the timeout object so that if the timer runs down,
+	// the current request does not continue to ping the server.
+	var timeout = null;
 
 	// Code to run after the page is completely loaded.
 	$(document).ready(function() {
@@ -41,12 +45,26 @@
 		
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
-			clearTimeout(timeout);
-			$("#transactionSummaryMessage").html("You ran out of time.");
-			$('#transactionSummaryOfferFromOpponent').css({display:"none"});
-			$('#transactionSummaryOfferToOpponent').css({display:"none"});
-			$("#transactionSummaryMessage").css({display:"block"});
+		  // close this overlay
+		  if ($('#deniedbuttonOk').length > 0) $('#deniedbuttonOk')[0].click();
+		  
+		  if ($('#jqifade').length > 0) { $('#jqifade').remove(); }
+		  if ($('#jqi').length > 0) { $('#jqi').remove(); }
+      
+		  
+			//clearTimeout(timeout);
+			$("html").trigger("widget_timer_event_stopTimer");
+			// n8: hide all the nonsense
+			$('.transactionSummaryMessages').css({display:"none"});
+			// n8: show the transation summary container
+			// no idea if this is the best place for this stuff
 			showScreen("transactionSummary");
+			// n8: show the screen that says that no transacation was agreed upon
+      $("#transactionSummary_timeRanOut").css({display:"block"});
+      
+      // nothing was agreed upon by the individuals, so each player gets
+      // however many points they started with.
+      $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
 		});
 		
     // $('#confirmEndRoundSubmit').click(function(event){
@@ -206,13 +224,13 @@
 					dataType: "json", 
 					success: function(pollServer){
 						if(pollServer['pollURL'] == "None"){
-							setTimeout("pollServer()", 1000);
+							timeout = setTimeout("pollServer()", 1000);
 						} else {
 							$.ajax({	url: pollServer['pollURL'], 
 										dataType: "json", 
 										success: function(responseJSON){
 											examineJSON(responseJSON);
-											setTimeout("pollServer()", 1000);
+											timeout = setTimeout("pollServer()", 1000);
 										}
 									});
 						}
@@ -597,6 +615,9 @@
 	<br/><br/>
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/><br/>
+	<div id="transactionSummary_timeRanOut" class="transactionSummaryMessages">
+	  No exchange was agreed upon before time ran out.
+  </div>
 	<div id="transactionSummary_youEndedTheRound" class="transactionSummaryMessages">
 		You ended the round.
 	</div>

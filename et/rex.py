@@ -330,6 +330,12 @@ def offerFormulation(request):
 	response = {}
 	response['processor'] = "offerFormulation"
 	
+	# n8: set this to False so that it is only set to True if if the user
+	# really declined to make an offer.  Otherwise, the declinedToMakeOffer
+	# variable is set to True when they really don't make an offer and then
+	# stays True indefinitely.
+	request.session['declinedToMakeOffer'] = False
+	
 	# If this has a value, the player declined to make an offer
 	if(request.POST.get('makeOfferSubmit')):
 		offeredX = "0"

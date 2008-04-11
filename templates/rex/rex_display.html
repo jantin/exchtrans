@@ -52,6 +52,9 @@
         // $("#transactionSummaryMessage").css({display:"block"});
         // showScreen("transactionSummary");
       }
+      else {
+        timerMadeOffer = false;
+      }
 		});
 		
 		// Bind the input fields of the offerFormulation screen
@@ -72,7 +75,8 @@
 		// When the player submits an offer, update the "offeredY" and "offeredX" spans.
 		// The value of these divs is used to calculate points when the transaction summary is shown
 		$('#offerFormulationOfferSubmit').bind("click", function(event){
-		  timerMadeOffer = true; // submitted the offer
+		  // submitted the offer so make sure the timer doesn't run out
+		  timerMadeOffer = true;
 			var offeredX = $("#offerFormulationOfferX").val();
 			var offeredY = $("#offerFormulationOfferY").val();
 			if(offeredX.length > 0 && !isNaN(offeredX)){
@@ -85,6 +89,9 @@
 		
 		// try to clear out the offeredX and Y values
 		$('#dontOffer').bind("click", function(event) {
+		  // again, deal with the timer by making sure it doesn't
+		  // try to resubmit the request
+		  timerMadeOffer = true;
 		  $('.offeredX').html("0");
 		  $('.offeredY').html("0");
 		})
@@ -439,7 +446,7 @@ responseJSON = responseText.parseJSON();
 	<h1>Exchanging with Player {{opponentIdentity}}</h1>
 	<br/>
 	<p>Player {{opponentIdentity}} gave you <b><span class="incomingX">0</span> X</b> and <b><span class="incomingY">0</span> Y</b> - worth a total of <b><span class="totalIncoming">0</span></b> point(s).</p>
-	<p>You gave Player {{opponentIdentity}} <b><span class="offeredX">0</span> X</b> and <b><span class="offeredY">0</span> Y</b> - worth a total of <b><span class="totalOffered">0</span></b> point(s).</p>
+	<p>You gave Player {{opponentIdentity}} <b><span class="offeredX">0</span> X</b> and <b><span class="offeredY">0</span> Y</b> - costing you a total of <b><span class="totalOffered">0</span></b> point(s).</p>
 	<p>You have <b><span class="remainingX">-</span> X</b> and <b><span class="remainingY">-</span> Y</b> that you chose not to give this round - worth a total of <b><span class="totalRemaining">0</span></b> point(s).</p>
 	<p>A total of <b><span class="currentPoints">-</span></b> point(s) will be added to your bank from this round.</p>
 	<p>

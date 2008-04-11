@@ -53,7 +53,8 @@ CREATE TABLE `et_log_rex` (
     `yValue` integer NOT NULL,
     `requiredGift` longtext NOT NULL,
     `pointChange` integer NOT NULL,
-    `timestamp` datetime NOT NULL
+    `timestamp` datetime NOT NULL,
+    `note` longtext NOT NULL
 );
 CREATE TABLE `et_componenttypes` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
