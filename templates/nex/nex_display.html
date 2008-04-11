@@ -45,14 +45,20 @@
 		
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
-		  // close this overlay
+		  // close the offer denied overlay
 		  if ($('#deniedbuttonOk').length > 0) $('#deniedbuttonOk')[0].click();
 		  
+		  // close the offer available overlays
 		  if ($('#jqifade').length > 0) { $('#jqifade').remove(); }
 		  if ($('#jqi').length > 0) { $('#jqi').remove(); }
       
+		  // handle both recording in the db that time ranout and mark any
+		  // outstanding offers as read
+		  $.ajax({
+		    url: "/nex/timerRanOut/"
+		  });
 		  
-			//clearTimeout(timeout);
+			// stop the timer
 			$("html").trigger("widget_timer_event_stopTimer");
 			// n8: hide all the nonsense
 			$('.transactionSummaryMessages').css({display:"none"});
@@ -64,7 +70,7 @@
       
       // nothing was agreed upon by the individuals, so each player gets
       // however many points they started with.
-      $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
+      $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'x']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'y']);
 		});
 		
     // $('#confirmEndRoundSubmit').click(function(event){
@@ -303,12 +309,12 @@
 			// default number of points you had before you started trading in the
 			// round.
 			if (responseJSON['transactionType'] == 'youEndedTheRound') {
-        $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
-		  }
+        $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'x']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'y']);
+      }
 		  
 		  if (responseJSON['transactionType'] == 'opponentEndedRound') {
-        $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'xMaxRequest']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'yMaxRequest']);
-		  }
+        $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'x']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'y']);
+      }
 		}
 		if(responseJSON['nonBindingOfferType']){
 			$('#nonBindingConfirmationOfferFromOpponent').css({display:"none"});
@@ -636,7 +642,7 @@
 		Player {{opponentIdentity}} offered <strong><span class="currentGain">-</span> <span class="currentGainUnit">-</span></strong>(s) - worth a total of <span class="totalGain">-</span> point(s). <br/>
 		In return you gave <strong><span class="currentLoss">-</span> <span class="currentLossUnit">-</span></strong>(s) - costing you a total of <span class="totalLoss">-</span> point(s). <br/>
 		<br/>
-		You received <strong><span class="currentPoints">-</span></strong>(s) points for this deal.
+		You received <strong><span class="currentPoints">-</span></strong> point(s) for this deal.
 	</div>
 	
 	<div id="transactionSummary_opponentAccepted" class="transactionSummaryMessages">

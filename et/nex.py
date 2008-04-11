@@ -873,6 +873,37 @@ def incomingOffer(request):
               {'response': jsonString}, 
               context_instance=RequestContext(request))
 
+# n8: this is a hack to deal with the timer ending in a NEX exchange
+# and create some record of it in the database.  it also takes a line
+# from the offerFormulation method which checks for any outstanding offers
+# and leaves them in the db, but marks them as read.  not happy about the
+# way this works... surprise!
+def timerRanOut(request):
+  request.session['logEntry'] = init_log_nex(request)
+  request.session['logEntry'].xGain = request.session['currentX']
+  request.session['logEntry'].yGain = request.session['currentY']
+  request.session['logEntry'].xLoss = 0
+  request.session['logEntry'].yLoss = 0
+  request.session['logEntry'].outcome = "timerRanOut"
+  request.session['logEntry'].save()
+
+  # try to find the offer
+  offerCheckKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['opponent'].name
+  try:
+    existingOffer = SessionVar.objects.get(key=offerCheckKey, unread=True, experimentSession=request.session['s'])
+  except:
+    pass # if the offer doesn't exist do nothing
+  else:
+    # mark the existing offer as read
+    existingOffer.unread = False
+    existingOffer.save()
+
+  response = {}
+  jsonString = simplejson.dumps(response)
+  return render_to_response('api.html', 
+              {'response': jsonString}, 
+              context_instance=RequestContext(request))
+
 def confirmEndRound(request):
   """Handles the confirmEndRound screen"""
   confirmed = request.POST.get('confirmEndRoundSubmit')
@@ -892,7 +923,6 @@ def confirmEndRound(request):
     # deleted
     request.session['logEntry'] = init_log_nex(request)
     request.session['logEntry'].initiatedOffer = 0
-    
     
   jsonString = simplejson.dumps(response)
   return render_to_response('api.html', 
