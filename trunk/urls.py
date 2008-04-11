@@ -74,6 +74,7 @@ urlpatterns = patterns('',
 	(r'^nex/nextRoundCountdownPollProcess/$', 'exchtran.et.nex.nextRoundCountdownPollProcess'),	
 	(r'^nex/nextRoundCountdown/$', 'exchtran.et.nex.nextRoundCountdown'),
 	(r'^nex/getPollURL/$', 'exchtran.et.nex.getPollURL'),
+	(r'^nex/timerRanOut/$', 'exchtran.et.nex.timerRanOut'), # n8 added to deal with time running out
 			
 	# Matcher
 	(r'^matcher/display/$', 'exchtran.et.matcher.matcherDisplay'),
