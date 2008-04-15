@@ -128,7 +128,7 @@
 		});
 		$("#counterOfferFormulationRequestUnit").change(function(){
 			offerPreview(true);
-		});
+		});	
 		
 		// Start polling server to check for opponents
 		pollServer();
@@ -347,14 +347,40 @@
 			$(".offerError").html("");
 			$(".requestError").html("");
 			$(".pointsPreview").html("--");
-			$("#counterOfferFormulationOffer").val("");
-			$("#counterOfferFormulationRequest").val("");
-			$("#counterOfferFormulationOfferUnit").val("x");
-			$("#counterOfferFormulationRequestUnit").val("y");
 			$("#offerFormulationOffer").val("");
 			$("#offerFormulationRequest").val("");
-			$("#offerFormulationOfferUnit").val("x");
-			$("#offerFormulationRequestUnit").val("y");
+			$("#counterOfferFormulationOffer").val("");
+			$("#counterOfferFormulationRequest").val("");
+      // $("#offerFormulationOfferUnit").val("x");
+      // $("#offerFormulationRequestUnit").val("y");
+      // $("#counterOfferFormulationOfferUnit").val("x");
+      // $("#counterOfferFormulationRequestUnit").val("y");
+			
+			
+			// n8: Check to see which value they have more of, X's or Y's.  Which
+			// ever one is more prevalent, assume they will trade more of and set 
+			// the defaults accordingly.
+			//
+			// This should fix a bug noted on 4/14 where players could not trade
+			// quickly enough when they had y's to give and x's to receive.
+			if (exchangeParametersJSON['p'+playerNumber+'x'] >
+  		    exchangeParametersJSON['p'+playerNumber+'y']) {
+  		  // first handle the offers or gives:
+  		  $('#offerFormulationOfferUnit').val("x");
+  		  $('#counterOfferFormulationOfferUnit').val("x");
+
+  		  // now set the default requests:
+  		  $('#offerFormulationRequestUnit').val("y");
+  		  $('#counterOfferFormulationRequestUnit').val("y");
+  		}
+  		else { // if the user has more y than x's:
+  		  $('#offerFormulationOfferUnit').val("y");
+  		  $('#counterOfferFormulationOfferUnit').val("y");
+
+  		  $('#offerFormulationRequestUnit').val("x");
+  		  $('#counterOfferFormulationRequestUnit').val("x");
+  		}
+			
 			$("#counterOfferFormulationSubmit").attr("disabled","disabled");
 			$("#offerFormulationOfferSubmit").attr("disabled","disabled");
 		}
@@ -476,8 +502,8 @@
 		<p>
 			<input type="text" name="offerFormulationRequest" id="offerFormulationRequest" class="offerFormulationInputs" value="" size="4" maxlength="4"/>
 			<select name="offerFormulationRequestUnit" id="offerFormulationRequestUnit">
-				<option>y</option>
 				<option>x</option>
+				<option>y</option>
 			</select>
 			<span id="offerFormulationRequestError" class="requestError"></span>
 		</p>
@@ -510,8 +536,8 @@
 		<p>
 			<input type="text" name="counterOfferFormulationRequest" id="counterOfferFormulationRequest" class="counterOfferFormulationInputs" value="" size="4" maxlength="4"/>
 			<select name="counterOfferFormulationRequestUnit" id="counterOfferFormulationRequestUnit">
-				<option>y</option>
 				<option>x</option>
+				<option>y</option>
 			</select>
 			<span id="counterOfferFormulationRequestError" class="requestError"></span>
 		</p>
