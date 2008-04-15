@@ -204,6 +204,18 @@ responseJSON = responseText.parseJSON();
 			$('.offeredY').html("0");
 		}
 		if(responseJSON['showScreen']){
+		  // n8: I can't believe I'm writing this here... I think I'm going to
+		  // puke on myself...
+		  // There is a bug with the timer that is caused by two players who keep 
+		  // making offers and then let the timer run down.  This sets
+		  // timerMadeOffer to true in an earlier round and then, when the timer
+		  // actually runs down it never gets reset to false.  I'm forcing a reset
+		  // to false here if the response is to show the transactionSummary page
+		  // indicating that the transaction was finished.  This is so terrible,
+		  // I can't even begin to explain it.
+		  if (responseJSON['showScreen'] == 'transactionSummary') {
+		    timerMadeOffer = false;
+		  }
 			showScreen(responseJSON['showScreen']);
 		}
 	}
