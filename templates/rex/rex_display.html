@@ -45,14 +45,9 @@
                 type: 'POST',
                 data: "makeOfferSubmit=Don't+Offer",
                 success: processFormResponse});
-
-        // $("#transactionSummaryMessage").html("You ran out of time.");
-        // $('#transactionSummaryOfferFromOpponent').css({display:"none"});
-        // $('#transactionSummaryOfferToOpponent').css({display:"none"});
-        // $("#transactionSummaryMessage").css({display:"block"});
-        // showScreen("transactionSummary");
       }
       else {
+        // reset the timer flag so that in the next round it can 
         timerMadeOffer = false;
       }
 		});
@@ -420,7 +415,7 @@ responseJSON = responseText.parseJSON();
 				<input type="text" name="offerFormulationOfferY" id="offerFormulationOfferY" class="offerFormulationInputs" value="" size="4" maxlength="4"/> Y
 				<span id="offerYError" class="offerError"></span>
 			</p>
-			<input type="submit" name="offerFormulationOfferSubmit" id="offerFormulationOfferSubmit" value="Submit" class="buttonBig" id="offerFormulationOfferSubmit" disabled="disabled"/>
+			<input type="submit" name="offerFormulationOfferSubmit" value="Submit" class="buttonBig" id="offerFormulationOfferSubmit" disabled="disabled"/>
 		</div>
 		<div id="offerFormulationRequiredGift" style="display:none">
 			<p>Do you want to give player {{opponentIdentity}} 

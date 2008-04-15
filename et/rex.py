@@ -480,7 +480,7 @@ def transactionSummary(request):
 		# If going on to the next pairing, redirect to the matcher display function which will figure out what to do next
 		if (request.session['exchangeParameters'].resetPoints):
 			
-			# This is a hack to show that the practice round ended
+			# n8: This is a hack to show that the practice round ended
 			log_rex(sid=request.session['s'].id,
 					cid=request.session['exchangeComponentID'],
 					componentIndex=request.session['p'].currentComponent+1,
