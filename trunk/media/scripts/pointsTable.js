@@ -1,4 +1,4 @@
-/** This is how you write javascript
+/**
  *
  * This is a simple javascript object which calculates the points for
  * display on the NEX offer page.  It uses a lookup table.
@@ -12,7 +12,8 @@
 // looking up the transaction total based on a given amount of X and Y offered
 // or received.    
 
-// This is a singleton!  Surprise!
+// This is a static instance of an anonymous function! Like a Singleton,
+// Surprise!
 var PointsTable = window.PointsTable = new function() {
   
   // The tables used by the PointsTable object are private.

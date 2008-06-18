@@ -22,10 +22,6 @@
   // to the tester
 	var dialogWindowOpened = false;
 	
-	// this is used by the timer so that it knows that if the player has
-	// made an offer, it shouldn't do anything.
-	var timerMadeOffer = false; 
-	
 	// n8: this holds the timeout object so that if the timer runs down,
 	// the current request does not continue to ping the server.
 	var timeout = null;
@@ -46,16 +42,26 @@
 		// Bind widget callbacks
 		$("html").bind("widget_timer_event_timeout", function (event) {
 		  // close the offer denied overlay
-		  if ($('#deniedbuttonOk').length > 0) $('#deniedbuttonOk')[0].click();
+		  if ($('#deniedbuttonOk').length > 0) {
+		    $('#deniedbuttonOk')[0].click(); 
+		  }
 		  
 		  // close the offer available overlays
-		  if ($('#jqifade').length > 0) { $('#jqifade').remove(); }
-		  if ($('#jqi').length > 0) { $('#jqi').remove(); }
+		  if ($('#jqifade').length > 0) {
+		    $('#jqifade').remove();
+		  }
+		  if ($('#jqi').length > 0) {
+		    $('#jqi').remove();
+		  }
       
-		  // handle both recording in the db that time ranout and mark any
-		  // outstanding offers as read
+		  // Handle both recording in the db that time ranout and mark any
+		  // outstanding offers as read.  This sets the behavior to async which
+		  // could potentially stall the browser, however we want to be sure that
+		  // the timerRanOut message is received and processed before the round
+      // continues.
 		  $.ajax({
-		    url: "/nex/timerRanOut/"
+		    url: "/nex/timerRanOut/",
+		    async: true
 		  });
 		  
 			// stop the timer
@@ -70,7 +76,11 @@
       
       // nothing was agreed upon by the individuals, so each player gets
       // however many points they started with.
-      $('#transactionSummaryPoints')[0].value = (points['p'+playerNumber+'xValue_raw'] * points['p'+playerNumber+'x']) + (points['p'+playerNumber+'yValue_raw'] * points['p'+playerNumber+'y']);
+      $('#transactionSummaryPoints')[0].value = 
+          (points['p'+playerNumber+'xValue_raw'] * 
+            points['p'+playerNumber+'x']) +
+          (points['p'+playerNumber+'yValue_raw'] * 
+            points['p'+playerNumber+'y']);
 		});
 		
     // $('#confirmEndRoundSubmit').click(function(event){
