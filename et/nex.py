@@ -309,33 +309,6 @@ def makeOfferButton(request):
   response['resetFormulationForms'] = True
   response['showScreen'] = "offerFormulation"
   
-  # n8: I moved this block of code that handles the timer start from the
-  # checkForOpponentPollProcess method because the timer was starting before
-  # the user was actually attempting to make a negotiation.
-  # This presents a problem, in that a user who clicks the "Click to begin"
-  # button prior to the other gets to start making an offer without the timer
-  # starting. That's because the timer starts only when both users are
-  # synchronized.
-  # On the other hand, you can think of this as not a necessarily
-  # bad thing since the objective is not to time the individuals, but to
-  # incentivise them to make a decision.
-  #
-  # check if the other player has set a start time message
-  # showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['p'].name
-  # try:
-  #   msg = SessionVar.objects.get(key=showTimeKey,unread=True, experimentSession=request.session['s'])
-  #   showTime = msg.value
-  #   msg.unread = False
-  #   msg.save()
-  # except:
-  #   # If not, set a start time and write it in a message to the other participant
-  #   # This synchronizes the timer's start time.
-  #   showTimeKey = request.session['keyPrefix'] + "_showTimeMessageTo_" + request.session['opponent'].name
-  #   showTime = int((time() + 3) * 1000)
-  #   SessionVar(key=showTimeKey, value=showTime, experimentSession=request.session['s']).save()
-  # 
-  # response['showTime'] = showTime
-  
   setPollURL(request, "/nex/checkForOfferPollProcess/")
   
   jsonString = simplejson.dumps(response)
@@ -877,9 +850,14 @@ def incomingOffer(request):
 # and create some record of it in the database.  it also takes a line
 # from the offerFormulation method which checks for any outstanding offers
 # and leaves them in the db, but marks them as read.  not happy about the
-# way this works... surprise!
+# way this works... surprise! (not even sure if it does work!)
 def timerRanOut(request):
-  request.session['logEntry'] = init_log_nex(request)
+
+  if (request.session['logEntry']):
+    # save the entrn, they start a new one
+    request.session['logEntry'].save()
+  
+  request.session['logEntry'] = init_log_nex(request)    
   request.session['logEntry'].xGain = request.session['currentX']
   request.session['logEntry'].yGain = request.session['currentY']
   request.session['logEntry'].xLoss = 0
@@ -887,16 +865,27 @@ def timerRanOut(request):
   request.session['logEntry'].outcome = "timerRanOut"
   request.session['logEntry'].save()
 
+  # Copied from above, we want to lock the table to prevent anyone from
+  # messing with it while the current offers are marked as read so they do not
+  # get the session out of sync.
+  from django.db import connection
+  cursor = connection.cursor()
+  cursor.execute("LOCK TABLES et_sessionvar WRITE, django_session WRITE, et_log_nex WRITE")
+  
   # try to find the offer
   offerCheckKey = request.session['keyPrefix'] + "_offerFrom_" + request.session['opponent'].name
   try:
     existingOffer = SessionVar.objects.get(key=offerCheckKey, unread=True, experimentSession=request.session['s'])
   except:
-    pass # if the offer doesn't exist do nothing
+    pass
+    #pass # if the offer doesn't exist do nothing
   else:
     # mark the existing offer as read
     existingOffer.unread = False
     existingOffer.save()
+
+  # unlock the tables
+  cursor.execute("UNLOCK TABLES")
 
   response = {}
   jsonString = simplejson.dumps(response)
@@ -1084,7 +1073,7 @@ def transactionSummary(request):
   if(int(request.session['currentRound']) > int(request.session['currentPairing']['rounds'])):
     # If going on to the next pairing, redirect to the matcher display function which will figure out what to do next
     
-    # n8 add block
+    # n8:
     # Figure out if this is just a practice round and if so, reset the points
     if (request.session['exchangeParameters'].resetPoints):
       request.session['logEntry'].outcome = "endedPracticeRound"
